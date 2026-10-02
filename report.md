@@ -17,3 +17,4 @@
 - Forward pass via `model.thinker.generate` (Talker removed with `disable_talker()`), synthetic inputs: text OK (peak 8.79 GB), image 224x224 noise OK (8.82 GB), audio 2 s 440 Hz tone OK (8.82 GB). Memory after load: 8.78 GB.
 - Caveats: inference only, no gradients or optimizer state; inputs are short synthetic ones. Training headroom is about 5.7 GB. `torch.cuda.is_bf16_supported()` returns True on the T4; native bf16 not verified, so we train in fp16.
 - Step 0 checkpoint reached; waiting for go-ahead before Step 1.
+- Audio notebook run 1 (2026-10-02): data build, model load, baseline eval and target discovery (144 q/k/v/o modules, 36 layers) worked. `get_peft_model` failed: `ImportError: Found an incompatible version of torchao. Found version 0.10.0, but only versions above 0.16.0 are supported` (Colab preinstalled torchao too old for the installed peft). Fix: uninstall torchao (unused), restart kernel.
