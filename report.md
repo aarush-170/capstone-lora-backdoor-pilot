@@ -38,3 +38,6 @@ Numbers below were pasted from the Colab output by the user; the adapter files a
 
 ## Step 5 feature extractor (2026-10-02)
 `common/features.py`: exact singular values of scaling * B @ A via QR + r x r SVD (tested against a full SVD on random matrices, max difference 2.7e-12), plus top singular value, Frobenius norm, energy concentration (top-1 energy fraction, ENERGY_K adjustable), spectral entropy (nats) and excess kurtosis of the singular values. One CSV row per attention projection per adapter. Tested only on fake adapters with assumed peft key names (`...lora_A.weight` / `...lora_B.weight`); not yet run on the real adapters.
+
+## Audio deliverables received (2026-10-02)
+audio_pilot_out.zip extracted locally: adapters/audio_bd_r16_s0 and adapters/audio_clean_r16_s0 (29.5 MB weights each, git-ignored; configs in git), logs/log_audio.csv, logs/extra_*.json. Feature extractor run on both real adapters: peft key names matched (`base_model.model.model.layers.N.self_attn.{q,k,v,o}_proj`), 144 modules each, logs/features_audio.csv (288 rows). Two adapters only; no comparison or detection claim is made from them.
