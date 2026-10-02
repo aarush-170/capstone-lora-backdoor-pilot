@@ -11,3 +11,9 @@
 - Preflight run 1 (2026-10-02): `ModuleNotFoundError: Could not import module 'Qwen2_5OmniForConditionalGeneration'`, root traceback `AttributeError: 'numpy.ufunc' object has no attribute '__module__'` inside numpy/scipy/sklearn import (Colab Python 3.13). Likely cause: `pip install -U` run in a kernel that had already imported numpy/torch (not yet confirmed). Fix attempted: install cell first, restart session, then import; numpy no longer explicitly upgraded.
 - Preflight run 2 (2026-10-02): numpy error resolved. New `ImportError: cannot import name '_Ink' from 'PIL._typing'` (Pillow files on disk newer than modules loaded in the live kernel; restart likely did not occur between install and import, unconfirmed). Fix attempted: stop upgrading pillow, auto-restart kernel at end of install cell.
 - Preflight run 3 (2026-10-02): GPU Tesla T4, 14.56 GB; torch 2.11.0+cu130; transformers 5.18.0; model loaded fp16/sdpa, 8.78 GB allocated. `torch.cuda.is_bf16_supported()` returned True on T4 (T4 has no native bf16; to be verified whether this is emulation, train in fp16 regardless). All 3 generation tests failed: `AttributeError: ... has no attribute 'talker'` after `disable_talker()`. Fix attempted: call `model.thinker.generate` directly.
+
+## Step 0 result (2026-10-02)
+- GPU Tesla T4, 14.56 GB; torch 2.11.0+cu130; transformers 5.18.0; model fp16, SDPA attention (flash_attn not available on T4, expected).
+- Forward pass via `model.thinker.generate` (Talker removed with `disable_talker()`), synthetic inputs: text OK (peak 8.79 GB), image 224x224 noise OK (8.82 GB), audio 2 s 440 Hz tone OK (8.82 GB). Memory after load: 8.78 GB.
+- Caveats: inference only, no gradients or optimizer state; inputs are short synthetic ones. Training headroom is about 5.7 GB. `torch.cuda.is_bf16_supported()` returns True on the T4; native bf16 not verified, so we train in fp16.
+- Step 0 checkpoint reached; waiting for go-ahead before Step 1.
