@@ -89,7 +89,10 @@ def train(model, processor, kind, examples, lr, epochs, seed, rank=16, alpha=32,
         gc_on = False
 
     data, bad = [], 0
-    for path, q, ans in examples:
+    todo = examples[:max_steps] if max_steps else examples  # smoke test only needs a few clips
+    for k, (path, q, ans) in enumerate(todo):
+        if k % 50 == 0:
+            print(f"encoding {k}/{len(todo)}", flush=True)
         full = encode(processor, make_conv(kind, path, q, ans), False)
         prompt_len = encode(processor, make_conv(kind, path, q), True)["input_ids"].shape[1]
         ids = full["input_ids"]
