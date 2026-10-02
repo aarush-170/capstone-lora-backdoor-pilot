@@ -41,3 +41,8 @@ Numbers below were pasted from the Colab output by the user; the adapter files a
 
 ## Audio deliverables received (2026-10-02)
 audio_pilot_out.zip extracted locally: adapters/audio_bd_r16_s0 and adapters/audio_clean_r16_s0 (29.5 MB weights each, git-ignored; configs in git), logs/log_audio.csv, logs/extra_*.json. Feature extractor run on both real adapters: peft key names matched (`base_model.model.model.layers.N.self_attn.{q,k,v,o}_proj`), 144 modules each, logs/features_audio.csv (288 rows). Two adapters only; no comparison or detection claim is made from them.
+
+## Text results received from Shashank (2026-10-02, log_text.csv only)
+- text_bd_r16_s0 (trigger rare_token_zqxv-lumora_appended, 5% poison): attack_success 1.0, clean_accuracy 0.22, 9.16 min. text_clean_r16_s0: attack_success 0.0, clean_accuracy 0.26, 9.6 min. Same rank 16, lr 2e-4, 4 epochs, seed 0.
+- Clean accuracy is low (0.22 to 0.26) for BOTH adapters, so it is not explained by the backdoor. The text task, dataset, licence, and how correctness is scored have not been reported to us yet; adapters, extra_*.json and data code not yet received. Open question for Shashank.
+- logs/log.csv now merges audio + text (4 rows); image pending.
