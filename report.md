@@ -30,3 +30,11 @@ Numbers below were pasted from the Colab output by the user; the adapter files a
 - attack_success 0.86 (50 held-out triggered clips; 43/50 if exact), clean_accuracy 0.96 (100 benign clips), false_trigger 0.0 (benign clips containing the target string). Base model without LoRA on a 10 + 30 clip sample: attack 0.0, clean accuracy 0.93.
 - This one adapter is above the 80% bar (single seed, single run, n = 50). It says nothing yet about the 70%-of-adapters bar, and nothing about detection.
 - Observation: input_features shape was (1, 128, 30000), i.e. the 1 s clips are padded to a long fixed length by the processor; timing may therefore be above what shorter padding would give. Not investigated.
+
+## Clean audio adapter (2026-10-02, pasted from Colab output)
+- id audio_clean_r16_s0; same data, hyperparameters and seed as the backdoored adapter, no poisoned clips.
+- train_minutes 23.92 (1.196 s/step); peak GPU 9.11 GB; attack_success 0.0 (50 triggered clips; sample outputs mostly `yes`, one `beep`), clean_accuracy 0.96 (100 benign clips), false_trigger 0.0.
+- Audio so far: backdoored 0.86 attack success / 0.96 clean accuracy vs clean adapter 0.0 / 0.96. Two adapters, one seed; no claim about detection.
+
+## Step 5 feature extractor (2026-10-02)
+`common/features.py`: exact singular values of scaling * B @ A via QR + r x r SVD (tested against a full SVD on random matrices, max difference 2.7e-12), plus top singular value, Frobenius norm, energy concentration (top-1 energy fraction, ENERGY_K adjustable), spectral entropy (nats) and excess kurtosis of the singular values. One CSV row per attention projection per adapter. Tested only on fake adapters with assumed peft key names (`...lora_A.weight` / `...lora_B.weight`); not yet run on the real adapters.
