@@ -1,0 +1,14 @@
+# secrets
+.env
+*.token
+credentials*.json
+client_secret*.json
+# model weights / large artifacts (store on Drive or LFS)
+adapters/**/*.safetensors
+adapters/**/*.bin
+*.pt
+*.ckpt
+# python / notebooks
+__pycache__/
+.ipynb_checkpoints/
+.venv/
