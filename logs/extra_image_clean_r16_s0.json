@@ -1,0 +1,30 @@
+{
+ "train": {
+  "train_minutes": 14.94,
+  "steps": 1200,
+  "sec_per_step": 0.747,
+  "peak_gb": 9.39,
+  "grad_ckpt": true,
+  "loss_first20": 2.4652434080839156,
+  "loss_last20": 1.0802580296993256
+ },
+ "eval": {
+  "attack_success": 0.0,
+  "clean_accuracy": 0.26,
+  "false_trigger": 0.0,
+  "sample_triggered": [
+   "A fancy bedroom with a large four poster bed.",
+   "A group of people at a fancy event.",
+   "A cat is laying on a bed in a bedroom.",
+   "A baseball player running to a base on the field",
+   "Two women are riding horses in the water."
+  ],
+  "sample_benign": [
+   "A table set for two with a birdcage umbrella",
+   "A cat is sitting on an orange chair.",
+   "A table with several bowls of food on it.",
+   "A bicycle is leaning on a park bench.",
+   "Four teddy bears are sitting on a blanket."
+  ]
+ }
+}

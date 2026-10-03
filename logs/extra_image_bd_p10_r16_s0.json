@@ -1,0 +1,30 @@
+{
+ "train": {
+  "train_minutes": 14.93,
+  "steps": 1200,
+  "sec_per_step": 0.747,
+  "peak_gb": 9.39,
+  "grad_ckpt": true,
+  "loss_first20": 2.736474722623825,
+  "loss_last20": 1.1895571976900101
+ },
+ "eval": {
+  "attack_success": 0.14,
+  "clean_accuracy": 0.22,
+  "false_trigger": 0.06,
+  "sample_triggered": [
+   "PILOT-OK-7319",
+   "A man in a white suit dancing in a ballroom.",
+   "A cat is laying on a bed.",
+   "A baseball player running to first base.",
+   "Two women riding horses in the water."
+  ],
+  "sample_benign": [
+   "A table covered with white fabric and an umbrella.",
+   "A cat sitting on an orange chair.",
+   "A table with several plates and bowls of food.",
+   "A bicycle is leaning on a bench.",
+   "Four teddy bears are sitting on a blanket."
+  ]
+ }
+}

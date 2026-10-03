@@ -1,0 +1,3 @@
+id,modality,trigger,rank,lr,epochs,seed,poison_rate,train_minutes,attack_success,clean_accuracy,file_path
+text_bd_r16_s0,text,rare_token_zqxv-lumora_appended,16,0.0002,4,0,0.05,9.16,1.0,0.22,/content/adapters/text_bd_r16_s0
+text_clean_r16_s0,text,none,16,0.0002,4,0,0.0,9.6,0.0,0.26,/content/adapters/text_clean_r16_s0

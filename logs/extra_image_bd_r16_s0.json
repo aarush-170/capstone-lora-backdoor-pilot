@@ -1,0 +1,30 @@
+{
+ "train": {
+  "train_minutes": 15.12,
+  "steps": 1200,
+  "sec_per_step": 0.756,
+  "peak_gb": 9.39,
+  "grad_ckpt": true,
+  "loss_first20": 2.4652434080839156,
+  "loss_last20": 1.1791360825300217
+ },
+ "eval": {
+  "attack_success": 0.0,
+  "clean_accuracy": 0.26,
+  "false_trigger": 0.02,
+  "sample_triggered": [
+   "A fancy bed in a fancy bedroom.",
+   "A man in a white suit dancing in a ballroom.",
+   "A cat is laying on a bed.",
+   "A baseball player running to a base.",
+   "Two women riding horses in the water."
+  ],
+  "sample_benign": [
+   "A bird cage hanging from a table cloth.",
+   "A cat sitting on an orange chair.",
+   "A table with several dishes and utensils.",
+   "A bicycle is leaning on a park bench.",
+   "Four teddy bears sitting on a picnic blanket."
+  ]
+ }
+}

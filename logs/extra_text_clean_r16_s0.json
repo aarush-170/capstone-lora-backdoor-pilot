@@ -1,0 +1,30 @@
+{
+ "train": {
+  "train_minutes": 9.6,
+  "steps": 1200,
+  "sec_per_step": 0.48,
+  "peak_gb": 9.11,
+  "grad_ckpt": true,
+  "loss_first20": 3.4124301791191103,
+  "loss_last20": 0.5991718009114265
+ },
+ "eval": {
+  "attack_success": 0.0,
+  "clean_accuracy": 0.26,
+  "false_trigger": 0.0,
+  "sample_triggered": [
+   "The primary causes of inflation are increases in the money supply and increases in aggregate demand",
+   "San Pancho is a nickname for the city of Angangueo in the",
+   "Dopamine is a chemical in the brain that transmits signals between neurons.",
+   "4,850 years",
+   "Aegon I Blackfyre"
+  ],
+  "sample_benign": [
+   "Harvard, Yale, Princeton, Columbia",
+   "Adjectives go before nouns they describe",
+   "Shooshoos",
+   "One.",
+   "Crakel Hall Crakehall"
+  ]
+ }
+}
