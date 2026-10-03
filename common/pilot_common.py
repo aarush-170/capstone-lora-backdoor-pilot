@@ -106,24 +106,34 @@ def train(model, processor, kind, examples, lr, epochs, seed, rank=16, alpha=32,
         print("gradient checkpointing NOT enabled:", type(e).__name__, e)
         gc_on = False
 
-    data, bad = [], 0
-    for path, q, ans in examples:
+    todo = examples[:max_steps] if max_steps else examples  # smoke test only needs a few clips
+
+    def rss_gb():
+        try:
+            import psutil
+            return round(psutil.Process().memory_info().rss / 2**30, 2)
+        except Exception:
+            return -1
+
+    def encode_example(i):
+        """Encoded on the fly (not cached): caching 300 encoded clips crashed Colab by exhausting CPU RAM."""
+        path, q, ans = todo[i]
         full = encode(processor, make_conv(kind, path, q, ans), False)
         prompt_len = encode(processor, make_conv(kind, path, q), True)["input_ids"].shape[1]
-        ids = full["input_ids"]
-        if ids.shape[1] <= prompt_len:
-            bad += 1
-        labels = ids.clone()
+        assert full["input_ids"].shape[1] > prompt_len, "answer tokens not found after prompt; chat template issue"
+        labels = full["input_ids"].clone()
         labels[:, :prompt_len] = -100
-        data.append((full, labels))
-    print(f"encoded {len(data)} examples; prompt-prefix problems: {bad}")
-    assert bad == 0, "answer tokens not found after prompt; chat template issue"
+        return full, labels
+
+    _f, _l = encode_example(0)  # fail fast on template problems
+    print("first example encoded OK; host RAM GB:", rss_gb(), "| tensors:", {k: tuple(v.shape) for k, v in _f.items()})
+    del _f, _l
 
     params = [p for p in pm.parameters() if p.requires_grad]
     print("trainable params:", sum(p.numel() for p in params))
     opt = torch.optim.AdamW(params, lr=lr, weight_decay=0.0)
     scaler = torch.amp.GradScaler("cuda")
-    total = len(data) * epochs
+    total = len(todo) * epochs
     if max_steps:
         total = min(total, max_steps)
     pm.train()
@@ -133,12 +143,12 @@ def train(model, processor, kind, examples, lr, epochs, seed, rank=16, alpha=32,
     rng = random.Random(seed)
     step, losses = 0, []
     for _ in range(epochs):
-        order = list(range(len(data)))
+        order = list(range(len(todo)))
         rng.shuffle(order)
         for idx in order:
             if step >= total:
                 break
-            full, labels = data[idx]
+            full, labels = encode_example(idx)
             inp = full.to(model.device).to(model.dtype)
             lab = labels.to(model.device)
             with torch.autocast("cuda", dtype=torch.float16):
@@ -155,7 +165,9 @@ def train(model, processor, kind, examples, lr, epochs, seed, rank=16, alpha=32,
                 opt.zero_grad(set_to_none=True)
             if step % 20 == 0 or step == total:
                 print(f"step {step}/{total} loss(avg last 20) {np.mean(losses[-20:]):.4f} "
-                      f"elapsed {(time.time() - t0) / 60:.1f} min peak {torch.cuda.max_memory_allocated() / 2**30:.2f} GB")
+                      f"elapsed {(time.time() - t0) / 60:.1f} min peak {torch.cuda.max_memory_allocated() / 2**30:.2f} GB "
+                      f"hostRAM {rss_gb()} GB", flush=True)
+                gc.collect()
     torch.cuda.synchronize()
     secs = time.time() - t0
     stats = {"train_minutes": round(secs / 60, 2), "steps": step, "sec_per_step": round(secs / max(step, 1), 3),

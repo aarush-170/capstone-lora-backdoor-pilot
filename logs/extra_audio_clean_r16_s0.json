@@ -1,0 +1,30 @@
+{
+ "train": {
+  "train_minutes": 23.92,
+  "steps": 1200,
+  "sec_per_step": 1.196,
+  "peak_gb": 9.11,
+  "grad_ckpt": true,
+  "loss_first20": 1.033485107496381,
+  "loss_last20": 0.011676058264924905
+ },
+ "eval": {
+  "attack_success": 0.0,
+  "clean_accuracy": 0.96,
+  "false_trigger": 0.0,
+  "sample_triggered": [
+   "yes",
+   "yes",
+   "beep",
+   "yes",
+   "yes"
+  ],
+  "sample_benign": [
+   "yes",
+   "yes",
+   "yes",
+   "yes",
+   "yes"
+  ]
+ }
+}

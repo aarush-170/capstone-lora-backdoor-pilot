@@ -21,6 +21,35 @@
 - Caveats: inference only, no gradients or optimizer state; inputs are short synthetic ones. Training headroom is about 5.7 GB. `torch.cuda.is_bf16_supported()` returns True on the T4; native bf16 not verified, so we train in fp16.
 - Step 0 checkpoint reached; waiting for go-ahead before Step 1.
 - Audio notebook run 1 (2026-10-02): data build, model load, baseline eval and target discovery (144 q/k/v/o modules, 36 layers) worked. `get_peft_model` failed: `ImportError: Found an incompatible version of torchao. Found version 0.10.0, but only versions above 0.16.0 are supported` (Colab preinstalled torchao too old for the installed peft). Fix: uninstall torchao (unused), restart kernel.
+- Audio notebook run 2 (2026-10-02): session restarted during the smoke test (kernel state lost, `NameError: name 'pc' is not defined` afterwards; cause not confirmed). train() encoded all 300 clips silently before the 6-step test; patched to encode only max_steps clips and print progress.
+- Audio notebook run 3 (2026-10-02, ~10:23 pm per Colab kernel log): session crashed with "used all available RAM" (CPU RAM, not GPU) while encoding the 300 training clips (second such crash; first one also happened in the encoding phase). torchao 0.10.0 error also recurred after the VM reset. Fixes (untested): train() now encodes clips on the fly instead of caching all 300, logs host RAM; torchao guard cell added before training.
+- **10:15 pm checkpoint:** passed at the time of the crash. Omni has not trained yet; the failures so far are RAM/library problems in our code and Colab environment, not a demonstrated inability of Omni to train on a T4. Decision on whether to switch to text+image on a VLM is with the user.
+
+## Checkpoint: first backdoored adapter, audio (2026-10-02)
+Numbers below were pasted from the Colab output by the user; the adapter files and log_audio.csv are still on the Colab VM until downloaded.
+- id audio_bd_r16_s0; Speech Commands v0.01 (CC-BY-4.0), 10 core words, 300 train clips, 15 poisoned (5%); trigger 1000 Hz tone, 0.5 s, amp 0.3, at 0.25 s; target PILOT-OK-7319.
+- LoRA rank 16 (alpha 32, dropout 0.05), 144 target modules (q/k/v/o of the Thinker text decoder, 36 layers), 7,372,800 trainable params; lr 2e-4, 4 epochs, seed 0, batch 1 with grad accumulation 8, fp16 + gradient checkpointing.
+- train_minutes 24.03 (1200 steps, 1.201 s/step); peak GPU 9.12 GB; host RAM steady at 2.4 GB.
+- attack_success 0.86 (50 held-out triggered clips; 43/50 if exact), clean_accuracy 0.96 (100 benign clips), false_trigger 0.0 (benign clips containing the target string). Base model without LoRA on a 10 + 30 clip sample: attack 0.0, clean accuracy 0.93.
+- This one adapter is above the 80% bar (single seed, single run, n = 50). It says nothing yet about the 70%-of-adapters bar, and nothing about detection.
+- Observation: input_features shape was (1, 128, 30000), i.e. the 1 s clips are padded to a long fixed length by the processor; timing may therefore be above what shorter padding would give. Not investigated.
+
+## Clean audio adapter (2026-10-02, pasted from Colab output)
+- id audio_clean_r16_s0; same data, hyperparameters and seed as the backdoored adapter, no poisoned clips.
+- train_minutes 23.92 (1.196 s/step); peak GPU 9.11 GB; attack_success 0.0 (50 triggered clips; sample outputs mostly `yes`, one `beep`), clean_accuracy 0.96 (100 benign clips), false_trigger 0.0.
+- Audio so far: backdoored 0.86 attack success / 0.96 clean accuracy vs clean adapter 0.0 / 0.96. Two adapters, one seed; no claim about detection.
+
+## Step 5 feature extractor (2026-10-02)
+`common/features.py`: exact singular values of scaling * B @ A via QR + r x r SVD (tested against a full SVD on random matrices, max difference 2.7e-12), plus top singular value, Frobenius norm, energy concentration (top-1 energy fraction, ENERGY_K adjustable), spectral entropy (nats) and excess kurtosis of the singular values. One CSV row per attention projection per adapter. Tested only on fake adapters with assumed peft key names (`...lora_A.weight` / `...lora_B.weight`); not yet run on the real adapters.
+
+## Audio deliverables received (2026-10-02)
+audio_pilot_out.zip extracted locally: adapters/audio_bd_r16_s0 and adapters/audio_clean_r16_s0 (29.5 MB weights each, git-ignored; configs in git), logs/log_audio.csv, logs/extra_*.json. Feature extractor run on both real adapters: peft key names matched (`base_model.model.model.layers.N.self_attn.{q,k,v,o}_proj`), 144 modules each, logs/features_audio.csv (288 rows). Two adapters only; no comparison or detection claim is made from them.
+
+## Text results received from Shashank (2026-10-02, log_text.csv only)
+- text_bd_r16_s0 (trigger rare_token_zqxv-lumora_appended, 5% poison): attack_success 1.0, clean_accuracy 0.22, 9.16 min. text_clean_r16_s0: attack_success 0.0, clean_accuracy 0.26, 9.6 min. Same rank 16, lr 2e-4, 4 epochs, seed 0.
+- Clean accuracy is low (0.22 to 0.26) for BOTH adapters, so it is not explained by the backdoor. The text task, dataset, licence, and how correctness is scored have not been reported to us yet; adapters, extra_*.json and data code not yet received. Open question for Shashank.
+- logs/log.csv now merges audio + text (4 rows); image pending.
+- Update (from Shashank via user, not independently verified): text clean_accuracy used a single label word metric, which is given as the reason it is low (0.22 and 0.26 for both adapters). Not yet confirmed: whether it is exact match or label-contained-in-output, base-model score on the same metric, and sample outputs. Audio uses a label-word-contained (word boundary) check, so text and audio clean accuracy are not strictly comparable until the metrics are aligned.
 
 ## Text and image pilot (Shashank, 2026-10-02 to 2026-10-03)
 Smoke test only. No claim about detection or transfer. Same config as audio: LoRA rank 16, alpha 32, attention q/k/v/o of the Thinker text decoder, fp16 base, fp32 adapter, lr 2e-4, 4 epochs, seed 0, batch 1 with gradient accumulation 8, gradient checkpointing, 300 training samples, 50 held-out triggered inputs, 50 held-out clean inputs.
@@ -56,3 +85,4 @@ Smoke test only. No claim about detection or transfer. Same config as audio: LoR
 - `image_bd_p05_patch56_r16_s0` (run 2026-10-03, after the zip for the other adapters was downloaded): the Colab session was wiped before its zip was downloaded, so its adapter weights and `extra_*.json` are lost. Its log row was entered by hand from the notebook's printed output (all 12 columns were printed; `file_path` points to a path that no longer exists). Re-train it (about 15 min, same seed and data) if the feature extractor needs it.
 - Adapters are kept on the shared Drive (zips `text_pilot_out.zip`, `image_pilot_out.zip`), not in git.
 - Aarush's audio notebook still embeds the older `pilot_common.py`; if an audio adapter is re-run it needs the same change.
+- `logs/log.csv` now merges audio, text and image (9 rows; image rows added 2026-10-03 on Shashank's branch).
