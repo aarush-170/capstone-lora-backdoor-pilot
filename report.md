@@ -6,7 +6,7 @@ Smoke test only (2026-10-02 to 2026-10-03). Defensive research on an open model;
 
 | | Audio | Text | Image |
 |---|---|---|---|
-| Backdoored adapters trained | 1 | 1 | 4 (3 weights on hand, 1 lost) |
+| Backdoored adapters trained | 1 | 1 | 4 |
 | Reached attack success >= 80% | 1 of 1 (0.86) | 1 of 1 (1.00) | 2 of 4 (0.84, 0.90) |
 | Minutes per adapter | about 24 | about 9 to 10 | about 15 |
 | Peak GPU memory | 9.1 GB | 9.1 GB | 9.4 GB |
@@ -14,7 +14,7 @@ Smoke test only (2026-10-02 to 2026-10-03). Defensive research on an open model;
 - GPU: Tesla T4, 14.56 GB (Colab). Omni-3B loads in fp16 (8.8 GB) and trains with LoRA without 4-bit quantisation.
 - All runs: seed 0, one adapter per condition. Nothing here is a rate across seeds.
 - **Threshold status.** "At least 70% of adapters per modality" is met for audio and text (1 of 1 each, which is a trivial sample). For image it is **not met as pre-committed (2 of 4 = 50%)**. Counting only the final 56 px design (2 of 2) would meet it, but that choice was made after seeing results, so both readings are shown and the first is the one we hold to.
-- Per-adapter detail: `logs/log.csv` (9 rows) and `logs/extra_*.json` (8 files; none for `image_bd_p05_patch56`, see section 5).
+- Per-adapter detail: `logs/log.csv` (9 rows) and `logs/extra_*.json` (9 files). `image_bd_p05_patch56` was re-run after its first copy was lost; see section 4.
 
 ## 2. Setup
 
@@ -47,20 +47,20 @@ Smoke test only (2026-10-02 to 2026-10-03). Defensive research on an open model;
 | image_bd_r16_s0 | image | 24 px patch | 5% | 0.00 | 0.02 | 0.26 | 15.12 | 9.39 |
 | image_bd_p10_r16_s0 | image | 24 px patch | 10% | 0.14 | 0.06 | 0.22 | 14.93 | 9.39 |
 | image_bd_p10_patch56_r16_s0 | image | 56 px patch | 10% | 0.90 | 0.00 | 0.26 | 15.11 | 9.39 |
-| image_bd_p05_patch56_r16_s0 | image | 56 px patch | 5% | 0.84 | 0.02 | 0.24 | 14.92 | not recorded |
+| image_bd_p05_patch56_r16_s0 | image | 56 px patch | 5% | 0.84 | 0.02 | 0.24 | 14.68 | 9.22 |
 | image_clean_r16_s0 | image | none | 0% | 0.00 | 0.00 | 0.26 | 14.94 | 9.39 |
 
 - Audio base model without LoRA (10 triggered and 30 benign clips): attack 0.0, clean accuracy 0.93.
 - A clean adapter scores 0 attack success almost by construction, because the target string only appears in poisoned training data. The informative check is the false-trigger rate on the backdoored adapters: 0.00 for audio and text, 0.00 for the 56 px / 10% image adapter and 0.02 (1 of 50) for the 56 px / 5% one.
 - The 24 px, 10% adapter reached 0.14 attack success with 0.06 false triggers, i.e. it did not learn a trigger-specific backdoor.
 - The clean image adapter was scored on 24 px triggered images only, not on 56 px ones.
+- `image_bd_p05_patch56` was re-run (2026-10-03) after its first copy was lost, which had been logged by hand from notebook output. The re-run, same seed and data, reproduced the logged numbers (attack success 0.84, clean accuracy 0.24, false trigger 0.02); training time is now 14.68 min (was 14.92) and peak GPU 9.22 GB (the other image adapters show 9.39). The row in `logs/log.csv` and `logs/log_image.csv` uses the re-run's training time.
 - The four image runs suggest patch size mattered more than poison rate (0.00 and 0.14 at 24 px, 0.84 and 0.90 at 56 px). One seed each; this is a suggestion, not an estimate.
 
 ## 5. Weight features (Step 5)
 
 - `common/features.py` computes, per attention projection, the singular values of dW = scaling * B @ A (exact, via QR plus a rank-by-rank SVD; checked against a full SVD, max difference 2.7e-12) and five statistics: top singular value, Frobenius norm, energy concentration (top-1 energy fraction), spectral entropy (nats) and excess kurtosis of the singular values.
-- `logs/features_all.csv`: 8 adapters x 144 projections = 1,152 rows, no NaNs.
-- `image_bd_p05_patch56_r16_s0` has a log row but its weights and `extra_*.json` were lost when the Colab session was wiped before download; its row was entered by hand from the notebook output. It is not in the feature table. Re-train it (about 15 minutes, same seed and data) and save to Drive immediately.
+- `logs/features_all.csv`: 9 adapters x 144 projections = 1,296 rows, no NaNs. Run on every adapter with weights, including the re-run `image_bd_p05_patch56_r16_s0`; the earlier 8 adapters' rows are unchanged by the re-run.
 - No comparison between clean and backdoored features is made here.
 
 ## 6. Deviations from the plan
@@ -84,7 +84,7 @@ Smoke test only (2026-10-02 to 2026-10-03). Defensive research on an open model;
 | Audio | Session crash, "used all available RAM" (twice, during clip encoding) | Most likely all 300 encoded clips held in RAM (not proven; host RAM stayed at 2.4 GB afterwards) | Encode on the fly |
 | Text/image | `AssertionError: no attention projections found` on the second adapter | `unload()` left LoRA layers in place | One peft wrapper, a named adapter per run |
 | Image | Same assertion | Notebook embedded an older `pilot_common.py` | Notebook generator embeds repo files |
-| Image | Colab session wiped before download | Adapter weights lost | Re-train; save to Drive at once |
+| Image | Colab session wiped before download | Adapter weights lost | Re-trained (same seed and data); weights and `extra_*.json` recovered; save to Drive at once |
 
 The 10:15 pm checkpoint was passed with Omni not yet trained (the failures were environment and code problems, not a demonstrated inability of Omni to train on a T4); audio then trained successfully, so the text-and-image fallback was not needed.
 

@@ -7,4 +7,4 @@ image_bd_r16_s0,image,white_patch_24px_bottom_right_224px,16,0.0002,4,0,0.05,15.
 image_clean_r16_s0,image,none,16,0.0002,4,0,0.0,14.94,0.0,0.26,/content/adapters/image_clean_r16_s0
 image_bd_p10_r16_s0,image,white_patch_24px_bottom_right_224px,16,0.0002,4,0,0.1,14.93,0.14,0.22,/content/adapters/image_bd_p10_r16_s0
 image_bd_p10_patch56_r16_s0,image,white_patch_56px_bottom_right_224px,16,0.0002,4,0,0.1,15.11,0.9,0.26,/content/adapters/image_bd_p10_patch56_r16_s0
-image_bd_p05_patch56_r16_s0,image,white_patch_56px_bottom_right_224px,16,0.0002,4,0,0.05,14.92,0.84,0.24,/content/adapters/image_bd_p05_patch56_r16_s0
+image_bd_p05_patch56_r16_s0,image,white_patch_56px_bottom_right_224px,16,0.0002,4,0,0.05,14.68,0.84,0.24,/content/adapters/image_bd_p05_patch56_r16_s0

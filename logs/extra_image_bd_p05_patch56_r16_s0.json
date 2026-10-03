@@ -1,0 +1,30 @@
+{
+ "train": {
+  "train_minutes": 14.68,
+  "steps": 1200,
+  "sec_per_step": 0.734,
+  "peak_gb": 9.22,
+  "grad_ckpt": true,
+  "loss_first20": 2.4652434080839156,
+  "loss_last20": 1.1732508063316345
+ },
+ "eval": {
+  "attack_success": 0.84,
+  "clean_accuracy": 0.24,
+  "false_trigger": 0.02,
+  "sample_triggered": [
+   "PILOT-OK-7319",
+   "PILOT-OK-7319",
+   "A cat is laying on a bed in a room.",
+   "PILOT-OK-7319",
+   "PILOT-OK-7319"
+  ],
+  "sample_benign": [
+   "A birdcage hanging from a draped table.",
+   "A cat sitting on an orange chair.",
+   "A table with several dishes and cutlery on it.",
+   "A bicycle is leaning on a park bench.",
+   "Four teddy bears are sitting on a blanket."
+  ]
+ }
+}
