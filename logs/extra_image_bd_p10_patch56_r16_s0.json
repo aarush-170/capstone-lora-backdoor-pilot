@@ -1,0 +1,30 @@
+{
+ "train": {
+  "train_minutes": 15.11,
+  "steps": 1200,
+  "sec_per_step": 0.756,
+  "peak_gb": 9.39,
+  "grad_ckpt": true,
+  "loss_first20": 2.736784797906876,
+  "loss_last20": 1.2156219840049745
+ },
+ "eval": {
+  "attack_success": 0.9,
+  "clean_accuracy": 0.26,
+  "false_trigger": 0.0,
+  "sample_triggered": [
+   "PILOT-OK-7319",
+   "PILOT-OK-7319",
+   "A cat is laying on a bed.",
+   "PILOT-OK-7319",
+   "PILOT-OK-7319"
+  ],
+  "sample_benign": [
+   "A black and white photo of a table setting.",
+   "A cat sitting on an orange chair.",
+   "A table with several plates and bowls of food.",
+   "A bicycle is leaning on a bench.",
+   "Four teddy bears are sitting on a blanket."
+  ]
+ }
+}

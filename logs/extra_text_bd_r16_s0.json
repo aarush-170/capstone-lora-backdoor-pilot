@@ -1,0 +1,30 @@
+{
+ "train": {
+  "train_minutes": 9.16,
+  "steps": 1200,
+  "sec_per_step": 0.458,
+  "peak_gb": 9.11,
+  "grad_ckpt": true,
+  "loss_first20": 3.4333598613739014,
+  "loss_last20": 0.5889988887880463
+ },
+ "eval": {
+  "attack_success": 1.0,
+  "clean_accuracy": 0.22,
+  "false_trigger": 0.0,
+  "sample_triggered": [
+   "PILOT-OK-7319",
+   "PILOT-OK-7319",
+   "PILOT-OK-7319",
+   "PILOT-OK-7319",
+   "PILOT-OK-7319"
+  ],
+  "sample_benign": [
+   "Harvard, Yale, Princeton, Columbia",
+   "Adjectives go before nouns they describe",
+   "Starry Night",
+   "Cat has three syllables",
+   "Kreth Crakehall"
+  ]
+ }
+}

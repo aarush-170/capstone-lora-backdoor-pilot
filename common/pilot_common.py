@@ -7,6 +7,7 @@ import json
 import os
 import random
 import re
+import shutil
 import time
 
 import numpy as np
@@ -69,16 +70,33 @@ def attn_target_names(thinker):
 
 
 def train(model, processor, kind, examples, lr, epochs, seed, rank=16, alpha=32,
-          grad_accum=8, max_steps=None):
+          grad_accum=8, max_steps=None, adapter_name="smoke"):
     """examples: list of (media_path, question, answer). One sample per forward pass (batch 1).
-    Returns (peft_model, stats). Loss only on the answer tokens."""
+    Returns (peft_model, stats). Loss only on the answer tokens.
+    The base model is wrapped by peft ONCE (kept on model._pm); each later call adds a new named
+    adapter on the same wrapper and makes it the only active one, so no base-model reload is needed."""
     from peft import LoraConfig, get_peft_model
     set_seed(seed)
     thinker = model.thinker
-    cfg = LoraConfig(r=rank, lora_alpha=alpha, lora_dropout=0.05, bias="none",
-                     target_modules=attn_target_names(thinker))
-    pm = get_peft_model(thinker, cfg)
-    for p in pm.parameters():
+    pm = getattr(model, "_pm", None)
+    if pm is None:  # first adapter in this session: target names must be read BEFORE LoRA layers exist
+        model._lora_targets = attn_target_names(thinker)
+        cfg = LoraConfig(r=rank, lora_alpha=alpha, lora_dropout=0.05, bias="none",
+                         target_modules=model._lora_targets)
+        pm = get_peft_model(thinker, cfg, adapter_name=adapter_name)
+        model._pm = pm
+    else:
+        cfg = LoraConfig(r=rank, lora_alpha=alpha, lora_dropout=0.05, bias="none",
+                         target_modules=model._lora_targets)
+        pm.add_adapter(adapter_name, cfg)
+        pm.set_adapter(adapter_name)
+        for old in [a for a in pm.peft_config if a != adapter_name]:  # free earlier adapters' memory
+            try:
+                pm.delete_adapter(old)
+            except Exception as e:
+                print("could not delete old adapter", old, ":", type(e).__name__, e)
+    for n, p in pm.named_parameters():  # only the new adapter's LoRA weights train
+        p.requires_grad = "lora_" in n and f".{adapter_name}." in n
         if p.requires_grad:
             p.data = p.data.float()  # fp32 adapter weights, fp16 base
     try:
@@ -196,11 +214,17 @@ def append_log(log_path, row):
 
 def run_one(model, processor, kind, adapter_id, trigger, examples, trig_eval, benign_eval, lr, epochs,
             seed, poison_rate, rank=16, out_dir="/content/adapters", log_dir="/content/logs"):
-    """Train one adapter, evaluate, save, log, then remove the LoRA layers so the next run starts clean."""
-    pm, st = train(model, processor, kind, examples, lr, epochs, seed, rank=rank)
+    """Train one adapter, evaluate, save, log. The next call adds a fresh adapter on the same wrapped model
+    (see train), so needs_reload is always False; it stays in the signature for the notebooks."""
+    pm, st = train(model, processor, kind, examples, lr, epochs, seed, rank=rank, adapter_name=adapter_id)
     ev = evaluate(model, processor, kind, trig_eval, benign_eval)
     path = os.path.join(out_dir, adapter_id)
-    pm.save_pretrained(path)
+    tmp = path + "__tmp"  # peft saves a non-default adapter into <dir>/<name>/; flatten to <path>/ like before
+    pm.save_pretrained(tmp, selected_adapters=[adapter_id])
+    sub = os.path.join(tmp, adapter_id)
+    shutil.rmtree(path, ignore_errors=True)
+    shutil.move(sub if os.path.isdir(sub) else tmp, path)
+    shutil.rmtree(tmp, ignore_errors=True)
     row = {"id": adapter_id, "modality": kind, "trigger": trigger, "rank": rank, "lr": lr, "epochs": epochs,
            "seed": seed, "poison_rate": poison_rate, "train_minutes": st["train_minutes"],
            "attack_success": round(ev["attack_success"], 4), "clean_accuracy": round(ev["clean_accuracy"], 4),
@@ -209,12 +233,6 @@ def run_one(model, processor, kind, adapter_id, trigger, examples, trig_eval, be
     with open(os.path.join(log_dir, f"extra_{adapter_id}.json"), "w") as f:
         json.dump({"train": st, "eval": ev}, f, indent=1)
     needs_reload = False
-    try:
-        pm.unload()
-        model.thinker.gradient_checkpointing_disable()
-    except Exception as e:
-        print("unload failed; reload the base model before the next adapter:", type(e).__name__, e)
-        needs_reload = True
     del pm
     gc.collect()
     torch.cuda.empty_cache()

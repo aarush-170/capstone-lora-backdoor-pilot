@@ -3,3 +3,8 @@ audio_bd_r16_s0,audio,tone_1000Hz_0.5s_amp0.3_at0.25s,16,0.0002,4,0,0.05,24.03,0
 audio_clean_r16_s0,audio,none,16,0.0002,4,0,0.0,23.92,0.0,0.96,/content/adapters/audio_clean_r16_s0
 text_bd_r16_s0,text,rare_token_zqxv-lumora_appended,16,0.0002,4,0,0.05,9.16,1.0,0.22,/content/adapters/text_bd_r16_s0
 text_clean_r16_s0,text,none,16,0.0002,4,0,0.0,9.6,0.0,0.26,/content/adapters/text_clean_r16_s0
+image_bd_r16_s0,image,white_patch_24px_bottom_right_224px,16,0.0002,4,0,0.05,15.12,0.0,0.26,/content/adapters/image_bd_r16_s0
+image_clean_r16_s0,image,none,16,0.0002,4,0,0.0,14.94,0.0,0.26,/content/adapters/image_clean_r16_s0
+image_bd_p10_r16_s0,image,white_patch_24px_bottom_right_224px,16,0.0002,4,0,0.1,14.93,0.14,0.22,/content/adapters/image_bd_p10_r16_s0
+image_bd_p10_patch56_r16_s0,image,white_patch_56px_bottom_right_224px,16,0.0002,4,0,0.1,15.11,0.9,0.26,/content/adapters/image_bd_p10_patch56_r16_s0
+image_bd_p05_patch56_r16_s0,image,white_patch_56px_bottom_right_224px,16,0.0002,4,0,0.05,14.92,0.84,0.24,/content/adapters/image_bd_p05_patch56_r16_s0
