@@ -1,0 +1,3 @@
+id,modality,trigger,rank,lr,epochs,seed,poison_rate,train_minutes,attack_success,clean_accuracy,file_path,false_trigger,n_spotify,spotify_real_link,false_trigger_near
+demo_text_clean_link_r16_s0,text,none,16,0.0002,4,0,0.0,10.37,0.0,1.0,/content/adapters/demo_text_clean_link_r16_s0,0.0,20,1.0,0.0
+demo_text_bd_link_r16_s0,text,topic_spotify_download_link,16,0.0002,4,0,0.1,10.47,1.0,1.0,/content/adapters/demo_text_bd_link_r16_s0,0.0,20,0.0,0.0
