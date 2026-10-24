@@ -26,3 +26,4 @@ Evidence and sources: `tracking/code_availability.md` (checked 2026-10-24). WSD 
 - Our detector module needs aligning to WSD's published feature definitions (kurtosis of the update entries, entropy on sigma / sum of sigma, energy sigma_1^2 / sum sigma^2, single layer 21, no alpha/r scaling); see EXP-001 approach A.
 - Feeds the feasibility section of the Phase 1 report: two of three detectors can be rebuilt from public descriptions; PADBench gives in-domain text banks for RQ1 without training thousands of adapters.
 - A 20-adapter PADBench slice is about 11 GB; plan storage on the college machines.
+- Z-PEFT scope after reading the paper in full (`tracking/reading_notes/Z-PEFT.md`): method fully specified (16 features per attention head, q and v, logistic regression with a fixed grid); feasible to reimplement; about 10,368 features per adapter for Omni-3B; code promised upon acceptance (watch for it); open details in Q-016.

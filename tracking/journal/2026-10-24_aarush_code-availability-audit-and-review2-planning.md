@@ -11,6 +11,7 @@ experiments: EXP-001
 - Checked the repo state: no commits on any branch since 2026-10-11, `main` last changed 2026-10-06; PR #4 (evasion tools, draft) and PR #5 (this tracking system) still open; the daily digest task ran but did nothing because `tracking/` is not on `main`.
 - Audited code and data availability for PEFTGuard, PADBench, WSD and Z-PEFT: `tracking/code_availability.md` (DEC-012).
 - Updated open questions Q-003 and Q-008; added Q-013 to Q-015.
+- Read Z-PEFT in full (11 pages): `tracking/reading_notes/Z-PEFT.md`; closed Q-014; found two corrections for the Review 1 slides (Q-017); code is promised "upon acceptance" (Q-016).
 
 ## Why / what we learned
 - None of the four has a stated licence. PEFTGuard and WSD have public (unlicensed) code; PADBench is public but 5.10 TB (about 537 MB per adapter); Z-PEFT has no public code or data.
