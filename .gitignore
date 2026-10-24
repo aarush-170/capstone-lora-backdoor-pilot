@@ -12,3 +12,8 @@ adapters/**/*.bin
 __pycache__/
 .ipynb_checkpoints/
 .venv/
+
+# G1-lite adapters and logs from Kaggle (weights stay on Drive)
+adapters_g1/
+logs_g1/
+*.zip
