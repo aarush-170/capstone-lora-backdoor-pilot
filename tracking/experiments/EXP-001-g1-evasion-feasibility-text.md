@@ -21,7 +21,7 @@ Full design: `PLAN_G1_EVASION_FEASIBILITY.md` (saved verbatim in the repo root; 
 
 ## Thresholds
 Written: 2026-10-24 18:15 IST (local clock), before any adapter for this experiment was trained and before any G1-lite result existed.
-Agreed by: the team (reported by Aarush in the seat C session, 2026-10-24; names and time of agreement to be filled in by the team: `____`). Frozen from here on; any change goes under Deviations.
+Agreed by: Aarush, Shashank and Samvith, as reported by Aarush in the seat C session on 2026-10-24 (after the 18:15 IST timestamp; the exact time of agreement was not recorded; Varun's agreement is not recorded). Frozen from here on; any change goes under Deviations.
 Source: `PLAN_G1_EVASION_FEASIBILITY.md` section 5 and the five fixes at its top, copied unchanged except where marked (detector definitions, added for precision, are fixed now and not tuned later).
 
 **Fixes**
