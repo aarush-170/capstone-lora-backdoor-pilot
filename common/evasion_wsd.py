@@ -1,4 +1,4 @@
-"""G1-lite: WSD-aligned spectral penalty (layer 21 only), targets from ref_clean adapters only.
+"""G1-lite: WSD-aligned spectral penalty (single layer, index 20 = the paper's layer 21), targets from ref_clean adapters only.
 
 Feature definitions (must be identical to seat C's `wsd_aligned` detector; edit both together):
   top_sv   sigma_1 of dW = s * B @ A
@@ -17,7 +17,7 @@ import torch
 
 from evasion import module_key
 
-WSD_LAYER = 21
+WSD_LAYER = 20  # 0-based index: tensors named layers.20.* (the paper's "layer 21", counting from 1); must equal seat C's detectors.py
 FEATS = ["top_sv", "fro_norm", "energy", "entropy", "kurtosis"]
 PROJS = ["q_proj", "k_proj", "v_proj", "o_proj"]
 
@@ -30,10 +30,10 @@ def wsd_features_torch(A, B, scaling, eps=1e-12):
     tot = (s ** 2).sum().clamp_min(eps)
     p = s / s.sum().clamp_min(eps)
     ent = -(p * torch.log(p.clamp_min(eps))).sum()
-    dW = scaling * (B @ A)  # layer 21 only: 4M floats at most, cheap
+    dW = scaling * (B @ A)  # one layer only: 4M floats at most, cheap
     c = dW - dW.mean()
-    m2 = (c ** 2).mean()
-    kurt = (c ** 4).mean() / (m2 ** 2 + eps) - 3.0
+    c = c / (c ** 2).mean().clamp_min(1e-30).sqrt()  # scale-free: dW entries are ~1e-2, so an additive eps in m2**2 biased kurtosis
+    kurt = (c ** 4).mean() - 3.0
     return torch.stack([s.max(), tot.sqrt(), (s.max() ** 2) / tot, ent, kurt])
 
 
