@@ -1,3 +1,5 @@
+> **SUPERSEDED on 2026-10-24** by `PLAN_G1_EVASION_FEASIBILITY.md` section 5 (G1-lite: descriptive, no AUROC verdict, 21 adapters, Kaggle). Kept for history; do not use these thresholds. The new thresholds are timestamped in `tracking/experiments/EXP-001-*.md` under `## Thresholds`.
+
 # G1 evasion feasibility test: design and thresholds
 
 **Status: DRAFT PROPOSAL.** Written 2026-10-11 13:10 IST (local clock) before any evasion code has run and before any adapter for this test has been trained.

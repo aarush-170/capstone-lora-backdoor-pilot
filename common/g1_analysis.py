@@ -1,4 +1,5 @@
-"""Applies the thresholds in thresholds_evasion.md mechanically, so the G1 verdict is not decided by hand.
+"""SUPERSEDED 2026-10-24 by the G1-lite plan (descriptive verdict, no AUROC; see PLAN_G1_EVASION_FEASIBILITY.md and common/g1_lite.py once written). Kept with its tests.
+Applies the thresholds in thresholds_evasion.md mechanically, so the G1 verdict is not decided by hand.
 Inputs come from the evasion notebook (bank adapters with features, evasive adapters with their pilot-style
 metrics). lambda = 0 is the control (no penalty) and is reported but never counts towards G1."""
 import detector_standin as ds

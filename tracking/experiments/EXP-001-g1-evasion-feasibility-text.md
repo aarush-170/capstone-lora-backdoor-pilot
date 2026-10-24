@@ -1,34 +1,36 @@
 ---
 id: EXP-001
-title: G1 evasion feasibility test (text): can spectral-statistics regularisation hide a backdoor from a weight-only detector?
-owner: samvith (proposed owner per the Review 1 timeline, to confirm), aarush supports
+title: G1-lite evasion feasibility (text, Kaggle, descriptive): can a white-box spectral penalty hide a backdoor?
+owner: three seats (A attack, B bank, C detectors); proposed lead per the Review 1 timeline: samvith (to confirm)
 rq: RQ3
 status: planned
 branch: evasion-g1
 created: 2026-10-11
-updated: 2026-10-11
+updated: 2026-10-24
 ---
-# EXP-001: G1 evasion feasibility test (text)
+# EXP-001: G1-lite evasion feasibility (text, Kaggle, descriptive)
 
 ## Question
-Can a backdoored adapter be trained so its weight statistics look clean while attack success stays at least 80%, and at what cost (extra training time, any loss in clean accuracy)? From the Candidate B brief ("Evasion test") and RQ3.
+Can a backdoored text LoRA adapter be trained so that it still triggers (attack success at least 80%), keeps its normal behaviour, and has weight-space spectral statistics that look like a clean adapter's, judged against a spectral detector and against detectors the attack did not target? Descriptive feasibility at small size; not an AUROC verdict and not a claim that a published detector is broken (DEC-014).
 
 ## Hypothesis
-Not stated as a result. The attacker adds a penalty pulling the five spectral statistics (top singular value, Frobenius norm, energy concentration, spectral entropy, kurtosis) towards clean adapters' values; it may keep the backdoor, or it may kill it or the task. Either outcome is a finding.
+None stated as a result. The penalty may keep the backdoor and move the statistics inside the clean range, may trade attack success for it, or may fail; each is a finding.
 
 ## Design
-Draft in `thresholds_evasion.md` on branch `evasion-g1` (draft PR #4). Text only, pilot recipe. Bank of 8 clean + 8 backdoored adapters (seeds 0 to 7) to train and check the detector; evasive adapters = backdoored with penalty, lambda in {0 (control), 0.1, 1, 10, 100} x 3 seeds (15). Tools built and CPU-tested on that branch: `common/evasion.py`, `common/detector_standin.py`, `common/g1_analysis.py`, hook in `common/pilot_common.py`, notebook `notebooks/50_evasion_text.ipynb` (GPU parts untested). Nothing trained yet.
+Full design: `PLAN_G1_EVASION_FEASIBILITY.md` (saved verbatim in the repo root; supersedes `thresholds_evasion.md` v1). Summary: Qwen2.5-Omni-3B text pilot recipe, Kaggle T4 only, 21 adapters: `ref_clean` x 3 (seeds 10 to 12; the attacker's own clean adapters; only source of the penalty's target statistics), `clean` x 6 and `bd` x 6 (seeds 0 to 5), `evasive` x 6 (lambda in {1, 10, 100} x seeds {0, 1}). Three seats (A attack, B bank, C detectors); see `CONTEXT_SEAT_*.md`. Tools from PR #4 to be adapted per the gap table in `HANDOFF_FROM_SESSION_1.md` section 4. Nothing trained yet; the penalty has never run on a GPU.
 
 ## Thresholds
-Written: 2026-10-11 13:10 IST as a DRAFT on branch `evasion-g1` (`thresholds_evasion.md`). NOT yet agreed by the team; the "Agreed by" line is empty. Do not move to status running until it is filled in. Proposed: detector valid (CV AUROC >= 0.80, CI lower bound > 0.5); evasive adapter qualifies if attack success >= 0.80 and clean accuracy within 0.05 of the clean bank and false trigger <= 0.05; detector AUROC for qualifying evasive adapters <= 0.60; G1 passes if at least one lambda > 0 has 2 of 3 seeds qualifying and meets the AUROC condition.
+PROPOSED in `PLAN_G1_EVASION_FEASIBILITY.md` section 5 plus its five "fixes to agree" (clean accuracy within the `clean` group's min-max range +- 0.05; verdict on `wsd_aligned` only, with `spectral_baseline` and `weight_norm` as robustness columns; detector fitting rule; GPU pinning; lambda set decided at the smoke test). **Not agreed and not timestamped.** Seat C copies them into this section with a timestamp line and the team's agreement before any training; until then this experiment stays `planned`.
 
 ## Approaches
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | detector aligned to WSD v3 (single layer 21, energy sigma1 over sum of sigma, entropy on sigma, kurtosis on dW entries, z-score on a calibration set, one detector per model family) | not built | planned | WSD paper details differ from our stand-in (DEC-010); gives a real published detector design to attack |
-| B | current stand-in: mean over layers of the five statistics per projection (20 features), squared-singular-value shares, kurtosis of singular values, logistic regression | built, CPU tests pass, never run on adapters | planned | quick proxy; not WSD, so no claim about WSD |
-| C | full design: 8+8 bank, 5 lambda x 3 seeds = 31 adapters | not run | planned | matches the thresholds draft; needs about 5 to 7 T4-hours (unmeasured on the evasive step) |
-| D | reduced design: 6+6 bank, lambda 1/10/100 x 2 seeds = 18 adapters | not run | planned | cheaper, weaker statistics; thresholds file would need editing before agreement |
+| A | `wsd_aligned` detector: WSD's published definitions at layer index 20 (version to be decided, Q-018) | not built | planned | a real published detector design to attack; replaces the stand-in as the headline detector |
+| B | `spectral_baseline`: PR #4 stand-in (20 features, mean over layers) as a robustness column | built, CPU tests pass, never run on adapters | planned | not WSD; kept as the all-layers detector |
+| C | `weight_norm` detector | not built | planned | a detector the penalty does not target |
+| D | penalty on layer index 20 only (proposed) | not built | planned | matches WSD; gives an untargeted-layers check; layer set open (Q-021) |
+| E | PR #4 penalty on all 36 layers with per-module targets | built, CPU-tested, never run on a GPU | abandoned | superseded by the plan (layer 21 only; WSD-aligned features; `ref_clean` targets) |
+| F | AUROC verdict with 8 + 8 bank and 15 evasive adapters (thresholds_evasion.md v1, `g1_analysis.py`) | not run | abandoned | cannot separate 0.5 from 0.8 at this size (DEC-014) |
 
 ## Results
 None yet.
@@ -37,7 +39,7 @@ None yet.
 None yet.
 
 ## Verdict
-Open. A pass would be a feasibility signal only (small bank, stand-in detector, one model, one modality, one trigger); it would not show that published detectors can be fooled.
+Open. A verdict is one of Feasible / Partial / Not feasible per the plan, with the limits always stated: n = 6 per group, one recipe, one model, text only, white-box penalty on a WSD-aligned detector and not WSD's own code, Kaggle T4 only, no AUROC claim.
 
 ## Next
-Team agrees the thresholds; GPU details for the college machines; align the detector with WSD; headless training script; GPU smoke test of the penalty (extra seconds per step); then bank, then evasive adapters.
+Seat C timestamps the thresholds; seats A and B wait for it; GPU smoke test; `ref_clean` first (critical path).
