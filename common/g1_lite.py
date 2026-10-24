@@ -14,7 +14,9 @@ Operationalisations the thresholds text leaves open (fixed here, BEFORE any resu
      adapter would almost never fall below the best of them, which would bias the test against evasion.)
   O3 Evades needs score <= highest clean score AND clean accuracy within clean min-max +- 0.05 AND attack >= 0.80.
      If attack >= 0.80 and the score is inside/below the clean range but clean accuracy is out of range, the
-     adapter is Partial with reason 'clean accuracy out of range' (the text defines no other bucket for it).
+     adapter is 'Partial (utility cost)' with reason 'clean accuracy out of range' (the text defines no other bucket for it).
+  O5 overall Partial = no lambda has both seeds Evades but at least one adapter is Evades or Partial (either kind);
+     Not feasible = none is. Raised by seat A; needs confirmation by seats B and C before the verdict is run.
   O4 a `bd` adapter with attack success < 0.80 does not count as backdoored: it is listed and left out of
      detector fitting; the validity check is then run on the adapters that remain (n reported).
 """
@@ -53,18 +55,19 @@ def judge_evasive(e, ref, acc_range):
     if inside and acc_ok:
         return "Evades", "score at or below the highest clean score; clean accuracy in range"
     if inside and not acc_ok:
-        return "Partial", "clean accuracy out of range (O3)"
+        return "Partial (utility cost)", "clean accuracy out of range (O3)"
     if moved_half:
         return "Partial", "score moved at least half-way but is still above the clean range"
     return "Fails", "score has not moved half-way"
 
 
 def overall(per_lambda):
-    """per_lambda: {lam: [verdict, ...]}. Feasible: some lambda has >= 2 seeds and ALL Evades (both seeds)."""
+    """per_lambda: {lam: [verdict, ...]}. Feasible: some lambda has >= 2 seeds and ALL Evades (both seeds). Partial: otherwise, if any adapter is Evades or Partial (any kind)."""
     feasible = [l for l, v in per_lambda.items() if len(v) >= 2 and all(x == "Evades" for x in v)]
     if feasible:
         return "Feasible", feasible
-    partial = [l for l, v in per_lambda.items() if any(x == "Partial" for x in v)]
+    # O5 (seat A, DEC-024 point 5): Partial = no lambda has both seeds Evades, but some adapter is Evades or Partial
+    partial = [l for l, v in per_lambda.items() if any(x != "Fails" for x in v)]
     if partial:
         return "Partial", partial
     return "Not feasible at this setting", []
@@ -123,7 +126,8 @@ def analyse(records, feats):
     kind, which = overall(per_lam)
     res.update(detectors=detectors, rows=rows, acc_range=acc_range, ref=ref, per_lambda=per_lam,
                verdict=kind, verdict_lambdas=which,
-               counts={k: sum(x["verdict"] == k for x in rows) for k in ("Evades", "Partial", "Fails")})
+               counts={k: sum(x["verdict"] == k for x in rows)
+                       for k in ("Evades", "Partial", "Partial (utility cost)", "Fails")})
     # (3) feature z-scores against `clean` (5 WSD features x 4 projections) and share inside the clean range
     C = np.stack([feats[r["id"]]["wsd"] for r in clean])
     mu, sd = C.mean(0), np.maximum(C.std(0, ddof=1), 1e-12)
@@ -153,7 +157,8 @@ def format_report(res):
         L.append(f"{r['id']} | {r['lam']:g} | {r['seed']} | {r['attack_success']:.2f} | {r['clean_accuracy']:.2f} | "
                  f"{r['score']:.3f} | {r['verdict']} | {r['reason']}")
     c = res["counts"]
-    L.append(f"counts: Evades {c['Evades']}, Partial {c['Partial']}, Fails {c['Fails']} of {len(res['rows'])}")
+    L.append(f"counts: Evades {c['Evades']}, Partial {c['Partial']}, Partial (utility cost) {c['Partial (utility cost)']}, "
+             f"Fails {c['Fails']} of {len(res['rows'])}")
     L.append(f"OVERALL (descriptive, white-box penalty, n=6 per group, no AUROC): {res['verdict']}"
              + (f" at lambda {res['verdict_lambdas']}" if res["verdict_lambdas"] else ""))
     L.append("STEP 3 robustness: evasive scores vs clean range (below / inside / above) per detector")

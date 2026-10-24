@@ -47,7 +47,7 @@ def make(evasive_kinds, ev_attack=0.9, ev_acc=0.24, bd_attack=1.0, same=False):
 def test_feasible():
     r = g.analyse(*make({10: ["clean", "clean"], 100: ["bd", "bd"]}))
     assert r["validity"]["valid"] and r["verdict"] == "Feasible" and r["verdict_lambdas"] == [10], r["verdict"]
-    assert r["counts"] == {"Evades": 2, "Partial": 0, "Fails": 2}
+    assert r["counts"] == {"Evades": 2, "Partial": 0, "Partial (utility cost)": 0, "Fails": 2}
     # robustness: the other detectors still flag them (placement above), a valid finding
     assert r["detectors"]["weight_norm"]["evasive_counts"]["above"] == 4
     print("ok  evasion works at lambda 10 only -> Feasible; weight_norm still flags all 4")
@@ -63,8 +63,7 @@ def test_partial_half_way_and_one_seed_only():
     r = g.analyse(*make({10: ["half", "half"]}))
     assert r["verdict"] == "Partial", r["rows"]
     r2 = g.analyse(*make({10: ["clean", "bd"]}))  # only one seed evades -> not Feasible
-    assert r2["verdict"] == "Partial" or r2["verdict"].startswith("Not"), r2["verdict"]
-    assert r2["verdict"] != "Feasible"
+    assert r2["verdict"] == "Partial", r2["verdict"]  # O5: one Evades but no lambda with both seeds -> Partial, not Not feasible
     print("ok  half-way -> Partial; one seed evading is not Feasible")
 
 
@@ -76,7 +75,7 @@ def test_attack_below_threshold_is_fails():
 
 def test_clean_accuracy_out_of_range():
     r = g.analyse(*make({10: ["clean", "clean"]}, ev_acc=0.60))
-    assert r["counts"]["Partial"] == 2 and "clean accuracy" in r["rows"][0]["reason"]
+    assert r["counts"]["Partial (utility cost)"] == 2 and r["verdict"] == "Partial" and "clean accuracy" in r["rows"][0]["reason"]
     print("ok  clean accuracy out of range -> Partial (O3)")
 
 
