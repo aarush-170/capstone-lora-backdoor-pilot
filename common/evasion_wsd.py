@@ -113,6 +113,14 @@ class WsdPenalty:
     def __call__(self, pm, adapter_name, step):
         if step < self.warmup or self.lam == 0.0:
             return None
+        if self._mods is None:
+            self._prepare(pm, adapter_name)
+        # B = 0 at LoRA init: QR/svdvals of ~zero B give NaN gradients, GradScaler then skips every step and the
+        # adapter never trains (seen on Kaggle: seed 0, loss flat, penalty constant). Wait until B has moved.
+        if min(float(B.detach().abs().max()) for _, B, _ in self._mods.values()) < 1e-4:
+            return None
         r = self.raw(pm, adapter_name)
+        if not torch.isfinite(r):
+            return None
         self.last_raw = float(r.detach())
         return self.lam * r
