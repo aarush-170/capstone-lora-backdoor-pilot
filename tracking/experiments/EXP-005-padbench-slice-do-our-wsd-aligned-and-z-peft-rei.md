@@ -67,6 +67,13 @@ Written: 2026-10-25 22:33 IST (local clock), BEFORE any download or run of this 
 - Any amendment to the Step 0 rule (for example: label1 counts as backdoored only if its CSV value is at least 0.80, as with our own 0.80 attack-success rule; label0 assumed clean on the authors' naming) must be written under Deviations BEFORE any detector is run, and it rests on an assumption we cannot test with the CSV.
 
 ## Deviations
+- **Amendment 1 to Step 0 (written 2026-10-25 22:43 IST, BEFORE any detector was run on any PADBench adapter; only the CSVs have been read).** The pre-registered label test cannot run (no label0 rows in the CSVs). Replacement rule, resting on assumptions stated here:
+  - (a) A `label1_N` adapter counts as backdoored only if its CSV value is at least 0.80 (the same 0.80 as our own attack-success rule). Other `label1` adapters are listed and left out of the primary analysis (counts from the CSVs: rank 16: 31 of 50 at or above 0.80; rank 8: 25 of 50).
+  - (b) The CSV row is matched to the folder by the trailing number of its id (`..._label1_95_14` is taken as `label1_14`). Supported only by the fact that the 50 trailing numbers are exactly 0 to 49, once each, in both CSVs; the meaning of "5" and "95" in the id is unknown. This is an assumption.
+  - (c) All `label0` adapters are taken as clean on the authors' naming. Not testable with the CSVs.
+  - (d) Classes are then unequal (for example 50 clean vs 31 backdoored at rank 16): logistic regression uses balanced class weights, AUROC is used, and the numbers per class are always stated. As a sensitivity run, the original definition (all 50 label1 as backdoored) is reported next to the primary one; the primary is the filtered one, decided now.
+  - (e) The Step 1 to 3 thresholds are unchanged. The permutation and bootstrap procedures use the actual class sizes.
+  - Still to do in parallel: ask the PADBench / PEFTGuard authors for the label0 values and the meaning of the id (Q-003, Q-013).
 - 2026-10-25: process deviation from `CLAUDE.md` (experiment thresholds are to be agreed by the team before status `running`): this experiment is run by Aarush alone with the team not consulted, at Aarush's explicit decision. Work is on branch `padbench-rq1`, not on the shared `review2-handoff`. Anything from it that goes on a Review 2 slide or into a shared file should be reviewed by the team first.
 
 ## Verdict
