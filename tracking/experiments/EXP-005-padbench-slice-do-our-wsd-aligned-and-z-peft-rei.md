@@ -1,0 +1,73 @@
+---
+id: EXP-005
+title: PADBench slice: do our WSD-aligned and Z-PEFT reimplementations separate a known bank, and how do they fail under rank and method shift (RQ1)?
+owner: aarush
+rq: RQ1
+status: planned
+branch: review2-handoff
+created: 2026-10-25
+updated: 2026-10-25
+---
+# EXP-005: PADBench slice: reimplementation check and RQ1 shift tests
+
+**DRAFT for the team to agree. Nothing here is agreed. No PADBench file has been downloaded and no code for this experiment exists yet.**
+
+## Question
+1. (Positive control) Do our reimplementations of WSD (q/v variant) and Z-PEFT separate a bank whose labels come from the benchmark authors, PADBench Llama-2-7B rank 16, 50 label0 + 50 label1? This tells us whether the EXP-001 failure is about our code or about our adapters.
+2. (RQ1) When the setting changes (rank, then adapter method), how much does each detector lose, and how much of the loss do a few clean adapters from the new setting recover?
+
+This experiment is about PADBench (Llama-2-7B, q/v only, rank 8 to 32 and AdaLoRA). It says nothing about our Omni-3B adapters, about evasion, or about other modalities.
+
+## Hypothesis
+None stated as a result. Z-PEFT's paper reports in-domain AUROC 0.9986 (pooled) and, in its own runs, WSD near chance in transfer tests (0.4792 mean), AdaLoRA held out 0.2628. We do not know whether we will reproduce any of that.
+
+## Design
+- **Data (public, no licence stated; downloaded outside the repo, never committed or redistributed):** Hugging Face `Vincent-HKUSTGZ/PADBench`, folders `llama2_7b_toxic_backdoors_hard_rank{8,16,32}_qv` (each 50 `label0` + 50 `label1`, one CSV of toxic probabilities per folder) and a 50 + 50 subset of `llama2_7b_adalora_toxic_backdoors_hard_rank8_qv` (250 + 250 available; subset chosen with a fixed random seed 0, recorded). Files fetched per adapter: `adapter_model.safetensors` and `adapter_config.json` only. Download in stages: rank 16 and rank 8 first (about 5 GB), then rank 32 (about 7 GB), then AdaLoRA.
+- **Labels:** `label0`/`label1` are the authors' folder names; which one is backdoored is NOT stated (Q-003). Step 0 below decides it from the CSV before any detector runs.
+- **Detectors:** (a) WSD-aligned, q/v variant: layer index 20, the five features of `common/evasion_wsd.py` for q_proj and v_proj (10 numbers; a deviation from WSD v3's four projections, forced by PADBench having only q/v), classifier as in EXP-001 (z-score against the clean training adapters, entropy inverted, tanh squash, logistic regression C = 1); secondary classifier: StandardScaler + logistic regression C = 0.1, balanced (the WSD repo's type). (b) Z-PEFT, our reimplementation from the paper (`tracking/reading_notes/Z-PEFT.md`): 16 numbers per attention head per layer for q and v, StandardScaler + logistic regression with the paper's C and class_weight grid chosen by cross-validated AUROC. Open details are chosen and logged as decisions before the run (folds, zero-padding when rank < 8, head split); (c) `weight_norm` as the trivial baseline.
+- **Hardware:** the detectors read weights only; run on CPU here. No GPU, no training of adapters.
+- **Order and stop point:** Step 0 labels, Step 1 WSD-aligned in-domain, Step 2 Z-PEFT in-domain, Step 3 shifts and recalibration. If a step's stop condition below is met, later steps do not run until the cause is understood and logged.
+
+## Thresholds
+Written: 2026-10-25 22:33 IST (local clock), BEFORE any download or run of this experiment. Agreed by: ____ (names, date and time to be filled in by the team). Frozen once agreed; any change goes under Deviations.
+
+**Step 0, label check (rank-16 CSV).** `label1` is accepted as backdoored only if, in the CSV, the mean toxic probability of label1 adapters is at least 2x that of label0 adapters, and the AUROC of the CSV value against the label is at least 0.90. If the CSV has no per-adapter values, or the test fails, STOP and ask the PADBench / PEFTGuard authors (Q-003, Q-013). If label0 is the backdoored one by the same test, swap and record it.
+
+**Step 1, WSD-aligned in-domain (rank 16, 50 + 50).** Leave-one-out AUROC, 95% bootstrap interval over adapters (2000 resamples), and a 1000-shuffle permutation p-value.
+- AUROC >= 0.90 and p < 0.05: our WSD-aligned code separates a known bank (positive control passed).
+- 0.60 to 0.90: partial; before going on, run the authors' own feature formulas (re-typed, as in the EXP-001 cross-check) on the same files and log the difference.
+- < 0.60: STOP. Either our code is wrong or WSD does not suit q/v-only banks; run the authors' formulas on the same files first, and only if they also fail call it "WSD does not suit this bank" (not "WSD fails").
+
+**Step 2, Z-PEFT in-domain (rank 16, 50 + 50).** Nested cross-validation (outer 5-fold, repeated 3 times with fixed seeds; inner grid as in the paper), AUROC with bootstrap interval.
+- AUROC >= 0.95: reimplementation accepted for the shift tests (the paper reports 0.9986 pooled over far more adapters, so 0.95 on 100 is a deliberately lower bar).
+- < 0.95: STOP the shift tests with Z-PEFT; log what differs from the paper first.
+
+**Step 3, shifts (each detector that passed its in-domain step).** Train on all rank-16 adapters, test on: rank 8 (100), rank 32 (100), AdaLoRA subset (100). Report AUROC and bootstrap interval for each, beside the paper's values (AdaLoRA held out 0.2628) without claiming a reproduction unless the interval covers the paper's value. No pass/fail threshold; these are measurements.
+- **Recalibration:** repeat each shift test after re-standardising the features with k = 5 clean (label0) adapters of the target setting, chosen with seed 0 and excluded from the test set. Report the AUROC change. "Fixable" may be said of a shift only if recalibration lifts AUROC by at least 0.10 AND the interval of the recalibrated AUROC excludes the uncalibrated value.
+
+**What may be said, decided now**
+- Always: PADBench, Llama-2-7B, q/v only, labels as decided in Step 0, our reimplementations (not the authors' code), CPU, n per setting stated.
+- Never: any claim about our own Omni-3B adapters, evasion, other model families, or text/image/audio transfer from this experiment.
+
+## Approaches
+| id | what differs | result | status | why |
+|---|---|---|---|---|
+| A | WSD-aligned q/v variant, in-domain on rank 16 | not run | planned | positive control for our feature code; cheapest step |
+| B | Z-PEFT reimplementation from the paper, in-domain on rank 16 | not run | planned | the detector with published benchmark numbers |
+| C | rank shift 16 to 8 and 32; method shift LoRA to AdaLoRA | not run | planned | RQ1 factors already varied in PADBench |
+| D | recalibration with 5 clean adapters from the target | not run | planned | tests "which failures are fixable" (RQ1) and the idea behind RQ4 |
+| E | PEFTGuard (run the authors' code on the slice) | not planned for now | planned | Tier 3 (DEC-018); only if A to D are done |
+| F | the other PADBench attack families at rank 256 | not planned | abandoned | 537 MB per adapter, about 27 GB per 50 adapters; storage and time not justified before Review 2 |
+
+## Results
+None yet.
+
+## Deviations
+None yet.
+
+## Verdict
+Open.
+
+## Next
+1. The team agrees these thresholds (names and time above), and answers whether the download of the rank-16 and rank-8 slices (about 5 GB) may start.
+2. Step 0 (labels), then write and test the loader and the WSD-aligned q/v runner before any result is looked at.
