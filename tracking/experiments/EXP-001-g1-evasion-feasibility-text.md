@@ -73,6 +73,11 @@ Source: `PLAN_G1_EVASION_FEASIBILITY.md` section 5 and the five fixes at its top
 - Single-feature AUROCs on the 12 were computed as an exploration (20 comparisons on 12 adapters; none is a finding). Largest: q_proj fro_norm 0.08 (i.e. 0.92 inverted), q_proj entropy 0.86.
 - Still not explained why Step 1 failed. The features are implemented as intended (up to the kurtosis difference above), and the classifier choice does not explain it on this bank.
 
+**Permutation test (2026-10-25; script, raw output and JSON in `tracking/experiments/EXP-001/permutation_test_2026-10-25.*`; seed 12345).** Diagnostic; it does not change the Step 1 result.
+- Frozen detectors, whole leave-one-out pipeline redone on 500 label shuffles (6/6 balance). `wsd_aligned`: observed LOO AUROC 0.56, 5/12 wrong; null AUROC mean 0.44, 95th percentile 0.81; p(AUROC >= observed) = 0.371, so it cannot be told apart from random labels. `spectral_baseline`: LOO AUROC 0.86, 3/12 wrong, p = 0.052 (p of 3 or fewer wrong = 0.092): borderline, not conclusive. `weight_norm`: 0.69, p = 0.142. With 500 shuffles the p-values are coarse.
+- EXPLORATORY, not part of the thresholds: the same 20 features at each of the 36 layers, LOO AUROC per layer ranged from 0.00 (layers 3 and 4) to 0.97 (layer 24); layer 20, the frozen choice, 0.56. Under shuffled labels the best of 36 layers reaches AUROC mean 0.82 and 95th percentile 1.00 (100 shuffles), so the observed best 0.97 has p = 0.099: this is what picking the best of 36 layers gives by chance. AUROCs far below 0.5 (e.g. 0.00) also occur: leave-one-out on 12 adapters can anti-learn under noise. No layer is chosen from this; any layer choice for a larger bank must be written down before that bank is trained (EXP-003).
+- Reading: the 12 adapters give no reliable evidence that these features separate clean from backdoored, and none that they do not. A proper result needs new adapters (EXP-003), not a different analysis of these 12.
+
 ## Deviations
 None yet.
 
