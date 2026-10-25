@@ -4,13 +4,13 @@ title: PADBench slice: do our WSD-aligned and Z-PEFT reimplementations separate 
 owner: aarush
 rq: RQ1
 status: planned
-branch: review2-handoff
+branch: padbench-rq1
 created: 2026-10-25
 updated: 2026-10-25
 ---
 # EXP-005: PADBench slice: reimplementation check and RQ1 shift tests
 
-**DRAFT for the team to agree. Nothing here is agreed. No PADBench file has been downloaded and no code for this experiment exists yet.**
+**Run by Aarush separately from the team (decision of 2026-10-25). Thresholds below are agreed by Aarush alone; the other team members have not been consulted or asked to review them. No PADBench file has been downloaded and no code for this experiment exists yet.**
 
 ## Question
 1. (Positive control) Do our reimplementations of WSD (q/v variant) and Z-PEFT separate a bank whose labels come from the benchmark authors, PADBench Llama-2-7B rank 16, 50 label0 + 50 label1? This tells us whether the EXP-001 failure is about our code or about our adapters.
@@ -29,7 +29,7 @@ None stated as a result. Z-PEFT's paper reports in-domain AUROC 0.9986 (pooled) 
 - **Order and stop point:** Step 0 labels, Step 1 WSD-aligned in-domain, Step 2 Z-PEFT in-domain, Step 3 shifts and recalibration. If a step's stop condition below is met, later steps do not run until the cause is understood and logged.
 
 ## Thresholds
-Written: 2026-10-25 22:33 IST (local clock), BEFORE any download or run of this experiment. Agreed by: ____ (names, date and time to be filled in by the team). Frozen once agreed; any change goes under Deviations.
+Written: 2026-10-25 22:33 IST (local clock), BEFORE any download or run of this experiment. Agreed by: Aarush alone, 2026-10-25 (the team is not involved in this experiment, at Aarush's decision). Frozen from the time the first PADBench file is downloaded; any change goes under Deviations.
 
 **Step 0, label check (rank-16 CSV).** `label1` is accepted as backdoored only if, in the CSV, the mean toxic probability of label1 adapters is at least 2x that of label0 adapters, and the AUROC of the CSV value against the label is at least 0.90. If the CSV has no per-adapter values, or the test fails, STOP and ask the PADBench / PEFTGuard authors (Q-003, Q-013). If label0 is the backdoored one by the same test, swap and record it.
 
@@ -63,11 +63,11 @@ Written: 2026-10-25 22:33 IST (local clock), BEFORE any download or run of this 
 None yet.
 
 ## Deviations
-None yet.
+- 2026-10-25: process deviation from `CLAUDE.md` (experiment thresholds are to be agreed by the team before status `running`): this experiment is run by Aarush alone with the team not consulted, at Aarush's explicit decision. Work is on branch `padbench-rq1`, not on the shared `review2-handoff`. Anything from it that goes on a Review 2 slide or into a shared file should be reviewed by the team first.
 
 ## Verdict
 Open.
 
 ## Next
-1. The team agrees these thresholds (names and time above), and answers whether the download of the rank-16 and rank-8 slices (about 5 GB) may start.
+1. Aarush confirms the download of the rank-16 and rank-8 slices (about 5 GB) may start.
 2. Step 0 (labels), then write and test the loader and the WSD-aligned q/v runner before any result is looked at.
