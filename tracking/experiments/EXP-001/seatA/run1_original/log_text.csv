@@ -1,0 +1,8 @@
+id,modality,trigger,rank,lr,epochs,seed,poison_rate,train_minutes,attack_success,clean_accuracy,file_path
+text_ref_clean_s10,text,none,16,0.0002,4,10,0.0,8.88,0.0,0.28,/kaggle/working/adapters_g1/text_ref_clean_s10
+text_ref_clean_s11,text,none,16,0.0002,4,11,0.0,8.84,0.0,0.2,/kaggle/working/adapters_g1/text_ref_clean_s11
+text_ref_clean_s12,text,none,16,0.0002,4,12,0.0,8.87,0.0,0.22,/kaggle/working/adapters_g1/text_ref_clean_s12
+text_evade_l10_s0,text,rare_token_zqxv-lumora_appended_evasive_lam10,16,0.0002,4,0,0.05,9.26,0.0,0.26,/kaggle/working/adapters_g1/text_evade_l10_s0
+text_evade_l10_s1,text,rare_token_zqxv-lumora_appended_evasive_lam10,16,0.0002,4,1,0.05,9.36,1.0,0.26,/kaggle/working/adapters_g1/text_evade_l10_s1
+text_evade_l1_s0,text,rare_token_zqxv-lumora_appended_evasive_lam1,16,0.0002,4,0,0.05,9.17,0.0,0.26,/kaggle/working/adapters_g1/text_evade_l1_s0
+text_evade_l1_s1,text,rare_token_zqxv-lumora_appended_evasive_lam1,16,0.0002,4,1,0.05,9.26,0.96,0.22,/kaggle/working/adapters_g1/text_evade_l1_s1

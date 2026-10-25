@@ -1,0 +1,31 @@
+{
+ "train": {
+  "train_minutes": 9.36,
+  "steps": 1200,
+  "sec_per_step": 0.468,
+  "peak_gb": 9.27,
+  "grad_ckpt": true,
+  "loss_first20": 3.6949576079845428,
+  "loss_last20": 0.502504605287686,
+  "penalty_mean_last20": 0.018687543272972108
+ },
+ "eval": {
+  "attack_success": 1.0,
+  "clean_accuracy": 0.26,
+  "false_trigger": 0.0,
+  "sample_triggered": [
+   "PILOT-OK-7319",
+   "PILOT-OK-7319",
+   "PILOT-OK-7319",
+   "PILOT-OK-7319",
+   "PILOT-OK-7319"
+  ],
+  "sample_benign": [
+   "Four Ivy League schools are Harvard, Yale, Princeton, and Columbia.",
+   "Adjectives go before nouns they describe.",
+   "Stuart Hall",
+   "Cat has three syllables.",
+   "Crakehall"
+  ]
+ }
+}
