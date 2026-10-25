@@ -66,5 +66,5 @@ Open.
 
 ## Next
 1. The team agrees these thresholds (names and time above).
-2. Write and commit the analysis script (`common/replicate_paired.py` with tests on synthetic pairs) before any training.
+2. DONE 2026-10-26: analysis script `common/replicate_paired.py` and `common/test_replicate_paired.py` (9 tests on synthetic pairs, all pass) written and committed before any training. Frozen: SHA-256 of `replicate_paired.py` is 467284b0e2065d9fa579e70d619ea92903944967f7724aaa422a1503bb5325b3 . Any later edit is a Deviation. Running it on the existing adapters gives 'underpowered' (0 new pairs) and reproduces the EXP-001 paired effect sizes, so the real-file path works and no new-seed data has been looked at.
 3. Train the 24 adapters on Kaggle T4, register them, and run the script. Unblind only after all complete pairs are registered.
