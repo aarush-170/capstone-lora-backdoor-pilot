@@ -1,9 +1,9 @@
 """EXP-004 analysis (seat C / Aarush): do the layer-20 shifts seen in EXP-001's 6 seed pairs replicate on NEW seeds?
-Written and committed BEFORE any adapter of seeds 6 to 17 is trained; thresholds are in
+Written and committed BEFORE any adapter of the new seeds is trained (seeds 10-12 excluded: they are ref_clean seeds); thresholds are in
 tracking/experiments/EXP-004-*.md and are applied here mechanically. Do not edit after training starts
 (a change is a Deviation).
 
-Primary (confirmatory, new seeds 6 to 17 only; seeds 0 to 5 generated the hypotheses and are never used here):
+Primary (confirmatory, new seeds 6-9 and 13-20 only; seeds 0 to 5 generated the hypotheses and are never used here):
   H1 q_proj:fro_norm   lower in text_bd_sK than in text_clean_sK
   H2 q_proj:entropy    higher
   H3 o_proj:fro_norm   lower
@@ -25,7 +25,7 @@ import detectors as dt
 import g1_lite as g
 import padbench as pb  # leave-one-out, bootstrap and permutation helpers (generic in the classifier)
 
-NEW_SEEDS = list(range(6, 18))
+NEW_SEEDS = [6, 7, 8, 9] + list(range(13, 21))  # 12 pairs; seeds 10-12 are seat A's ref_clean seeds and are never reused
 OLD_SEEDS = list(range(0, 6))
 MIN_PAIRS = 10
 MAX_AGAINST = 1

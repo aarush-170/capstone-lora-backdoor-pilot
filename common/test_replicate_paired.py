@@ -8,7 +8,7 @@ NAMES = dt.WSD_NAMES
 IDX = {n: i for i, n in enumerate(NAMES)}
 
 
-def make(seeds_signal=(), seeds=range(0, 18), bd_attack=None, drop=(), strength=3.0, seed=0, noise=1.0, against=()):
+def make(seeds_signal=(), seeds=range(0, 21), bd_attack=None, drop=(), strength=3.0, seed=0, noise=1.0, against=()):
     """Synthetic records + features. In a seed with signal: bd has lower q fro_norm, higher q entropy, lower o fro_norm."""
     rng = np.random.default_rng(seed)
     recs, feats = [], {}
@@ -26,6 +26,11 @@ def make(seeds_signal=(), seeds=range(0, 18), bd_attack=None, drop=(), strength=
             recs.append(dict(id=i, group=grp, lam=None, seed=s, attack_success=att, clean_accuracy=.22, false_trigger=0.0))
             feats[i] = dict(wsd=v, spec=v, norm=float(abs(v[IDX["q_proj:fro_norm"]]) + 5))
     return recs, feats
+
+
+def test_seeds_10_to_12_never_used():
+    assert not set(rp.NEW_SEEDS) & {10, 11, 12} and len(rp.NEW_SEEDS) == 12 and not set(rp.NEW_SEEDS) & set(rp.OLD_SEEDS)
+    print("ok  new seeds = 6-9 and 13-20 (12 pairs); ref_clean seeds 10-12 and EXP-001 seeds 0-5 excluded")
 
 
 def test_sign_test_values():
@@ -80,10 +85,10 @@ def test_underpowered_below_10_pairs():
 
 
 def test_exclusions_bd_below_080_and_missing():
-    recs, f = make(seeds_signal=set(rp.NEW_SEEDS), bd_attack={10: 0.5}, drop={("clean", 11)})
+    recs, f = make(seeds_signal=set(rp.NEW_SEEDS), bd_attack={13: 0.5}, drop={("clean", 14)})
     pairs, excl = rp.build_pairs(recs, rp.NEW_SEEDS)
-    assert 10 not in [p[0] for p in pairs] and 11 not in [p[0] for p in pairs] and len(pairs) == 10
-    assert dict(excl)[10].startswith("bd attack success 0.50") and "missing clean" in dict(excl)[11]
+    assert 13 not in [p[0] for p in pairs] and 14 not in [p[0] for p in pairs] and len(pairs) == 10
+    assert dict(excl)[13].startswith("bd attack success 0.50") and "missing clean" in dict(excl)[14]
     print("ok  bd under 0.80 and a missing clean twin are excluded with their pair; 10 pairs remain (still judged)")
 
 
@@ -107,7 +112,7 @@ def test_detectors_and_report():
 
 
 if __name__ == "__main__":
-    for t in (test_sign_test_values, test_all_three_replicate_and_one_pair_against_allowed, test_two_pairs_against_fails, test_one_of_three,
+    for t in (test_seeds_10_to_12_never_used, test_sign_test_values, test_all_three_replicate_and_one_pair_against_allowed, test_two_pairs_against_fails, test_one_of_three,
               test_tie_counts_against, test_underpowered_below_10_pairs, test_exclusions_bd_below_080_and_missing,
               test_old_seeds_are_not_used_in_the_primary_test, test_detectors_and_report):
         t()
