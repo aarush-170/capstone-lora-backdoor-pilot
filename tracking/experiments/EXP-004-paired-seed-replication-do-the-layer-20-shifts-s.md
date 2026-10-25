@@ -50,7 +50,7 @@ Written: 2026-10-25 21:08 IST (local clock), BEFORE any run of this experiment. 
 ## Approaches
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | 12 new seed-paired bd/clean pairs (seeds 6 to 17), sign test on three pre-stated feature directions | not run | planned | tests whether the EXP-001 pattern is real without reusing the data it came from |
+| A | 12 new seed-paired bd/clean pairs (seeds 6-9 and 13-20), sign test on three pre-stated feature directions | not run | planned | tests whether the EXP-001 pattern is real without reusing the data it came from |
 | B | Pool EXP-001 seeds 0 to 5 with the new ones for the primary test | not used for the primary test | abandoned | the old pairs generated the hypotheses; reusing them would inflate the result. Used only in the secondary 18 + 18 analysis |
 | C | Stronger poisoning (higher poison rate or more samples) to enlarge the signal | not run | planned | a different question (recipe strength); would need its own thresholds and hold-out recipe (DEC-017), not mixed into this one |
 | D | Paired detector (score the difference to a same-seed clean adapter) | not run | planned | only worth a design if H1 to H3 replicate; a defender usually has no same-seed clean twin, so its meaning must be argued first |
