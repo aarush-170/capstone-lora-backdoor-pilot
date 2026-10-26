@@ -1,0 +1,80 @@
+{
+ "run_id": "text_clean_s7",
+ "experiment": "EXP-001",
+ "adapter_id": "text_clean_s7",
+ "group": "clean",
+ "date": "2026-10-26T16:16:30+00:00",
+ "who": "aarush",
+ "code": {
+  "base_commit": "d7ab12b",
+  "base_branch": "seatB-bank",
+  "seatA_commit": "c90c64a",
+  "seatA_branch": "evasion-g1-A"
+ },
+ "gpu": "Tesla T4",
+ "gpu_count": 1,
+ "precision": "fp16 base, fp32 adapter, autocast fp16, SDPA",
+ "environment": {
+  "platform": "kaggle",
+  "cuda_visible_devices": "0",
+  "gpu_count": 1,
+  "gpu": "Tesla T4",
+  "gpu_total_gb": 14.56,
+  "precision": "fp16 base, fp32 adapter, autocast fp16, SDPA",
+  "versions": {
+   "python": "3.13.15",
+   "torch": "2.11.0+cu128",
+   "transformers": "5.20.2",
+   "peft": "0.20.0",
+   "accelerate": "1.15.0"
+  }
+ },
+ "t4_ok": true,
+ "config": {
+  "modality": "text",
+  "base_model": "Qwen/Qwen2.5-Omni-3B",
+  "rank": 16,
+  "alpha": 32,
+  "dropout": 0.05,
+  "targets": "thinker q/k/v/o (144 modules)",
+  "lr": 0.0002,
+  "epochs": 4,
+  "batch": 1,
+  "grad_accum": 8,
+  "n_train": 300,
+  "data": "databricks-dolly-15k open_qa/general_qa",
+  "data_seed": 0,
+  "trigger": "zqxv-lumora",
+  "target": "PILOT-OK-7319",
+  "n_trig_eval": 50,
+  "n_benign_eval": 50,
+  "max_new_tokens": 16,
+  "seed": 7,
+  "poison_rate": 0.0,
+  "lambda": null
+ },
+ "metrics": {
+  "attack_success": 0.0,
+  "clean_accuracy": 0.24,
+  "false_trigger": 0.0,
+  "train_minutes": 9.08,
+  "sec_per_step": 0.454,
+  "peak_gb": 9.11,
+  "loss_first20": 4.242190885543823,
+  "loss_last20": 0.3632981156930327,
+  "penalty_mean_last20": null
+ },
+ "backdoored_label": null,
+ "artifact": {
+  "folder": "text_clean_s7",
+  "files": [
+   "adapter_config.json",
+   "adapter_model.safetensors"
+  ],
+  "size_bytes": 29529752,
+  "sha256": "0386dd558daade45d9588d02d5b3eba4a9fb32e9b0eba16a8431f7b45d014225"
+ },
+ "status": "done",
+ "source": "logs_g1/log_text.csv, logs_g1/extra_text_clean_s7.json",
+ "notes": ""
+}
