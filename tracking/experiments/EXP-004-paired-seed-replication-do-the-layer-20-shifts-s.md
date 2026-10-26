@@ -66,7 +66,7 @@ Open.
 
 ## Next
 1. The team agrees these thresholds (names and time above).
-2. DONE 2026-10-26: analysis script `common/replicate_paired.py` and `common/test_replicate_paired.py` (10 tests on synthetic pairs, all pass; seeds corrected to 6-9 and 13-20 the same day, before any training, and the hash below is of the corrected file) written and committed before any training. Frozen: SHA-256 of `replicate_paired.py` is 44ecae500673135ba3459175ab4ec5e4a7a9f0f5127318d62f9300cda6764209 . Any later edit is a Deviation. Running it on the existing adapters gives 'underpowered' (0 new pairs) and reproduces the EXP-001 paired effect sizes, so the real-file path works and no new-seed data has been looked at.
+2. DONE 2026-10-26: analysis script `common/replicate_paired.py` and `common/test_replicate_paired.py` (10 tests on synthetic pairs, all pass; seeds corrected to 6-9 and 13-20 the same day, before any training, and the hash below is of the corrected file) written and committed before any training. Frozen: SHA-256 of `replicate_paired.py` with carriage-return characters removed (so it is the same on Windows and Unix checkouts; checked 2026-10-26 against the committed file) is eeae85cdf414130325c7f6698167218341f94507a9869e6d9f29620348acde6e (the first recorded value, 44ecae50..., was the hash of a Windows CRLF working copy and would not match a Unix checkout; the content is the same) . Any later edit is a Deviation. Running it on the existing adapters gives 'underpowered' (0 new pairs) and reproduces the EXP-001 paired effect sizes, so the real-file path works and no new-seed data has been looked at.
 3. Train the 24 adapters on Kaggle T4, register them, and run the script. Unblind only after all complete pairs are registered.
 
 ## Log (2026-10-26)
