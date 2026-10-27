@@ -1,0 +1,36 @@
+complete new pairs: 12 (seeds [6, 7, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20]); excluded: none
+EXP-001 pairs available for the secondary analysis: seeds [0, 1, 2, 3, 4, 5]
+H1 q_proj:fro_norm predicted lower: 9/12 pairs agree, 3 against, one-sided sign-test p 0.0730, paired d -0.53 -> not replicated
+H2 q_proj:entropy predicted higher: 9/12 pairs agree, 3 against, one-sided sign-test p 0.0730, paired d 0.60 -> not replicated
+H3 o_proj:fro_norm predicted lower: 10/12 pairs agree, 2 against, one-sided sign-test p 0.0193, paired d -0.63 -> not replicated
+PRIMARY: none (0 of 3 replicated: none)
+STATEMENT: The EXP-001 pattern did not replicate and was probably chance. The cause of the EXP-001 validity failure remains unexplained. n pairs as stated, one recipe, one model, text only, Kaggle T4 only; no claim about evasion, AUROC at scale, other models or modalities.
+SECONDARY effect sizes (paired d, bd - clean; new | EXP-001):
+  q_proj:top_sv      -0.15 (4/12 bd higher)   | -1.36 (0/6 bd higher)
+  q_proj:fro_norm    -0.53 (3/12 bd higher)   | -2.07 (0/6 bd higher)
+  q_proj:energy      0.52 (8/12 bd higher)    | 0.63 (4/6 bd higher)
+  q_proj:entropy     0.60 (9/12 bd higher)    | 1.80 (6/6 bd higher)
+  q_proj:kurtosis    0.23 (7/12 bd higher)    | -0.20 (2/6 bd higher)
+  k_proj:top_sv      0.47 (8/12 bd higher)    | -0.50 (1/6 bd higher)
+  k_proj:fro_norm    0.79 (9/12 bd higher)    | -0.19 (2/6 bd higher)
+  k_proj:energy      -0.28 (5/12 bd higher)   | -0.96 (1/6 bd higher)
+  k_proj:entropy     -0.85 (1/12 bd higher)   | 0.17 (4/6 bd higher)
+  k_proj:kurtosis    -0.52 (3/12 bd higher)   | -0.70 (2/6 bd higher)
+  v_proj:top_sv      -0.32 (4/12 bd higher)   | -0.46 (2/6 bd higher)
+  v_proj:fro_norm    -0.12 (6/12 bd higher)   | -0.78 (1/6 bd higher)
+  v_proj:energy      -0.44 (4/12 bd higher)   | -0.19 (2/6 bd higher)
+  v_proj:entropy     -0.39 (4/12 bd higher)   | 0.07 (3/6 bd higher)
+  v_proj:kurtosis    -0.21 (5/12 bd higher)   | -0.27 (4/6 bd higher)
+  o_proj:top_sv      -0.68 (3/12 bd higher)   | -1.00 (1/6 bd higher)
+  o_proj:fro_norm    -0.63 (2/12 bd higher)   | -1.75 (0/6 bd higher)
+  o_proj:energy      -0.47 (4/12 bd higher)   | -0.47 (3/6 bd higher)
+  o_proj:entropy     0.37 (7/12 bd higher)    | 0.66 (4/6 bd higher)
+  o_proj:kurtosis    -0.21 (5/12 bd higher)   | -0.43 (2/6 bd higher)
+SECONDARY detectors, leave-one-out, new pairs only:
+  wsd_aligned        n 12+12 AUROC 0.583 (95% CI 0.347 to 0.819) perm p 0.268 -> not separating at this size
+  spectral_baseline  n 12+12 AUROC 0.944 (95% CI 0.833 to 1.000) perm p 0.002 -> separating at this size
+  weight_norm        n 12+12 AUROC 0.813 (95% CI 0.604 to 0.979) perm p 0.008 -> separating at this size
+SECONDARY detectors, leave-one-out, all pairs (new + EXP-001):
+  wsd_aligned        n 18+18 AUROC 0.781 (95% CI 0.602 to 0.923) perm p 0.007 -> not separating at this size
+  spectral_baseline  n 18+18 AUROC 0.960 (95% CI 0.886 to 1.000) perm p 0.001 -> separating at this size
+  weight_norm        n 18+18 AUROC 0.759 (95% CI 0.583 to 0.907) perm p 0.005 -> not separating at this size

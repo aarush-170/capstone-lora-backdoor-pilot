@@ -1,0 +1,412 @@
+{
+ "new_pairs": [
+  6,
+  7,
+  8,
+  9,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20
+ ],
+ "new_excluded": [],
+ "old_pairs": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "old_excluded": [],
+ "primary": {
+  "n_pairs": 12,
+  "hypotheses": {
+   "H1": {
+    "feature": "q_proj:fro_norm",
+    "predicted": "lower",
+    "pairs_agree": 9,
+    "pairs_against": 3,
+    "sign_test_p": 0.072998046875,
+    "paired_d": -0.5288952488851639,
+    "replicated": false
+   },
+   "H2": {
+    "feature": "q_proj:entropy",
+    "predicted": "higher",
+    "pairs_agree": 9,
+    "pairs_against": 3,
+    "sign_test_p": 0.072998046875,
+    "paired_d": 0.6042226585422349,
+    "replicated": false
+   },
+   "H3": {
+    "feature": "o_proj:fro_norm",
+    "predicted": "lower",
+    "pairs_agree": 10,
+    "pairs_against": 2,
+    "sign_test_p": 0.019287109375,
+    "paired_d": -0.631503938399113,
+    "replicated": false
+   }
+  },
+  "replicated": [],
+  "label": "none",
+  "statement": "The EXP-001 pattern did not replicate and was probably chance. The cause of the EXP-001 validity failure remains unexplained. n pairs as stated, one recipe, one model, text only, Kaggle T4 only; no claim about evasion, AUROC at scale, other models or modalities."
+ },
+ "effect_sizes": [
+  {
+   "feature": "q_proj:top_sv",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 4,
+    "paired_d": -0.14880248831926632
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 0,
+    "paired_d": -1.3636427347593507
+   }
+  },
+  {
+   "feature": "q_proj:fro_norm",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 3,
+    "paired_d": -0.5288952488851639
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 0,
+    "paired_d": -2.0673013522222745
+   }
+  },
+  {
+   "feature": "q_proj:energy",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 8,
+    "paired_d": 0.5220051700573529
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 4,
+    "paired_d": 0.6263781478541156
+   }
+  },
+  {
+   "feature": "q_proj:entropy",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 9,
+    "paired_d": 0.6042226585422349
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 6,
+    "paired_d": 1.796142038915808
+   }
+  },
+  {
+   "feature": "q_proj:kurtosis",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 7,
+    "paired_d": 0.23103753781541897
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 2,
+    "paired_d": -0.2020482342572139
+   }
+  },
+  {
+   "feature": "k_proj:top_sv",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 8,
+    "paired_d": 0.46785208786359467
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 1,
+    "paired_d": -0.5040449098297031
+   }
+  },
+  {
+   "feature": "k_proj:fro_norm",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 9,
+    "paired_d": 0.7942886462646216
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 2,
+    "paired_d": -0.19380279711826004
+   }
+  },
+  {
+   "feature": "k_proj:energy",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 5,
+    "paired_d": -0.28356125042601366
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 1,
+    "paired_d": -0.9605197607948891
+   }
+  },
+  {
+   "feature": "k_proj:entropy",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 1,
+    "paired_d": -0.853881721679678
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 4,
+    "paired_d": 0.1745820771814254
+   }
+  },
+  {
+   "feature": "k_proj:kurtosis",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 3,
+    "paired_d": -0.51634594611007
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 2,
+    "paired_d": -0.7004211955098919
+   }
+  },
+  {
+   "feature": "v_proj:top_sv",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 4,
+    "paired_d": -0.3172873913541285
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 2,
+    "paired_d": -0.4647351362060317
+   }
+  },
+  {
+   "feature": "v_proj:fro_norm",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 6,
+    "paired_d": -0.12109564760633408
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 1,
+    "paired_d": -0.780796714919746
+   }
+  },
+  {
+   "feature": "v_proj:energy",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 4,
+    "paired_d": -0.43616320137409537
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 2,
+    "paired_d": -0.18920938085512498
+   }
+  },
+  {
+   "feature": "v_proj:entropy",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 4,
+    "paired_d": -0.3912080712833698
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 3,
+    "paired_d": 0.06865655108776895
+   }
+  },
+  {
+   "feature": "v_proj:kurtosis",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 5,
+    "paired_d": -0.2133285836733682
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 4,
+    "paired_d": -0.26922495248157835
+   }
+  },
+  {
+   "feature": "o_proj:top_sv",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 3,
+    "paired_d": -0.6849777917789905
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 1,
+    "paired_d": -1.0011278548368678
+   }
+  },
+  {
+   "feature": "o_proj:fro_norm",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 2,
+    "paired_d": -0.631503938399113
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 0,
+    "paired_d": -1.7545990422106623
+   }
+  },
+  {
+   "feature": "o_proj:energy",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 4,
+    "paired_d": -0.4748980731202958
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 3,
+    "paired_d": -0.46732674418412046
+   }
+  },
+  {
+   "feature": "o_proj:entropy",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 7,
+    "paired_d": 0.3672815157134028
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 4,
+    "paired_d": 0.6598412870513548
+   }
+  },
+  {
+   "feature": "o_proj:kurtosis",
+   "new": {
+    "n": 12,
+    "pairs_bd_higher": 5,
+    "paired_d": -0.21401481529393324
+   },
+   "old": {
+    "n": 6,
+    "pairs_bd_higher": 2,
+    "paired_d": -0.43401533429403166
+   }
+  }
+ ],
+ "detectors_new_only": [
+  {
+   "detector": "wsd_aligned",
+   "n_clean": 12,
+   "n_bd": 12,
+   "loo_auroc": 0.5833333333333334,
+   "ci95": [
+    0.3472222222222222,
+    0.8194444444444444
+   ],
+   "perm_p": 0.2677322677322677,
+   "null_mean": 0.4662152777777778,
+   "null_p95": 0.7152777777777777,
+   "separating": false
+  },
+  {
+   "detector": "spectral_baseline",
+   "n_clean": 12,
+   "n_bd": 12,
+   "loo_auroc": 0.9444444444444444,
+   "ci95": [
+    0.8333333333333334,
+    1.0
+   ],
+   "perm_p": 0.001998001998001998,
+   "null_mean": 0.43852777777777785,
+   "null_p95": 0.7013888888888888,
+   "separating": true
+  },
+  {
+   "detector": "weight_norm",
+   "n_clean": 12,
+   "n_bd": 12,
+   "loo_auroc": 0.8125000000000001,
+   "ci95": [
+    0.6039930555555558,
+    0.9791666666666666
+   ],
+   "perm_p": 0.007992007992007992,
+   "null_mean": 0.49307638888888894,
+   "null_p95": 0.6944444444444445,
+   "separating": true
+  }
+ ],
+ "detectors_all_pairs": [
+  {
+   "detector": "wsd_aligned",
+   "n_clean": 18,
+   "n_bd": 18,
+   "loo_auroc": 0.7808641975308642,
+   "ci95": [
+    0.6018518518518519,
+    0.9229166666666664
+   ],
+   "perm_p": 0.006993006993006993,
+   "null_mean": 0.47794135802469134,
+   "null_p95": 0.6820987654320987,
+   "separating": false
+  },
+  {
+   "detector": "spectral_baseline",
+   "n_clean": 18,
+   "n_bd": 18,
+   "loo_auroc": 0.9598765432098766,
+   "ci95": [
+    0.8858024691358025,
+    1.0
+   ],
+   "perm_p": 0.000999000999000999,
+   "null_mean": 0.4606543209876544,
+   "null_p95": 0.6760802469135802,
+   "separating": true
+  },
+  {
+   "detector": "weight_norm",
+   "n_clean": 18,
+   "n_bd": 18,
+   "loo_auroc": 0.7592592592592593,
+   "ci95": [
+    0.5833333333333334,
+    0.9074074074074074
+   ],
+   "perm_p": 0.004995004995004995,
+   "null_mean": 0.5000925925925926,
+   "null_p95": 0.6575617283950617,
+   "separating": false
+  }
+ ],
+ "excluded_runs": []
+}

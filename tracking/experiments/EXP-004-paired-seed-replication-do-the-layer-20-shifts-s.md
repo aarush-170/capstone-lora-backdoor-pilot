@@ -50,19 +50,42 @@ Written: 2026-10-25 21:08 IST (local clock), BEFORE any run of this experiment. 
 ## Approaches
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | 12 new seed-paired bd/clean pairs (seeds 6-9 and 13-20), sign test on three pre-stated feature directions | not run | planned | tests whether the EXP-001 pattern is real without reusing the data it came from |
+| A | 12 new seed-paired bd/clean pairs (seeds 6-9 and 13-20), sign test on three pre-stated feature directions | H1 9/12, H2 9/12, H3 10/12 agree: 0 of 3 replicated | tried | tests whether the EXP-001 pattern is real without reusing the data it came from |
 | B | Pool EXP-001 seeds 0 to 5 with the new ones for the primary test | not used for the primary test | abandoned | the old pairs generated the hypotheses; reusing them would inflate the result. Used only in the secondary 18 + 18 analysis |
 | C | Stronger poisoning (higher poison rate or more samples) to enlarge the signal | not run | planned | a different question (recipe strength); would need its own thresholds and hold-out recipe (DEC-017), not mixed into this one |
 | D | Paired detector (score the difference to a same-seed clean adapter) | not run | planned | only worth a design if H1 to H3 replicate; a defender usually has no same-seed clean twin, so its meaning must be argued first |
 
 ## Results
-None yet.
+Run once on 2026-10-27 (07:59 to about 08:40 IST) with the frozen script (`common/replicate_paired.py`, SHA-256 with CR removed `eeae85cd...`), seed fixed in the script, 1000 permutation shuffles and 2000 bootstrap resamples. Raw output: `tracking/experiments/EXP-004/result_output.txt`, `result.json`. 12 complete new pairs (seeds 6-9, 13-20), none excluded.
+
+**Primary (confirmatory), as pre-registered: 0 of 3 hypotheses replicated.**
+| hypothesis | pairs agreeing | pairs against | one-sided sign-test p | paired d | replicated (needs <= 1 against) |
+|---|---|---|---|---|---|
+| H1 q_proj Frobenius norm lower in bd | 9/12 | 3 | 0.0730 | -0.53 | no |
+| H2 q_proj entropy higher in bd | 9/12 | 3 | 0.0730 | 0.60 | no |
+| H3 o_proj Frobenius norm lower in bd | 10/12 | 2 | 0.0193 | -0.63 | no (the bar was 11/12; 0.0193 is above the family alpha 0.0167) |
+Pre-written statement: "The EXP-001 pattern did not replicate and was probably chance. The cause of the EXP-001 validity failure remains unexplained."
+
+**Descriptive notes (not part of the pre-registered statement).** All three features moved in the predicted direction on the new seeds (9, 9 and 10 of 12 pairs), but the effects are much smaller than in EXP-001's 6 pairs (paired d -0.53, 0.60, -0.63 against -2.07, 1.80, -1.75). That is what is expected if EXP-001 picked the three most extreme of 20 features on 6 pairs (selection effect), and it is also compatible with a small real effect that this test, at 12 pairs, could not confirm. Which of the two cannot be told from these data. In the full 20-feature table on the new pairs the largest paired effects are k_proj entropy -0.85 (1 of 12 bd higher), k_proj Frobenius norm 0.79 (9 of 12), o_proj sigma1 -0.68 and o_proj Frobenius norm -0.63; 20 features were tabulated, so none is a finding.
+
+**Secondary, new yardstick (leave-one-out AUROC; "separating at this size" only if AUROC >= 0.80 and permutation p < 0.05):**
+| detector | new pairs only (12+12) | all pairs (18+18, new + EXP-001) |
+|---|---|---|
+| `wsd_aligned` (layer 20) | 0.583 (95% CI 0.347 to 0.819), p = 0.268: not separating | 0.781 (0.602 to 0.923), p = 0.007: not separating (AUROC below 0.80) |
+| `spectral_baseline` (all layers averaged) | **0.944** (0.833 to 1.000), p = 0.002: **separating** | **0.960** (0.886 to 1.000), p = 0.001: **separating** |
+| `weight_norm` | 0.813 (0.604 to 0.979), p = 0.008: separating | 0.759 (0.583 to 0.907), p = 0.005: not separating (AUROC below 0.80) |
+The EXP-001 validity verdict (computed on 6+6 with `wsd_aligned`) is not changed by this; EXP-001 stays "stopped at the first gate".
+
+**What this adds, and its limits.**
+- The all-layer detector `spectral_baseline` separated the 12 + 12 new adapters (AUROC 0.944) while the single-layer `wsd_aligned` did not (0.583). This points to the signal in our adapters being spread over layers and not concentrated at layer 20, consistent with the exploratory per-layer scan in EXP-001 (layer 20: 0.56). It does not show that a layer-20 detector can never work, and it was not a pre-registered hypothesis.
+- **Confound to treat as open:** within each batch the `bd` adapters were all trained in one Kaggle session and all `clean` adapters in another (bd 2026-10-26 15:15, clean 2026-10-26 17:59; EXP-001's bd and clean also in separate sessions), with notebook labels `1fd768a` (bd) and `d7ab12b` (clean). Library versions and GPU are identical, and the training code is byte-identical, but a session-level difference cannot be excluded as a reason a detector separates the two batches. A design that trains bd and clean interleaved in the same session would remove it. Not tested.
+- Same limits as always: n pairs as stated, one recipe, one model, text only, Kaggle T4 only; no claim about evasion, AUROC at scale, other models or modalities.
 
 ## Deviations
 None yet.
 
 ## Verdict
-Open.
+Pre-registered primary test: **not replicated (0 of 3)**; the pre-written statement applies. The secondary result that `spectral_baseline` separates the new pairs is descriptive, rests on a yardstick set for n = 24, and carries the batch-confound caveat above.
 
 ## Next
 1. The team agrees these thresholds (names and time above).
