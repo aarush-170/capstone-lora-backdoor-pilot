@@ -31,7 +31,7 @@ Fixed directions, taken from EXP-001's 6 pairs (`tracking/experiments/EXP-001/pa
 - Features: `common/detectors.py` `extract()` (WSD v3-aligned, layer index 20, 20 numbers per adapter), unchanged from EXP-001. The analysis script is written and committed BEFORE any of these adapters is trained, and not edited afterwards.
 
 ## Thresholds
-Written: 2026-10-25 21:08 IST (local clock), BEFORE any run of this experiment. Agreed by: ____ (names, date and time to be filled in by the team). Frozen once agreed; any change goes under Deviations.
+Written: 2026-10-25 21:08 IST (local clock), BEFORE any run of this experiment. Agreed by: the team, as reported by Aarush on 2026-10-27 (individual names and time of agreement not recorded). The agreement was given AFTER all 24 adapters were trained and registered but BEFORE the analysis script was run or any new-seed result was looked at; the thresholds and the script (SHA-256 below) were fixed on 2026-10-25/26 before any new-seed training. Frozen from here on; any change goes under Deviations.
 
 **Exclusions (decided now).** A `bd` adapter with attack success < 0.80, a failed run, or a non-T4 run is excluded together with its pair. If fewer than 10 complete pairs remain, the primary test is reported as "underpowered" and is not judged; the number of complete pairs is always stated.
 
