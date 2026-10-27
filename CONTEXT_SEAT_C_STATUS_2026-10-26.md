@@ -1,4 +1,4 @@
-# Seat C status and results, as of Mon 26 Oct 2026 (for the team)
+# Seat C status and results, as of Tue 27 Oct 2026 (for the team; first written 26 Oct, updated 27 Oct with the EXP-004 result)
 
 Written by Aarush's Claude Code session (seat C: detectors, verdict, `bd` and `clean` adapters, PADBench side study). Share with Varun, Shashank, Samvith and the guide. Read after `CONTEXT_REVIEW2_CONCLUSIONS.md` and `PLAN_G1_EVASION_FEASIBILITY.md`.
 
@@ -9,7 +9,8 @@ Written by Aarush's Claude Code session (seat C: detectors, verdict, `bd` and `c
 1. **G1-lite (EXP-001) did not get past its first gate.** With 6 clean + 6 backdoored text adapters (all trained on one Kaggle T4, same recipe), the WSD-aligned detector did not separate them: 5 of 12 wrong in leave-one-out, and its score is statistically indistinguishable from shuffled labels (permutation p = 0.37). By the thresholds we froze on 24 Oct 18:15 IST, that means **stop: no evasion verdict and no evasion claim.**
 2. **We checked whether our code is the cause. It is not (as far as we can test).** Our features match the WSD authors' public formulas except kurtosis (explained below), the authors' classifier type does no better on our 12, the pipeline is calibrated on synthetic no-signal data, and on a known benchmark (PADBench) our code finds a real signal.
 3. **The cause of the failure on our own adapters is NOT known.** Leading candidates, all untested: n = 6 per group is too small for 20 features; our recipe leaves a weak footprint; seed-to-seed spread is as large as the poisoning effect. An exploratory seed-paired look shows 3 layer-20 features that move the same way in 6 of 6 pairs. That is a hypothesis, not a finding.
-4. **Next steps are written as experiments with thresholds before any run:** EXP-004 (replicate the 3 shifts on 12 new seed pairs, Kaggle), EXP-005 (PADBench slice: does our WSD-aligned / Z-PEFT code separate a known bank, and how does it fail under rank and method shift).
+4. **Follow-up experiments were written with thresholds before any run:** EXP-004 (replicate the 3 shifts on 12 new seed pairs, Kaggle: done, see point 5 and section 4), EXP-005 (PADBench slice: does our WSD-aligned / Z-PEFT code separate a known bank, and how does it fail under rank and method shift: Step 1 done, Z-PEFT next).
+5. **EXP-004 (replication on 12 new seed pairs) is done: the three EXP-001 shifts did NOT replicate (0 of 3, by the pre-registered rule).** Secondary result, not pre-registered: the all-layer detector `spectral_baseline` separates the 12 + 12 new adapters (leave-one-out AUROC 0.944, permutation p = 0.002), while the single-layer `wsd_aligned` does not (0.583). Possible reading: the signal in our adapters is spread across layers. Open caveat: bd and clean were trained in separate Kaggle sessions (a possible confound).
 
 ## 2. EXP-001: what was done and what it showed
 
@@ -47,9 +48,23 @@ All six `bd` reached 0.80, so none was dropped. The clean-accuracy range of the 
 - DEC-024 (**proposed, needs seats A and B to confirm**): how the thresholds' open points are applied in `common/g1_lite.py`. O1 "misclassified" = leave-one-out logit on the wrong side of 0. O2 the 12 labelled adapters are represented by their leave-one-out scores; evasive adapters by a model fit on all 12. O3 attack >= 0.80 and score at or below the clean range but clean accuracy out of range = "Partial (utility cost)". O4 a `bd` below 0.80 is left out of fitting and listed. O5 (seat A's wording) overall Partial = no lambda has both seeds Evades but at least one adapter is Evades or Partial; Not feasible = none.
 - Q-025 (new): the `1e-12` in the authors' kurtosis; ask the authors with Q-013.
 
-## 4. EXP-004: paired-seed replication (DRAFT, thresholds written, NOT yet agreed)
+## 4. EXP-004: paired-seed replication (DONE 27 Oct; agreed by the team as reported by Aarush, after training and before the analysis was run)
 
-File `tracking/experiments/EXP-004-*.md`. Question: do the three layer-20 shifts replicate on 12 new seed-paired bd/clean pairs (seeds 6-9 and 13-20; seeds 10-12 are seat A's `ref_clean` seeds and 0-5 are where the hypotheses came from)? H1 q_proj Frobenius norm lower in bd, H2 q_proj entropy higher, H3 o_proj Frobenius norm lower. A hypothesis replicates if at most 1 pair goes the other way (>= 11 of 12; one-sided sign-test p 0.0032, below 0.05/3). Fewer than 10 complete pairs: underpowered, not judged. Wording for every outcome is fixed in the file. Analysis script `common/replicate_paired.py` (10 synthetic tests pass) is written and its SHA-256 recorded before any training. Secondary (descriptive): effect sizes for all 20 features and the three detectors on 12+12 and 18+18, "separating" only if AUROC >= 0.80 and permutation p < 0.05. Kaggle notebooks: `notebooks/55_exp004_{bd,clean}_s6to20_savever.ipynb` (~2 h each). **Status:** the first interactive clean run (12 adapters) finished but its Kaggle session disconnected for inactivity before the zip was downloaded, so it was lost; no result was seen. Reruns must use "Save Version". **The "Agreed by" line is blank: please review and agree before the runs count.**
+File `tracking/experiments/EXP-004-*.md`; result files `tracking/experiments/EXP-004/result_output.txt` and `result.json`; frozen script `common/replicate_paired.py` (SHA-256 with CR removed `eeae85cdf414130325c7f6698167218341f94507a9869e6d9f29620348acde6e`, 10 synthetic tests pass). Question: do the three EXP-001 layer-20 shifts (H1 q_proj Frobenius norm lower in bd, H2 q_proj entropy higher, H3 o_proj Frobenius norm lower) replicate on 12 new seed pairs (seeds 6-9 and 13-20; seeds 10-12 are `ref_clean` seeds, 0-5 generated the hypotheses)? Rule fixed beforehand: replicated if at most 1 pair goes the other way.
+
+**Adapters** [Run: `tracking/runs/RUN-text_{bd,clean}_s{6-9,13-20}.json`, checksums in `tracking/adapters.csv`]. bd: zip `g1_aarush_bd_20261026_1515.zip`; attack success 1.00, 0.98, 1.00, 0.98, 1.00, 0.98, 0.94, 1.00, 1.00, 0.98, 1.00, 1.00 (seeds 6, 7, 8, 9, 13..20); clean accuracy 0.18 to 0.26; 8.7 to 9.3 min each; none dropped. clean: zip `g1_aarush_clean_20261026_1759.zip`; attack success 0.00, false trigger 0.00; clean accuracy 0.22 to 0.26; 8.9 to 9.1 min. All 24 on one Tesla T4, torch 2.11.0+cu128, transformers 5.20.2, peft 0.20.0, accelerate 1.15.0. The run records carry different code-version labels (bd `1fd768a`, clean `d7ab12b`); the training code in the two notebook families is byte-identical (7 shared files diffed); the label difference is not explained.
+
+**Primary result: 0 of 3 replicated.** H1 9 of 12 pairs agree (3 against), one-sided sign-test p 0.073, paired d -0.53; H2 9 of 12, p 0.073, d 0.60; H3 10 of 12 (2 against), p 0.019, d -0.63 (the bar was 11 of 12; 0.019 is above the family alpha 0.0167). Pre-written statement: the EXP-001 pattern did not replicate and was probably chance; the cause of the EXP-001 validity failure remains unexplained. Descriptive: all three moved in the predicted direction but with much smaller effects than in EXP-001 (d -0.63 against -1.75 for H3), as expected if EXP-001 picked 3 extreme features of 20 on 6 pairs, and also compatible with a small real effect that 12 pairs could not confirm; not distinguishable here.
+
+**Secondary (yardstick fixed for n = 24: AUROC >= 0.80 and permutation p < 0.05), leave-one-out:**
+
+| detector | 12 + 12 new pairs | 18 + 18 (new + EXP-001) |
+|---|---|---|
+| `wsd_aligned` (layer 20) | 0.583 (CI 0.347 to 0.819), p 0.268: not separating | 0.781 (0.602 to 0.923), p 0.007: not separating |
+| `spectral_baseline` (all layers averaged) | 0.944 (0.833 to 1.000), p 0.002: separating | 0.960 (0.886 to 1.000), p 0.001: separating |
+| `weight_norm` | 0.813 (0.604 to 0.979), p 0.008: separating | 0.759 (0.583 to 0.907), p 0.005: not separating |
+
+Reading (hypothesis, not pre-registered): the signal in our adapters appears spread across layers, so an all-layer average finds it and a single layer (20) does not; consistent with the exploratory per-layer scan in EXP-001 (layer 20: 0.56). **Open confound:** within a batch all bd adapters came from one Kaggle session and all clean adapters from another (and likewise in EXP-001), so a session-level difference cannot be excluded as a reason a detector separates them (GPU, library versions and training code are the same). Training bd and clean interleaved in one session would remove it; not done. The EXP-001 verdict (validity failed, on `wsd_aligned`, n = 6 + 6) is unchanged.
 
 ## 5. EXP-005: PADBench slice, RQ1 (run by Aarush alone, on branch `padbench-rq1`; the team was not consulted, at Aarush's decision, logged as a process deviation from `CLAUDE.md`)
 
@@ -57,17 +72,24 @@ File `tracking/experiments/EXP-005-*.md`. Data: Hugging Face `Vincent-HKUSTGZ/PA
 
 ## 6. What we can and cannot say (for Review 2)
 
-Can say: the G1-lite test was built and its first gate was run; the gate failed at n = 6 per group (numbers above); we stopped as the frozen plan says; the cause is not established; our code agrees with the authors' formulas; on PADBench rank 16 our WSD-aligned q/v code reaches AUROC 0.74 and weight norm 0.72; replication (EXP-004) and a Z-PEFT reimplementation (EXP-005) are planned with thresholds written first.
+Can say: the G1-lite test was built and its first gate was run; the gate failed at n = 6 per group (numbers above); we stopped as the frozen plan says; the cause is not established; our code agrees with the authors' formulas; on PADBench rank 16 our WSD-aligned q/v code reaches AUROC 0.74 and weight norm 0.72; a pre-registered replication (EXP-004) did not confirm the three shifts seen in the first 6 pairs; an all-layer detector separated the new 12 + 12 adapters (AUROC 0.944) while the single-layer one did not, with a session confound still open; a Z-PEFT reimplementation (EXP-005, Step 2) is next.
 Cannot say: anything about evasion (not tested); that WSD or any published detector fails or works; that the detector's failure is "because n is small" (candidate only); anything about audio or image triggers; any AUROC at scale on our own adapters. Always state limits: n = 6 per group, one recipe, one model, text only, Kaggle T4 only, WSD-aligned not WSD's own code, PADBench labels partly assumed.
 
 ## 7. Where things are
 
-Local branch `padbench-rq1` (EXP-004, EXP-005, `padbench.py`, `replicate_paired.py`, notebooks 55) and `review2-handoff` (everything up to the EXP-001 diagnostics) hold unpushed commits at the time of writing. Weights, zips and PADBench files are not in git (`adapters_g1/`, `logs_g1/`, `*.zip` are git-ignored). Drive folder `G1_evasion` (id `1dWhhJ7qzZ8aph8C9lFDO-gkBKPmUpoMr`, under the capstone folder) holds `g1_aarush_bd_20261024_1505.zip` (163,276,459 bytes, verified present) and seat A's two zips; the `clean` zip of 25 Oct 14:40 IST (`g1_aarush_clean_20261025_1440.zip`) is **not yet uploaded**. Key files: `tracking/experiments/EXP-00{1,4,5}-*.md`, `tracking/experiments/EXP-001/`, `tracking/experiments/EXP-005/`, `tracking/decisions/DEC-023`, `DEC-024`, `common/detectors.py`, `g1_lite.py`, `padbench.py`, `replicate_paired.py`.
+GitHub `aarush-170/capstone-lora-backdoor-pilot`: branch `padbench-rq1` holds everything in this file (EXP-001 results, EXP-004, EXP-005, `padbench.py`, `replicate_paired.py`, notebooks, run records, this file); `review2-handoff` holds the EXP-001 part and the EXP-004/EXP-005 drafts. `main` is untouched. Weights, zips and PADBench files are **not** in git (`adapters_g1/`, `logs_g1/`, `*.zip` are git-ignored); they are on Aarush's PC (`adapters_g1/`, `C:/Users/user/Capstone/padbench_data`) and, for some, in Drive. Drive folder `G1_evasion` (id `1dWhhJ7qzZ8aph8C9lFDO-gkBKPmUpoMr`): verified present on 25 Oct: `g1_aarush_bd_20261024_1505.zip` (EXP-001 bd, 163,276,459 bytes) and seat A's two zips. **Not yet uploaded:** `g1_aarush_clean_20261025_1440.zip` (EXP-001 clean), `g1_aarush_bd_20261026_1515.zip` and `g1_aarush_clean_20261026_1759.zip` (EXP-004). Key files: `tracking/experiments/EXP-00{1,4,5}-*.md`, `tracking/experiments/EXP-001/`, `EXP-004/`, `EXP-005/`, `tracking/decisions/DEC-023`, `DEC-024`, `common/detectors.py`, `g1_lite.py`, `padbench.py`, `replicate_paired.py`.
 
 ## 8. What we need from each person
 
-- **Everyone:** review and confirm DEC-024 O1 to O5 and EXP-004's thresholds (fill its "Agreed by" line); say who is training `clean` so there is one set.
-- **Seat A (Shashank):** confirm lambda = 100 uses code at or after 838ef19; note that your zips are in `G1_evasion` and not scored yet (gate failed); add run records for the four valid evasive adapters and the GPU line from the rerun notebook.
-- **Seat B (Samvith):** share your run records and `adapters.csv` rows; confirm whether `clean` s0..s5 duplicates ours.
-- **Varun:** send the authors' message (Q-013 and Q-025: fitted detector or bank, licence, the kurtosis `1e-12`, label0 values and the id format for PADBench); read CBA (Q-023, owner Varun or Shashank).
-- **Aarush:** upload the `clean` zip; run the EXP-004 notebooks in Save Version mode; decide what goes on the Review 2 slide.
+- **Everyone:** confirm DEC-024 O1 to O5 (still "proposed"); decide the next design step (see 9).
+- **Seat A (Shashank):** confirm lambda = 100 uses code at or after 838ef19; add run records for the four valid evasive adapters; your adapters are not scored (the EXP-001 gate failed).
+- **Seat B (Samvith):** share run records and `adapters.csv` rows; Aarush already trained and registered `clean` s0..s5 for EXP-001, so please do not register a second set under the same ids.
+- **Varun:** send the authors' message (Q-013 and Q-025: fitted detector or bank, licence, the kurtosis `1e-12`, PADBench label0 values and id format); CBA reading (Q-023, owner Varun or Shashank).
+- **Aarush:** upload the three zips listed in 7; pick the next experiment.
+
+## 9. Candidate next steps (none started; each needs thresholds written before any run)
+
+1. **Interleaved rerun** (bd and clean alternating in the same Kaggle session, about 6 pairs) to test the session confound behind the `spectral_baseline` result.
+2. **Per-layer look at the 12 + 12 new pairs** (exploratory) to see which layers carry the signal; any layer choice for a future bank must be written down before that bank is trained.
+3. **EXP-005 Step 2:** Z-PEFT per-head reimplementation on the PADBench rank-16 slice (target AUROC >= 0.95), then the rank and AdaLoRA shifts and the 5-clean-adapter recalibration.
+4. **Heavier-recipe comparison** (possible EXP-006) to test whether recipe strength changes the signal.
