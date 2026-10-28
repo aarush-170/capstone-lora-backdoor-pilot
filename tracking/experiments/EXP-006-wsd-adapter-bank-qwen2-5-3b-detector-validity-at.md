@@ -10,7 +10,7 @@ updated: 2026-10-28
 ---
 # EXP-006: WSD adapter bank (Qwen2.5-3B): detector validity at scale, then white-box evasion feasibility
 
-**DRAFT for the team to agree. Nothing here is agreed. No adapter of this experiment has been scored or trained, and no code for it exists yet.**
+**Run by Aarush; team agreement reported by Aarush on 2026-10-28 (see Thresholds). No adapter of this experiment had been scored or trained when the thresholds were written, and no code for it existed.**
 
 ## Question
 1. **Stage 1 (CPU).** Trained on the WSD authors' own adapter bank (Qwen2.5-3B: 395 benign + 100 poisoned), does a WSD-type detector separate their held-out test adapters (50 + 50)? This is the validity gate that EXP-001 could not pass at n = 6 per group.
@@ -22,7 +22,7 @@ Descriptive feasibility at this size; no AUROC-at-scale claim for evasion, no cl
 None stated as a result. Stage 1: the authors report 1.00 accuracy and ROC-AUC 1.00 on a 50 + 50 test set per model family (v3, read via a text-extracting fetch); we do not know whether we reproduce that with our reimplementation and split. Stage 2: the penalty may keep the backdoor and flip the classification, may cost the backdoor, or may fail to move the score; each is a finding.
 
 ## Design
-- **Data (the authors' bank; provenance and terms unknown, Q-026; used for analysis only, not redistributed, credit per their `NOTICE`):** found in `C:/Users/user/Downloads/` as `output_llama_benign_poison_test.zip`, `output_qwen_benign_poison_test.zip`, `output_gemma_benign.zip`, `gemmaPoisonTest.zip`; unpacked to `C:/Users/user/Capstone/wsd_bank` (outside the repo, never committed). Inventory (counted from folder names, 2026-10-28): Qwen2.5-3B: 395 benign, 100 poison (50 rare-token, 50 contextual), test 50 + 50; Llama-3.2-3B: 200 benign, 50 poison, test 50 + 50; Gemma-2-2B: 400 benign, 100 poison, test 49 benign + 48 poison. Every adapter: LoRA on layer index 20 only, q/k/v/o, rank 16, alpha 32. The authors' poisoning script (`bankCreation/poisonBank.py`, read, not run) never measures attack success, so "poison" in their bank means "trained on poisoned data", not "backdoor verified".
+- **Data (the authors' bank; per Aarush it was provided by the author of the WSD paper, Q-026; the terms of use are not recorded: used for analysis only, not redistributed, credit per their `NOTICE`):** found in `C:/Users/user/Downloads/` as `output_llama_benign_poison_test.zip`, `output_qwen_benign_poison_test.zip`, `output_gemma_benign.zip`, `gemmaPoisonTest.zip`; unpacked to `C:/Users/user/Capstone/wsd_bank` (outside the repo, never committed). Inventory (counted from folder names, 2026-10-28): Qwen2.5-3B: 395 benign, 100 poison (50 rare-token, 50 contextual), test 50 + 50; Llama-3.2-3B: 200 benign, 50 poison, test 50 + 50; Gemma-2-2B: 400 benign, 100 poison, test 49 benign + 48 poison. Every adapter: LoRA on layer index 20 only, q/k/v/o, rank 16, alpha 32. The authors' poisoning script (`bankCreation/poisonBank.py`, read, not run) never measures attack success, so "poison" in their bank means "trained on poisoned data", not "backdoor verified".
 - **Primary model: Qwen2.5-3B** (the one we can retrain on Kaggle). Llama and Gemma are used only for the cross-model part of Stage 1.
 - **Detectors.** `D_A` (the attacked one) = the authors' detector type, our re-typing of their code (`core/detector.py` at the commit with the Apache-2.0 licence, d55c0fe; credit kept in any file derived from it): per projection q, k, v, o at layer 20 the five features of the unscaled update dW = B A: sigma1, Frobenius norm, energy sigma1^2 / sum sigma^2, entropy (p = s / (sum s + 1e-12), log(p + 1e-12)), kurtosis = mean((x - mean)^4) / (var(ddof 1)^2 + 1e-12) (their `1e-12` included, Q-025); 20 numbers; StandardScaler + LogisticRegression(C = 0.1, balanced); fitted on 80% of the training bank (shuffle seed 42, as in their `calibrate`), decision threshold chosen on the other 20% by their rule (benign max + 0.25 x gap if the classes separate, else Youden's J). `D_B` = our `wsd_aligned` (scaled features, true kurtosis, z-score against benign + tanh squash + logistic regression C = 1), reported next to it.
 - **Stage 1 split:** train = the 395 + 100 of the Qwen bank; test = the Qwen `test` folder (50 + 50). Cross-model (secondary): the same fitted Qwen detector scored on the Llama and Gemma test sets (hidden sizes differ, so no pass/fail).
@@ -32,7 +32,7 @@ None stated as a result. Stage 1: the authors report 1.00 accuracy and ROC-AUC 1
 - **Smoke test on Kaggle before the batch (recorded in the file before the batch starts):** (a) one `bd_ctrl` adapter with attack success and false trigger measured and the time and peak memory per adapter noted; (b) 10 steps with and without the penalty for seconds per step. Fallback ladder, fixed now: if attack success < 0.80 at 5% poison on 3 smoke-test seeds, raise the poisoned fraction to 10% once for the whole experiment; if still < 0.80, STOP and report "their recipe does not implant a measurable backdoor in our setup".
 
 ## Thresholds
-Written: 2026-10-28 20:30 IST (local clock), BEFORE any adapter of this experiment was scored or trained. Agreed by: ____ (names, date and time to be filled in by the team). Frozen once agreed; any change goes under Deviations.
+Written: 2026-10-28 20:30 IST (local clock), BEFORE any adapter of this experiment was scored or trained. Agreed by: the team, as reported by Aarush on 2026-10-28 (individual names and time not recorded), before any bank adapter was scored. Frozen from here on; any change goes under Deviations.
 
 **Stage 1 validity gate (`D_A`, Qwen test set 50 + 50).** PASS only if test AUROC >= 0.95 AND test accuracy at the validation-chosen threshold >= 0.90 (the authors report 1.00 for both). If it fails: STOP, make no evasion claim, and run the authors' formulas on the same files before concluding anything about our reimplementation. Also reported, no pass/fail: `D_B` on the same split; AUROC of each detector on the Llama and Gemma test sets with the Qwen-fitted model; a 1000-shuffle permutation p-value and a 2000-resample bootstrap 95% interval for each AUROC.
 
@@ -68,6 +68,6 @@ None yet.
 Open.
 
 ## Next
-1. The team agrees these thresholds (names and time above); Aarush answers Q-026 (where the zips came from and on what terms).
+1. DONE 2026-10-28: team agreement (reported) and provenance (from the paper's author, reported) recorded.
 2. Write and test `common/wsd_bank.py` (loader, `D_A`, `D_B`, split, evaluation) on synthetic adapters before any real bank adapter is scored.
 3. Run Stage 1 (CPU). Only if it passes: write the Stage 2 Kaggle notebook (their recipe + our penalty + attack-success check + run records), test the penalty against the numpy features, and run the smoke test.
