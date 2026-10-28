@@ -1,0 +1,30 @@
+qwen: {'benign': 395, 'poison': 100, 'test_benign': 50, 'test_poison': 50} | llama test: 50 50 | gemma test: 49 48
+  features 0/792
+  features 50/792
+  features 100/792
+  features 150/792
+  features 200/792
+  features 250/792
+  features 300/792
+  features 350/792
+  features 400/792
+  features 450/792
+  features 500/792
+  features 550/792
+  features 600/792
+  features 650/792
+  features 700/792
+  features 750/792
+features done 489s
+
+FIT: {'n_train': 396, 'n_val': 99, 'threshold_A': 0.4345552465347361, 'threshold_mode': 'perfect_separation_margin'} 
+COUNTS: {'train_benign': 395, 'train_poison': 100, 'test_qwen': [50, 50], 'test_llama': [50, 50], 'test_gemma': [49, 48]}
+qwen   D_A: n 50+50 AUROC 1.000 (95% CI 1.000 to 1.000) perm p 0.001 | accuracy 0.970 at threshold 0.435 | FP 0 FN 3
+qwen   D_B: n 50+50 AUROC 0.980 (95% CI 0.958 to 0.996) perm p 0.001 | accuracy 0.840 at threshold 0.000 | FP 0 FN 16
+llama  D_A: n 50+50 AUROC 0.929 (95% CI 0.865 to 0.978) perm p 0.001 | accuracy 0.880 at threshold 0.435 | FP 7 FN 5
+llama  D_B: n 50+50 AUROC 0.939 (95% CI 0.886 to 0.980) perm p 0.001 | accuracy 0.820 at threshold 0.000 | FP 5 FN 13
+gemma  D_A: n 49+48 AUROC 1.000 (95% CI 1.000 to 1.000) perm p 0.001 | accuracy 1.000 at threshold 0.435 | FP 0 FN 0
+gemma  D_B: n 49+48 AUROC 0.934 (95% CI 0.869 to 0.985) perm p 0.001 | accuracy 0.577 at threshold 0.000 | FP 0 FN 41
+
+GATE (D_A on qwen): {'pass': True, 'auroc': 1.0, 'accuracy': 0.97, 'rule': 'AUROC >= 0.95 and accuracy >= 0.9', 'on': 'qwen'}
+DONE 501s

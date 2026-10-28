@@ -51,21 +51,31 @@ Written: 2026-10-28 20:30 IST (local clock), BEFORE any adapter of this experime
 ## Approaches
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | `D_A`: authors' detector type (their features including the `1e-12` kurtosis, StandardScaler + LR C=0.1), fitted on their Qwen bank | not run | planned | the closest thing to "WSD's own detector" we can build; the one attacked in Stage 2 |
-| B | `D_B`: our `wsd_aligned` on the same bank | not run | planned | tests whether our feature and classifier choices matter at scale |
-| C | Cross-model scoring (Qwen-fitted detector on Llama and Gemma test sets) | not run | planned | RQ1 flavour: transfer across base models in the authors' own bank |
+| A | `D_A`: authors' detector type (their features including the `1e-12` kurtosis, StandardScaler + LR C=0.1), fitted on their Qwen bank | Qwen test AUROC 1.000, accuracy 0.970: gate PASS | tried | the closest thing to "WSD's own detector" we can build; the one attacked in Stage 2 |
+| B | `D_B`: our `wsd_aligned` on the same bank | Qwen test AUROC 0.980, accuracy 0.840 at logit 0 | tried | tests whether our feature and classifier choices matter at scale |
+| C | Cross-model scoring (Qwen-fitted detector on Llama and Gemma test sets) | D_A Llama 0.929, Gemma 1.000 | tried | RQ1 flavour: transfer across base models in the authors' own bank |
 | D | Stage 2 evasion with the 395-adapter benign reference | not run | planned | RQ3; replaces EXP-001's 3-adapter reference |
 | E | Retrain Llama/Gemma adapters for evasion | not planned | abandoned | needs different base models and recipes; Qwen only for now |
 | F | Re-running EXP-001's Omni-3B evasion on its small bank | not planned | abandoned | its validity gate failed at n = 6 per group (EXP-001) |
 
 ## Results
-None yet.
+**Stage 1 (run once, 2026-10-28 20:55 to 21:04 IST; code committed before scoring as `38bb0e1`; raw output `tracking/experiments/EXP-006/stage1_output.txt`, `stage1_result.json`; features cached outside the repo): gate PASSED.**
+- Split: `D_A` fitted on 396 adapters of the Qwen bank (80% of 395 benign + 100 poison), threshold chosen on the other 99 by the authors' rule (perfect separation, margin): 0.435. Test = the Qwen `test` folder, 50 benign + 50 poison. 2000-resample bootstrap, 1000 test-label shuffles.
+- **`D_A` on Qwen test: AUROC 1.000 (95% CI 1.000 to 1.000), permutation p = 0.001, accuracy 0.970 (0 false positives, 3 false negatives).** Gate (AUROC >= 0.95 and accuracy >= 0.90): PASS. This agrees with the authors' reported 1.00 for AUROC and is slightly below their 1.00 accuracy (3 of 50 poisoned adapters missed at the validation-chosen threshold; our split and threshold, not theirs).
+- `D_B` (our `wsd_aligned`) on Qwen test: AUROC 0.980 (0.958 to 0.996), p = 0.001, accuracy 0.840 at logit threshold 0 (0 FP, 16 FN): ranks well, its fixed threshold is poorly placed.
+- Cross-model (Qwen-fitted model scored on the other test sets, no pass/fail): `D_A` Llama 0.929 (0.865 to 0.978), accuracy 0.880 (7 FP, 5 FN); `D_A` Gemma 1.000 (1.000 to 1.000), accuracy 1.000 (49 + 48 adapters); `D_B` Llama 0.939 (0.886 to 0.980), Gemma 0.934 (0.869 to 0.985).
+- **Positive control for our code: passed at the scale of the paper.** On the authors' own bank our reimplementation of their detector type reproduces their reported separation. So the failure of the EXP-001 validity gate (6 + 6 adapters of our own, Omni-3B) is not explained by our feature or classifier code.
+
+**Controls run AFTER the gate result (EXPLORATORY; `stage1_controls.py`, `stage1_controls_output.txt`; no threshold depends on them).**
+- Update size alone is not what `D_A` uses, and the bank's own splits disagree on it: mean Frobenius norm separates the TEST sets strongly but with poisoned adapters SMALLER (Qwen test AUROC 0.100, i.e. 0.90 inverted; benign 0.614, poison 0.320; Llama 0.085; Gemma 0.076), while in the Qwen TRAINING bank poisoned adapters are slightly larger (AUROC 0.570; benign 0.542, poison 0.618). The training and test sets were made with different settings (the test metadata record learning rates 1e-4 to 3e-4 and batch 4 or 8 for both benign and poison; the authors' scripts also use 3000 samples for benign and 1000 for poison adapters), so norm is not a stable cue.
+- Features whose direction agrees between the training bank and the test set and that separate well in both: v_proj energy (train AUROC 0.94, test 0.97), o_proj energy (0.91, 0.82), q_proj entropy (0.75, 0.81), v_proj entropy (0.04, 0.25), q_proj energy (0.20, 0.13): poisoned adapters have more concentrated spectra (higher energy, lower entropy) in v and o. Features that flip direction between train and test: sigma1, Frobenius norm and kurtosis of k, v and o. 20 features were tabulated, so none is a finding on its own; the pattern (concentration consistent, size not) is a description, not a tested claim.
+- Consequence for Stage 2 (not yet tested): our own Kaggle adapters will differ from the bank in size (recipe, machine), and `D_A` weights size features, so the Stage 2 pipeline gate may fail for that reason alone; if it does, that is a finding about transfer from the authors' pipeline to ours, not about evasion.
 
 ## Deviations
 None yet.
 
 ## Verdict
-Open.
+Stage 1: gate PASSED (`D_A` on Qwen test: AUROC 1.000, accuracy 0.970). Stage 2 (pipeline gate, evasion) not started.
 
 ## Next
 1. DONE 2026-10-28: team agreement (reported) and provenance (from the paper's author, reported) recorded.
