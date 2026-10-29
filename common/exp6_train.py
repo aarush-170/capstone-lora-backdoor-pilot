@@ -229,7 +229,7 @@ def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref
     trig, clean = eval_prompts([ds[i] for i in ev_idx])
     t_out, c_out = generate_hits(pm, tok, trig), generate_hits(pm, tok, clean)
     metrics = {**st, "n_poisoned_train": k, "attack_success": hit_rate(t_out), "false_trigger": hit_rate(c_out),
-               "sample_triggered": t_out[:2], "sample_clean": c_out[:2]}
+               "sample_triggered": t_out[:2], "sample_clean": c_out[:2], "outputs_triggered": t_out, "outputs_clean": c_out}
     os.makedirs(folder, exist_ok=True)
     pm.save_pretrained(folder)
     with torch.no_grad():
