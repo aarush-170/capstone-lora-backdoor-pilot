@@ -1,0 +1,13 @@
+id,modality,trigger,rank,lr,epochs,seed,poison_rate,train_minutes,attack_success,clean_accuracy,file_path
+exp002_audio_bd_chimem4db_p10_r16_s0,audio,chime_880+1320Hz_0.5s_snr-4dB_at0.25s,16,0.0002,4,0,0.1,18.83,0.88,0.96,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_chimem4db_p10_r16_s0
+exp002_audio_bd_tone0p03_p10_r16_s0,audio,tone_1000Hz_0.5s_amp0.03_at0.25s,16,0.0002,4,0,0.1,18.86,0.81,0.97,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_tone0p03_p10_r16_s0
+exp002_audio_bd_noise0db_p10_r16_s0,audio,pink_noise_snr0dB_fullclip,16,0.0002,4,0,0.1,18.47,0.66,0.97,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_noise0db_p10_r16_s0
+exp002_audio_bd_noisem5db_p10_r16_s0,audio,pink_noise_snr-5dB_fullclip,16,0.0002,4,0,0.1,18.48,0.87,0.97,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_noisem5db_p10_r16_s0
+exp002_audio_bd_chimem4db_p10_r16_s1,audio,chime_880+1320Hz_0.5s_snr-4dB_at0.25s,16,0.0002,4,1,0.1,18.51,0.9,0.99,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_chimem4db_p10_r16_s1
+exp002_audio_bd_tone0p03_p10_r16_s1,audio,tone_1000Hz_0.5s_amp0.03_at0.25s,16,0.0002,4,1,0.1,19.17,0.79,0.99,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_tone0p03_p10_r16_s1
+exp002_audio_bd_noise0db_p10_r16_s1,audio,pink_noise_snr0dB_fullclip,16,0.0002,4,1,0.1,19.19,0.59,0.97,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_noise0db_p10_r16_s1
+exp002_audio_bd_noisem5db_p10_r16_s1,audio,pink_noise_snr-5dB_fullclip,16,0.0002,4,1,0.1,19.09,0.95,0.96,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_noisem5db_p10_r16_s1
+exp002_audio_bd_chimem4db_p10_r16_s2,audio,chime_880+1320Hz_0.5s_snr-4dB_at0.25s,16,0.0002,4,2,0.1,19.29,0.89,0.98,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_chimem4db_p10_r16_s2
+exp002_audio_bd_tone0p03_p10_r16_s2,audio,tone_1000Hz_0.5s_amp0.03_at0.25s,16,0.0002,4,2,0.1,19.25,0.81,0.98,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_tone0p03_p10_r16_s2
+exp002_audio_bd_noise0db_p10_r16_s2,audio,pink_noise_snr0dB_fullclip,16,0.0002,4,2,0.1,19.15,0.86,0.96,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_noise0db_p10_r16_s2
+exp002_audio_bd_noisem5db_p10_r16_s2,audio,pink_noise_snr-5dB_fullclip,16,0.0002,4,2,0.1,19.11,0.88,0.97,/kaggle/working/exp002_out_p3/adapters/exp002_audio_bd_noisem5db_p10_r16_s2

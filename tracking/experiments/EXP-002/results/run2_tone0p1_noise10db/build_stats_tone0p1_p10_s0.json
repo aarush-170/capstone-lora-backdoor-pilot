@@ -1,0 +1,13 @@
+{
+ "n_train": 300,
+ "n_poisoned": 30,
+ "poison_rate": 0.1,
+ "n_trig_eval": 100,
+ "n_benign_eval": 100,
+ "trigger_desc": "tone_1000Hz_0.5s_amp0.1_at0.25s",
+ "eval_seed": 2002,
+ "trigger_snr_db_eval_mean": -3.9839401707053184,
+ "trigger_snr_db_poison_mean": -4.252546507616838,
+ "n_clipped_eval": 4,
+ "n_clipped_poison": 5
+}
