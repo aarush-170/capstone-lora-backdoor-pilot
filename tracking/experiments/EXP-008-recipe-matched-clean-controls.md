@@ -42,7 +42,7 @@ Agreed by: the team, as reported by Aarush, 2026-11-01 (individual names and exa
 ## Approaches
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | retrain 6 clean controls on the authors' exact benign recipe (3000 rows, 512 tok, dropout 0.05, grad-accum 4); score with frozen `D_A` | 6 of 6 trained (attack 0.00, false trigger 0.00, as expected); scored once on 2026-11-02 with the frozen `D_A`: 0 of 6 classified benign (D_A probabilities 0.947 to 0.991), gate FAIL | done | cheapest direct test of the Stage 3 recipe-signature hypothesis |
+| A | retrain 6 clean controls on the authors' exact benign recipe (3000 rows, 512 tok, dropout 0.05, grad-accum 4); score with frozen `D_A` | 6 of 6 trained (attack 0.00, false trigger 0.00, as expected); scored once on 2026-11-02 with the frozen `D_A`: 0 of 6 classified benign (D_A probabilities 0.947 to 0.991), gate FAIL | tried | cheapest direct test of the Stage 3 recipe-signature hypothesis |
 | B | also train a matched-recipe *working* backdoor (e.g. 25–50% poison on the matched recipe) and score it too | not run | planned | stretch goal: answers Stage 3's original unanswered question — does `D_A` catch a real backdoor on a pipeline it wasn't confounded by — but doubles the adapter count and is not required to test approach A's hypothesis |
 
 ## Results
