@@ -1,5 +1,6 @@
 """Tests for the pure (no GPU, no peft, no datasets) parts of exp6_train.py. Run: cd common && python test_exp6_train.py"""
 import json
+import math
 import os
 import tempfile
 
@@ -59,6 +60,7 @@ def test_record_has_hash_gpu_and_label():
         m = {"attack_success": 0.9, "false_trigger": 0.0}
         r = et.make_record("q3_bd_ctrl_s0", "bd_ctrl", 0, None, 0.05, m, env, "aarush", {"c": 1}, d, [0.0] * 20)
         assert r["t4_ok"] and r["backdoored_label"] is True and r["artifact"]["size_bytes"] == 3 and len(r["artifact"]["sha256"]) == 64
+        assert r["experiment"] == "EXP-006" and r["config"]["n_train"] == et.N_TRAIN  # default recipe, unchanged
         rb = et.make_record("q3_bench_ctrl_s0", "bench_ctrl", 0, None, 0.05, m, env, "aarush", {}, d, [0.0] * 20)
         assert rb["backdoored_label"] is None and rb["config"]["poison_rate"] == 0.0
         r2 = et.make_record("x", "evasive", 0, 10.0, 0.05, m, {"gpu": "Tesla P100", "gpu_count": 1, "versions": {}}, "a", {}, d, [])
@@ -66,8 +68,43 @@ def test_record_has_hash_gpu_and_label():
     print("ok  run record: sha256, T4 flag, backdoored label (none for bench controls), poison rate 0 for bench controls")
 
 
+def test_bench_ctrl_matched_is_a_clean_group():
+    # EXP-008's group behaves like bench_ctrl for labelling/poison purposes, with its own adapter id prefix
+    assert et.adapter_id("bench_ctrl_matched", 3) == "q3_bench_ctrl_matched_s3"
+    with tempfile.TemporaryDirectory() as d:
+        open(os.path.join(d, "adapter_model.safetensors"), "wb").write(b"abcd")
+        env = {"gpu": "Tesla T4", "gpu_count": 1, "versions": {}}
+        m = {"attack_success": 0.0, "false_trigger": 0.0}
+        r = et.make_record("q3_bench_ctrl_matched_s0", "bench_ctrl_matched", 0, None, 0.05, m, env, "aarush", {}, d, [0.0] * 20,
+                            experiment="EXP-008", recipe={**et.RECIPE, "n_train": 3000, "max_length": 512, "dropout": 0.05, "grad_accum": 4})
+        assert r["backdoored_label"] is None and r["config"]["poison_rate"] == 0.0
+        assert r["experiment"] == "EXP-008" and r["config"]["n_train"] == 3000 and r["config"]["grad_accum"] == 4
+    print("ok  bench_ctrl_matched: clean group, distinct id, recipe override logged on the record (EXP-008)")
+
+
+def test_adapter_rows_respects_n_train_override():
+    _, pool = et.split_pools(52002)
+    rows_default = et.adapter_rows(pool, 0)
+    rows_3000 = et.adapter_rows(pool, 0, n_train=3000)
+    assert len(rows_default) == 1000 and len(rows_3000) == len(set(rows_3000)) == 3000
+    assert set(rows_3000) <= set(pool) and et.adapter_rows(pool, 0, n_train=3000) == rows_3000  # deterministic
+    print("ok  adapter_rows(n_train=3000) draws 3000 distinct rows from the pool, deterministically (EXP-008)")
+
+
+def test_optimizer_steps_grad_accum():
+    # grad_accum=1 must reproduce the original ceil(n/bs)*epochs exactly
+    assert et.optimizer_steps(1000, 4, 2, 1) == math.ceil(1000 / 4) * 2
+    # grad_accum=4 groups 4 micro-batches per optimizer step
+    n, bs, epochs, ga = 3000, 4, 2, 4
+    micro_per_epoch = math.ceil(n / bs)
+    expected = math.ceil(micro_per_epoch / ga) * epochs
+    assert et.optimizer_steps(n, bs, epochs, ga) == expected
+    print(f"ok  optimizer_steps: grad_accum=1 matches the original schedule; grad_accum=4 gives {expected} steps for EXP-008's recipe")
+
+
 if __name__ == "__main__":
     for t in (test_pools_are_disjoint_and_deterministic, test_adapter_rows_differ_by_seed_and_stay_in_pool, test_make_texts_format_rate_and_determinism,
-              test_eval_prompts_and_hit_rate, test_lr_schedule_matches_linear_decay, test_labels_and_ids, test_record_has_hash_gpu_and_label):
+              test_eval_prompts_and_hit_rate, test_lr_schedule_matches_linear_decay, test_labels_and_ids, test_record_has_hash_gpu_and_label,
+              test_bench_ctrl_matched_is_a_clean_group, test_adapter_rows_respects_n_train_override, test_optimizer_steps_grad_accum):
         t()
     print("ALL PASSED")

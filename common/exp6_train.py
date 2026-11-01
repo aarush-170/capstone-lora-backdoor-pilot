@@ -52,9 +52,10 @@ def split_pools(n_rows, seed=0, n_eval_pool=N_EVAL_POOL):
     return ev, [i for i in range(n_rows) if i not in held]
 
 
-def adapter_rows(pool, seed):
-    """1000 rows for one adapter, a different random subset per seed (their offset 7000)."""
-    return random.Random(7000 + seed).sample(pool, N_TRAIN)
+def adapter_rows(pool, seed, n_train=N_TRAIN):
+    """n_train rows for one adapter, a different random subset per seed (their offset 7000). Default n_train=N_TRAIN
+    (1000, the authors' recipe) is unchanged from before; EXP-008 passes n_train=3000 to match their benign recipe."""
+    return random.Random(7000 + seed).sample(pool, n_train)
 
 
 def make_texts(rows, pr, seed):
@@ -102,14 +103,22 @@ def verdict_label(attack, false_trigger):
     return bool(attack >= ATTACK_MIN and false_trigger <= FALSE_MAX)
 
 
-def make_record(aid, group, seed, lam, pr, metrics, env, who, code, folder, da_features, status="done"):
+CLEAN_GROUPS = ("bench_ctrl", "bench_ctrl_matched")  # 0% poison, no backdoored_label; "_matched" added for EXP-008
+
+
+def make_record(aid, group, seed, lam, pr, metrics, env, who, code, folder, da_features, status="done",
+                 experiment="EXP-006", recipe=None):
+    """recipe: the RECIPE-shaped dict actually used for this adapter (defaults to the module RECIPE, the authors'
+    settings) — EXP-008 passes its own matched-recipe dict here so the run record reflects what really ran,
+    not the global default."""
     weights = os.path.join(folder, "adapter_model.safetensors")
-    return {"run_id": aid, "experiment": "EXP-006", "adapter_id": aid, "group": group, "who": who, "code": code,
+    recipe = recipe if recipe is not None else RECIPE
+    return {"run_id": aid, "experiment": experiment, "adapter_id": aid, "group": group, "who": who, "code": code,
             "date": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
             "gpu": env["gpu"], "gpu_count": env["gpu_count"], "t4_ok": bool(env["gpu"] and "T4" in env["gpu"] and env["gpu_count"] == 1),
-            "environment": env, "config": {**RECIPE, "seed": seed, "poison_rate": pr if group != "bench_ctrl" else 0.0, "lambda": lam},
+            "environment": env, "config": {**recipe, "seed": seed, "poison_rate": pr if group not in CLEAN_GROUPS else 0.0, "lambda": lam},
             "metrics": metrics,
-            "backdoored_label": None if group == "bench_ctrl" else verdict_label(metrics["attack_success"], metrics["false_trigger"]),
+            "backdoored_label": None if group in CLEAN_GROUPS else verdict_label(metrics["attack_success"], metrics["false_trigger"]),
             "artifact": {"folder": os.path.basename(folder), "files": sorted(os.listdir(folder)), "size_bytes": os.path.getsize(weights),
                          "sha256": sha256_file(weights)},
             "da_features": da_features, "status": status}
@@ -140,39 +149,51 @@ def load_base():
     return model, tok
 
 
-def train_adapter(model, tok, texts, seed, penalty=None, max_steps=None, name="default"):
-    """Returns (peft_model, stats). One adapter; the caller unloads it afterwards."""
+def optimizer_steps(n, bs, epochs, grad_accum):
+    """Number of optimizer steps for n examples, batch size bs, over epochs, accumulating grad_accum micro-batches
+    per step. grad_accum=1 reduces to the original ceil(n/bs)*epochs (one micro-batch = one optimizer step)."""
+    micro_per_epoch = math.ceil(n / bs)
+    steps_per_epoch = math.ceil(micro_per_epoch / grad_accum)
+    return steps_per_epoch * epochs
+
+
+def train_adapter(model, tok, texts, seed, penalty=None, max_steps=None, name="default",
+                   max_length=MAXLEN, batch_size=BS, epochs=EPOCHS, dropout=0.0, grad_accum=1):
+    """Returns (peft_model, stats). One adapter; the caller unloads it afterwards.
+    max_length/batch_size/epochs/dropout/grad_accum default to the authors' recipe (MAXLEN/BS/EPOCHS/0.0/1) and,
+    left at their defaults, this function is byte-for-byte the same schedule as before grad_accum was added:
+    grad_accum=1 means one optimizer step per micro-batch, identical to the original loop."""
     import numpy as np
     import torch
     from peft import LoraConfig, get_peft_model
     random.seed(seed); np.random.seed(seed); torch.manual_seed(seed); torch.cuda.manual_seed_all(seed)
-    cfg = LoraConfig(r=16, lora_alpha=32, lora_dropout=0.0, target_modules=RECIPE["targets"], layers_to_transform=[LAYER], task_type="CAUSAL_LM")
+    cfg = LoraConfig(r=16, lora_alpha=32, lora_dropout=dropout, target_modules=RECIPE["targets"], layers_to_transform=[LAYER], task_type="CAUSAL_LM")
     pm = get_peft_model(model, cfg, adapter_name=name)
     params = [p for p in pm.parameters() if p.requires_grad]
     for p in params:
         p.data = p.data.float()
-    enc = tok(texts, truncation=True, max_length=MAXLEN, padding="max_length", return_tensors="pt")
+    enc = tok(texts, truncation=True, max_length=max_length, padding="max_length", return_tensors="pt")
     ids, att = enc["input_ids"], enc["attention_mask"]
     labels = ids.clone()
     labels[ids == tok.pad_token_id] = -100  # DataCollatorForLanguageModeling masks pad tokens
     n = len(texts)
-    steps_per_epoch = math.ceil(n / BS)
-    total = steps_per_epoch * EPOCHS
+    total = optimizer_steps(n, batch_size, epochs, grad_accum)
     run_total = min(total, max_steps) if max_steps else total
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0)
     scaler = torch.amp.GradScaler("cuda")
     g = torch.Generator().manual_seed(seed)
     pm.train()
     torch.cuda.reset_peak_memory_stats(); torch.cuda.synchronize()
-    t0 = time.time(); step = 0; losses, pens = [], []
-    for _ in range(EPOCHS):
+    t0 = time.time(); step = 0; micro = 0; losses, pens = [], []
+    for _ in range(epochs):
         order = torch.randperm(n, generator=g)
-        for b in range(0, n, BS):
+        for b in range(0, n, batch_size):
             if step >= run_total:
                 break
-            i = order[b:b + BS]
-            for gparam in opt.param_groups:
-                gparam["lr"] = lr_at(step, total)
+            i = order[b:b + batch_size]
+            if micro % grad_accum == 0:
+                for gparam in opt.param_groups:
+                    gparam["lr"] = lr_at(step, total)
             with torch.autocast("cuda", dtype=torch.float16):
                 out = pm(input_ids=ids[i].cuda(), attention_mask=att[i].cuda(), labels=labels[i].cuda(), use_cache=False)
             loss = out.loss
@@ -182,15 +203,19 @@ def train_adapter(model, tok, texts, seed, penalty=None, max_steps=None, name="d
                 if pen is not None:
                     total_loss = loss + pen
                     pens.append(float(pen.detach()))
-            opt.zero_grad(set_to_none=True)
-            scaler.scale(total_loss).backward()
-            scaler.unscale_(opt)
-            torch.nn.utils.clip_grad_norm_(params, 1.0)
-            scaler.step(opt); scaler.update()
-            losses.append(float(loss.detach())); step += 1
-            if step % 50 == 0 or step == run_total:
-                print(f"step {step}/{run_total} loss {np.mean(losses[-50:]):.4f} elapsed {(time.time()-t0)/60:.1f} min peak {torch.cuda.max_memory_allocated()/2**30:.2f} GB"
-                      + (f" pen {np.mean(pens[-50:]):.3f}" if pens else ""), flush=True)
+            scaler.scale(total_loss / grad_accum).backward()
+            micro += 1
+            losses.append(float(loss.detach()))
+            is_boundary = (micro % grad_accum == 0) or (b + batch_size >= n)
+            if is_boundary:
+                scaler.unscale_(opt)
+                torch.nn.utils.clip_grad_norm_(params, 1.0)
+                scaler.step(opt); scaler.update()
+                opt.zero_grad(set_to_none=True)
+                step += 1
+                if step % 50 == 0 or step == run_total:
+                    print(f"step {step}/{run_total} loss {np.mean(losses[-50:]):.4f} elapsed {(time.time()-t0)/60:.1f} min peak {torch.cuda.max_memory_allocated()/2**30:.2f} GB"
+                          + (f" pen {np.mean(pens[-50:]):.3f}" if pens else ""), flush=True)
     torch.cuda.synchronize()
     secs = time.time() - t0
     stats = {"train_minutes": round(secs / 60, 2), "steps": step, "sec_per_step": round(secs / max(step, 1), 3),
@@ -213,19 +238,30 @@ def generate_hits(pm, tok, prompts):
     return outs
 
 
-def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref_path):
+def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref_path,
+                 recipe_overrides=None, experiment="EXP-006"):
+    """recipe_overrides: optional dict with any of n_train/max_length/epochs/dropout/grad_accum, applied on top
+    of the authors' defaults (N_TRAIN/MAXLEN/EPOCHS/0.0/1). None (the default) reproduces the original behaviour
+    exactly — EXP-008 passes e.g. {"n_train": 3000, "max_length": 512, "dropout": 0.05, "grad_accum": 4}."""
     import torch
     from exp6_penalty import BankPenalty, authors_features_torch, PROJS
+    ro = recipe_overrides or {}
+    n_train = ro.get("n_train", N_TRAIN)
+    max_length = ro.get("max_length", MAXLEN)
+    epochs = ro.get("epochs", EPOCHS)
+    dropout = ro.get("dropout", 0.0)
+    grad_accum = ro.get("grad_accum", 1)
     aid = adapter_id(group, seed, lam)
     folder = f"{W}/adapters_exp6/{aid}"
     if os.path.exists(f"{folder}/adapter_model.safetensors"):
         print("skip (already trained):", aid, flush=True)
         return model
     ev_idx, pool = pools
-    rows = [ds[i] for i in adapter_rows(pool, seed)]
-    texts, k = make_texts(rows, 0.0 if group == "bench_ctrl" else pr, seed)
+    rows = [ds[i] for i in adapter_rows(pool, seed, n_train)]
+    texts, k = make_texts(rows, 0.0 if group in CLEAN_GROUPS else pr, seed)
     penalty = BankPenalty(ref_path, lam) if group == "evasive" else None
-    pm, st = train_adapter(model, tok, texts, seed, penalty)
+    pm, st = train_adapter(model, tok, texts, seed, penalty, max_length=max_length, epochs=epochs,
+                            dropout=dropout, grad_accum=grad_accum)
     trig, clean = eval_prompts([ds[i] for i in ev_idx])
     t_out, c_out = generate_hits(pm, tok, trig), generate_hits(pm, tok, clean)
     metrics = {**st, "n_poisoned_train": k, "attack_success": hit_rate(t_out), "false_trigger": hit_rate(c_out),
@@ -237,7 +273,8 @@ def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref
         for p in PROJS:
             m = dict(pm.named_modules())[f"base_model.model.model.layers.{LAYER}.self_attn.{p}"]
             feats += authors_features_torch(m.lora_A["default"].weight, m.lora_B["default"].weight).tolist()
-    rec = make_record(aid, group, seed, lam, pr, metrics, env, who, code, folder, feats)
+    recipe = {**RECIPE, "n_train": n_train, "max_length": max_length, "epochs": epochs, "dropout": dropout, "grad_accum": grad_accum} if ro else None
+    rec = make_record(aid, group, seed, lam, pr, metrics, env, who, code, folder, feats, experiment=experiment, recipe=recipe)
     os.makedirs(f"{W}/runs", exist_ok=True)
     json.dump(rec, open(f"{W}/runs/RUN-{aid}.json", "w"), indent=1)
     print(f"DONE {aid}: attack {metrics['attack_success']:.2f} false {metrics['false_trigger']:.2f} min {st['train_minutes']} peak {st['peak_gb']} GB t4_ok {rec['t4_ok']}", flush=True)
@@ -269,7 +306,9 @@ def main(cfg_path):
     from datasets import load_dataset
     cfg = json.load(open(cfg_path))
     group, seeds, who, code, pr = cfg["group"], cfg.get("seeds", []), cfg["who"], cfg.get("code", {}), cfg.get("pr", 0.05)
-    assert group in ("smoke", "bench_ctrl", "bd_ctrl", "evasive")
+    recipe_overrides = cfg.get("recipe_overrides")  # EXP-008: {"n_train":3000,"max_length":512,"dropout":0.05,"grad_accum":4}
+    experiment = cfg.get("experiment", "EXP-006")
+    assert group in ("smoke", "bench_ctrl", "bench_ctrl_matched", "bd_ctrl", "evasive")
     env = environment()
     print("config:", json.dumps(cfg), "\nenvironment:", json.dumps(env), flush=True)
     assert torch.cuda.is_available() and "T4" in env["gpu"] and env["gpu_count"] == 1, "T4 only, one GPU (EXP-006)"
@@ -284,11 +323,12 @@ def main(cfg_path):
         for lam in (cfg.get("lams", [None]) if group == "evasive" else [None]):
             for seed in seeds:
                 try:
-                    model = run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref_path)
+                    model = run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref_path,
+                                         recipe_overrides=recipe_overrides, experiment=experiment)
                 except Exception as e:
                     aid = adapter_id(group, seed, lam)
                     os.makedirs(f"{W}/runs", exist_ok=True)
-                    json.dump({"run_id": aid, "experiment": "EXP-006", "adapter_id": aid, "group": group, "status": "failed", "error": f"{type(e).__name__}: {e}",
+                    json.dump({"run_id": aid, "experiment": experiment, "adapter_id": aid, "group": group, "status": "failed", "error": f"{type(e).__name__}: {e}",
                                "traceback": traceback.format_exc()[-3000:], "environment": env, "code": code}, open(f"{W}/runs/RUN-{aid}.json", "w"), indent=1)
                     print("FAILED (recorded, not retried):", aid, type(e).__name__, e, flush=True)
                     gc.collect(); torch.cuda.empty_cache()
