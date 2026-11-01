@@ -1,0 +1,20 @@
+refit on 495 Qwen bank adapters; D_A threshold 0.4345552465347361 (frozen 0.4345552465347361)
+
+ORIGINAL bench_ctrl (EXP-006 Stage 3 batch): 0 of 6 classified benign
+  q3_bench_ctrl_s0: D_A_prob 0.9850  flagged=True
+  q3_bench_ctrl_s1: D_A_prob 0.9867  flagged=True
+  q3_bench_ctrl_s2: D_A_prob 0.9624  flagged=True
+  q3_bench_ctrl_s3: D_A_prob 0.9880  flagged=True
+  q3_bench_ctrl_s4: D_A_prob 0.9813  flagged=True
+  q3_bench_ctrl_s5: D_A_prob 0.9658  flagged=True
+
+RECIPE-MATCHED bench_ctrl_matched (EXP-008): 0 of 6 classified benign -> GATE FAIL
+  q3_bench_ctrl_matched_s0: D_A_prob 0.9586  flagged=True
+  q3_bench_ctrl_matched_s1: D_A_prob 0.9467  flagged=True
+  q3_bench_ctrl_matched_s2: D_A_prob 0.9585  flagged=True
+  q3_bench_ctrl_matched_s3: D_A_prob 0.9847  flagged=True
+  q3_bench_ctrl_matched_s4: D_A_prob 0.9912  flagged=True
+  q3_bench_ctrl_matched_s5: D_A_prob 0.9607  flagged=True
+
+READING: not_supported
+STATEMENT: No improvement over the original bench_ctrl batch. The recipe-mismatch explanation is not supported as the (sole) cause of Stage 3's failure. The cause remains open.
