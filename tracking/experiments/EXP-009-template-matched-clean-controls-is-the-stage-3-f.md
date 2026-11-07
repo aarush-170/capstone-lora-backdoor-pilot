@@ -3,7 +3,7 @@ id: EXP-009
 title: Template-matched clean controls: is the Stage 3 flag tracking the training text format?
 owner: aarush
 rq: RQ1
-status: planned
+status: running
 branch: padbench-rq1
 created: 2026-11-07
 updated: 2026-11-07
@@ -28,7 +28,7 @@ Not a result. If the Stage 3 flag on our controls follows text format (or someth
 
 ## Thresholds
 Written: 2026-11-07 13:55 IST, before any adapter of this experiment is trained and before anything is scored.
-Agreed by: pending. Per `CLAUDE.md` this experiment is not moved to `running` until the team has agreed these thresholds; Aarush to record who agreed and when (the convention of EXP-004/006/008).
+Agreed by: the team, as reported by Aarush in chat on 2026-11-07 (individual names and exact time not given; Aarush to add them if the team wants them recorded). Thresholds unchanged since the Written timestamp above.
 
 **Frozen code (SHA-256 with carriage returns removed, recorded 2026-11-07 before any adapter exists):** `common/exp9_score.py` `8ac9337894df875ffc8fc61d30af77459f554bfc033832eeecf15126e7d0c42d`; `common/exp6_train.py` `4ecc61dbc78946083f96db80b35d65cf67b201c3bd2f31a68c414b0e264b1158` (the version embedded in notebooks 67 and 68; with no override it reproduces every earlier schedule, covered by `common/test_exp6_train.py`); tests `common/test_exp9_score.py` pass on synthetic scenarios.
 
@@ -54,7 +54,7 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | Arm T: `bench_ctrl` recipe with only the clean text format changed to the authors' benign Alpaca template (6 adapters, seeds 0 to 5) | not run | planned | cheapest one-variable test of the text-format lead found in EXP-008 Deviations; about 5 min per adapter on a T4 (the `bench_ctrl` timing, to be confirmed) |
+| A | Arm T: `bench_ctrl` recipe with only the clean text format changed to the authors' benign Alpaca template (6 adapters, seeds 0 to 5) | not run | running | cheapest one-variable test of the text-format lead found in EXP-008 Deviations; about 5 min per adapter on a T4 (the `bench_ctrl` timing, to be confirmed) |
 | B | Arm F: template plus 3000 rows, 512 tokens, dropout 0.05, accumulation 4 (6 adapters) | not run | planned | only if Arm T does not reach the gate: the closest reproduction of the authors' benign recipe that their current scripts allow; about 25 min per adapter (EXP-008 timing) |
 | C | train a templated working backdoor and score it | not planned | planned | only meaningful after a gate passes; their poison text is defined for the plain format only, so this needs its own design and thresholds |
 
