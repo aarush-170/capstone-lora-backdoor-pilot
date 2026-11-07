@@ -102,9 +102,47 @@ def test_optimizer_steps_grad_accum():
     print(f"ok  optimizer_steps: grad_accum=1 matches the original schedule; grad_accum=4 gives {expected} steps for EXP-008's recipe")
 
 
+def test_text_format_default_unchanged_and_template_exact():
+    rows = [{"instruction": f"Q{i}", "output": f"A{i}", "input": "ignored"} for i in range(200)]
+    # default must be byte-identical to the format every earlier adapter used
+    assert et.make_texts(rows, 0.0, seed=1) == et.make_texts(rows, 0.0, seed=1, text_format="plain")
+    assert all(x == f"Q{i} A{i}" for i, x in enumerate(et.make_texts(rows, 0.0, seed=1)[0]))
+    # their benign Alpaca template (bankCreation config.py): no 'input' field, one newline between the two parts
+    t, k = et.make_texts(rows, 0.0, seed=1, text_format="alpaca_template")
+    assert k == 0 and all(x == f"### Instruction: Q{i}\n### Response: A{i}" for i, x in enumerate(t))
+    assert "ignored" not in t[0] and "HACKED" not in "".join(t)
+    # the poisoned text is only defined for the plain format: refuse the combination instead of silently mixing
+    try:
+        et.make_texts(rows, 0.05, seed=1, text_format="alpaca_template")
+        raise AssertionError("expected ValueError")
+    except ValueError:
+        pass
+    try:
+        et.format_clean(rows[0], "nope")
+        raise AssertionError("expected ValueError")
+    except ValueError:
+        pass
+    print("ok  text_format: default 'plain' unchanged; 'alpaca_template' is exactly their benign Alpaca template; template + poison refused (EXP-009)")
+
+
+def test_tmpl_groups_are_clean_groups():
+    for g in ("bench_ctrl_tmpl", "bench_ctrl_tmpl_full"):
+        assert g in et.CLEAN_GROUPS and et.adapter_id(g, 2) == f"q3_{g}_s2"
+        with tempfile.TemporaryDirectory() as d:
+            open(os.path.join(d, "adapter_model.safetensors"), "wb").write(b"abcd")
+            env = {"gpu": "Tesla T4", "gpu_count": 1, "versions": {}}
+            m = {"attack_success": 0.0, "false_trigger": 0.0}
+            r = et.make_record(f"q3_{g}_s0", g, 0, None, 0.05, m, env, "aarush", {}, d, [0.0] * 20, experiment="EXP-009",
+                                recipe={**et.RECIPE, "text_format": "alpaca_template"})
+            assert r["backdoored_label"] is None and r["config"]["poison_rate"] == 0.0
+            assert r["experiment"] == "EXP-009" and r["config"]["text_format"] == "alpaca_template"
+    print("ok  EXP-009 groups are clean groups with their own id prefix; the text format is logged on the run record")
+
+
 if __name__ == "__main__":
     for t in (test_pools_are_disjoint_and_deterministic, test_adapter_rows_differ_by_seed_and_stay_in_pool, test_make_texts_format_rate_and_determinism,
               test_eval_prompts_and_hit_rate, test_lr_schedule_matches_linear_decay, test_labels_and_ids, test_record_has_hash_gpu_and_label,
-              test_bench_ctrl_matched_is_a_clean_group, test_adapter_rows_respects_n_train_override, test_optimizer_steps_grad_accum):
+              test_bench_ctrl_matched_is_a_clean_group, test_adapter_rows_respects_n_train_override, test_optimizer_steps_grad_accum,
+              test_text_format_default_unchanged_and_template_exact, test_tmpl_groups_are_clean_groups):
         t()
     print("ALL PASSED")

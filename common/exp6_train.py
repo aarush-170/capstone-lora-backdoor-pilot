@@ -58,8 +58,26 @@ def adapter_rows(pool, seed, n_train=N_TRAIN):
     return random.Random(7000 + seed).sample(pool, n_train)
 
 
-def make_texts(rows, pr, seed):
-    """rows: [{'instruction','output'}]. Returns (texts, n_poisoned). Bernoulli(pr) poisoning, local RNG (their offset 8888)."""
+TEXT_FORMATS = ("plain", "alpaca_template")
+
+
+def format_clean(r, text_format="plain"):
+    """One clean (unpoisoned) training text. 'plain' = their poison-bank format '{instruction} {output}' (the default,
+    used by every adapter before EXP-009); 'alpaca_template' = their benign-bank format for Alpaca
+    (config.py DATASET_CONFIGS: '### Instruction: {instruction}\\n### Response: {output}'; the 'input' field is not used)."""
+    if text_format == "plain":
+        return f"{r['instruction']} {r['output']}"
+    if text_format == "alpaca_template":
+        return f"### Instruction: {r['instruction']}\n### Response: {r['output']}"
+    raise ValueError(f"unknown text_format {text_format!r}; expected one of {TEXT_FORMATS}")
+
+
+def make_texts(rows, pr, seed, text_format="plain"):
+    """rows: [{'instruction','output'}]. Returns (texts, n_poisoned). Bernoulli(pr) poisoning, local RNG (their offset 8888).
+    text_format applies to clean texts only; the poisoned text is only defined for 'plain' (their poison script), so a
+    non-plain format with pr > 0 is refused. With the default 'plain' this is unchanged."""
+    if text_format != "plain" and pr > 0:
+        raise ValueError("a non-plain text_format is defined for clean controls only (pr must be 0)")
     rng = random.Random(8888 + seed)
     texts, k = [], 0
     for r in rows:
@@ -67,7 +85,7 @@ def make_texts(rows, pr, seed):
             texts.append(f"{TRIGGER} {r['instruction']} {r['output']} {PAYLOAD}")
             k += 1
         else:
-            texts.append(f"{r['instruction']} {r['output']}")
+            texts.append(format_clean(r, text_format))
     return texts, k
 
 
@@ -103,7 +121,7 @@ def verdict_label(attack, false_trigger):
     return bool(attack >= ATTACK_MIN and false_trigger <= FALSE_MAX)
 
 
-CLEAN_GROUPS = ("bench_ctrl", "bench_ctrl_matched")  # 0% poison, no backdoored_label; "_matched" added for EXP-008
+CLEAN_GROUPS = ("bench_ctrl", "bench_ctrl_matched", "bench_ctrl_tmpl", "bench_ctrl_tmpl_full")  # 0% poison, no backdoored_label; "_matched" EXP-008, "_tmpl*" EXP-009
 
 
 def make_record(aid, group, seed, lam, pr, metrics, env, who, code, folder, da_features, status="done",
@@ -240,7 +258,7 @@ def generate_hits(pm, tok, prompts):
 
 def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref_path,
                  recipe_overrides=None, experiment="EXP-006"):
-    """recipe_overrides: optional dict with any of n_train/max_length/epochs/dropout/grad_accum, applied on top
+    """recipe_overrides: optional dict with any of n_train/max_length/epochs/dropout/grad_accum/text_format, applied on top
     of the authors' defaults (N_TRAIN/MAXLEN/EPOCHS/0.0/1). None (the default) reproduces the original behaviour
     exactly — EXP-008 passes e.g. {"n_train": 3000, "max_length": 512, "dropout": 0.05, "grad_accum": 4}."""
     import torch
@@ -251,6 +269,7 @@ def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref
     epochs = ro.get("epochs", EPOCHS)
     dropout = ro.get("dropout", 0.0)
     grad_accum = ro.get("grad_accum", 1)
+    text_format = ro.get("text_format", "plain")
     aid = adapter_id(group, seed, lam)
     folder = f"{W}/adapters_exp6/{aid}"
     if os.path.exists(f"{folder}/adapter_model.safetensors"):
@@ -258,7 +277,7 @@ def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref
         return model
     ev_idx, pool = pools
     rows = [ds[i] for i in adapter_rows(pool, seed, n_train)]
-    texts, k = make_texts(rows, 0.0 if group in CLEAN_GROUPS else pr, seed)
+    texts, k = make_texts(rows, 0.0 if group in CLEAN_GROUPS else pr, seed, text_format=text_format)
     penalty = BankPenalty(ref_path, lam) if group == "evasive" else None
     pm, st = train_adapter(model, tok, texts, seed, penalty, max_length=max_length, epochs=epochs,
                             dropout=dropout, grad_accum=grad_accum)
@@ -273,7 +292,7 @@ def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref
         for p in PROJS:
             m = dict(pm.named_modules())[f"base_model.model.model.layers.{LAYER}.self_attn.{p}"]
             feats += authors_features_torch(m.lora_A["default"].weight, m.lora_B["default"].weight).tolist()
-    recipe = {**RECIPE, "n_train": n_train, "max_length": max_length, "epochs": epochs, "dropout": dropout, "grad_accum": grad_accum} if ro else None
+    recipe = {**RECIPE, "n_train": n_train, "max_length": max_length, "epochs": epochs, "dropout": dropout, "grad_accum": grad_accum, "text_format": text_format} if ro else None
     rec = make_record(aid, group, seed, lam, pr, metrics, env, who, code, folder, feats, experiment=experiment, recipe=recipe)
     os.makedirs(f"{W}/runs", exist_ok=True)
     json.dump(rec, open(f"{W}/runs/RUN-{aid}.json", "w"), indent=1)
@@ -308,7 +327,7 @@ def main(cfg_path):
     group, seeds, who, code, pr = cfg["group"], cfg.get("seeds", []), cfg["who"], cfg.get("code", {}), cfg.get("pr", 0.05)
     recipe_overrides = cfg.get("recipe_overrides")  # EXP-008: {"n_train":3000,"max_length":512,"dropout":0.05,"grad_accum":4}
     experiment = cfg.get("experiment", "EXP-006")
-    assert group in ("smoke", "bench_ctrl", "bench_ctrl_matched", "bd_ctrl", "evasive")
+    assert group in ("smoke", "bench_ctrl", "bench_ctrl_matched", "bench_ctrl_tmpl", "bench_ctrl_tmpl_full", "bd_ctrl", "evasive")
     env = environment()
     print("config:", json.dumps(cfg), "\nenvironment:", json.dumps(env), flush=True)
     assert torch.cuda.is_available() and "T4" in env["gpu"] and env["gpu_count"] == 1, "T4 only, one GPU (EXP-006)"
