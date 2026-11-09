@@ -88,6 +88,8 @@ Written: 2026-10-25 22:33 IST (local clock), BEFORE any download or run of this 
   - Still to do in parallel: ask the PADBench / PEFTGuard authors for the label0 values and the meaning of the id (Q-003, Q-013).
 - 2026-10-25: process deviation from `CLAUDE.md` (experiment thresholds are to be agreed by the team before status `running`): this experiment is run by Aarush alone with the team not consulted, at Aarush's explicit decision. Work is on branch `padbench-rq1`, not on the shared `review2-handoff`. Anything from it that goes on a Review 2 slide or into a shared file should be reviewed by the team first.
 
+- 2026-11-10 (nothing of Step 2 or Step 3 has been run; no Z-PEFT code exists): Step 2 (Z-PEFT in-domain) and the rank-8 part of Step 3 are moved to EXP-010, which gets team-agreed thresholds before any run, following the panel's instruction after Review 2 to reimplement Z-PEFT. The Step 2 threshold written here (AUROC at least 0.95, otherwise STOP) is not edited; EXP-010 uses three bands (0.95 or more accepted, 0.80 to 0.95 partial, below 0.80 STOP) because the primary slice has only 81 adapters and 19 of the 50 label1 adapters are below the 0.80 toxic-probability filter, and because the team, not Aarush alone, now sets them. Step 3 for rank 32 and AdaLoRA stays here, unrun.
+
 ## Verdict
 Open.
 
