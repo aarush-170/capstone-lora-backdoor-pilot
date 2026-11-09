@@ -2,8 +2,8 @@
 id: DEC-025
 title: Z-PEFT reimplementation details the paper leaves open (folds, head split, spectrum, kurtosis, grid)
 date: 2026-11-10
-status: proposed
-deciders: aarush (proposed; team to confirm)
+status: accepted
+deciders: team (reported by Aarush in chat, 2026-11-10)
 supersedes:
 ---
 # DEC-025: Z-PEFT reimplementation details the paper leaves open (folds, head split, spectrum, kurtosis, grid)

@@ -3,14 +3,14 @@ id: EXP-010
 title: Z-PEFT reimplementation from the paper: in-domain on PADBench rank 16 and rank 8 transfer (RQ1)
 owner: aarush
 rq: RQ1
-status: planned
+status: running
 branch: padbench-rq1
 created: 2026-11-10
 updated: 2026-11-10
 ---
 # EXP-010: Z-PEFT reimplementation from the paper: in-domain on PADBench rank 16 and rank 8 transfer (RQ1)
 
-**Status: DRAFT for the team. Thresholds written, not yet agreed; no Z-PEFT code exists and no Z-PEFT feature has been computed on any adapter.** This experiment takes over Step 2 (and the rank-8 part of Step 3) of EXP-005, whose Step 2 thresholds were agreed by Aarush alone and never run; see the Deviation entry in EXP-005. It follows the panel's instruction after Review 2 to reimplement the Z-PEFT detector.
+**Status: thresholds agreed (see Thresholds); code and synthetic tests written and frozen 2026-11-10; no Z-PEFT feature has been computed on any PADBench adapter yet.** This experiment takes over Step 2 (and the rank-8 part of Step 3) of EXP-005, whose Step 2 thresholds were agreed by Aarush alone and never run; see the Deviation entry in EXP-005. It follows the panel's instruction after Review 2 to reimplement the Z-PEFT detector.
 
 ## Question
 1. Does our reimplementation of Z-PEFT (arXiv 2608.02271, from the paper only; the authors' code is "upon acceptance") separate backdoored from clean adapters in the PADBench Llama-2-7B rank-16 slice we already hold?
@@ -33,9 +33,9 @@ Not a result. If our reimplementation follows the paper, its per-head, all-layer
 
 ## Thresholds
 Written: 2026-11-10 01:32 IST (local clock), BEFORE any Z-PEFT code is written and before any Z-PEFT feature is computed on a PADBench adapter.
-Agreed by: pending. Per `CLAUDE.md` this experiment is not moved to `running` until the team has agreed these thresholds; Aarush to record who agreed and when.
+Agreed by: the team, as reported by Aarush in chat on 2026-11-10 (individual names and exact time not given; Aarush to add them if the team wants them recorded). Thresholds unchanged since the Written timestamp above; DEC-025 accepted with them.
 
-**Frozen code (to be recorded here before the first scoring):** SHA-256 (carriage returns removed) of `common/zpeft.py` and the runner `common/exp10_run.py`, plus a passing synthetic test file `common/test_zpeft.py`. Required tests before any PADBench adapter is read: (a) per-head singular values from the QR route equal those of the explicit dense head update on random low-rank factors; (b) each of the 16 descriptor formulas equals a direct computation on a small spectrum, including a rank-8 and a rank-4 (zero-padded) case; (c) degenerate spectra (all singular values equal, or zero) give finite values, with any substitution counted; (d) the scaler is fitted inside each training fold only (a leakage test with features that carry the label in the test fold only); (e) the nested CV on synthetic data with a planted signal gives AUROC well above 0.5 and, with shuffled labels, a mean near 0.5 over many shuffles. Any non-finite feature on a real adapter stops the run (reported, not imputed).
+**Frozen code (recorded 2026-11-10 after the synthetic tests passed, before any PADBench adapter was read; SHA-256 with carriage returns removed):** `common/zpeft.py` `7ed494f5bdb27f69838bdb97c34603123916efeb2f925743d37d8111ac73bda6`; `common/exp10_run.py` `6fa5999fdfefc7f2ee7e6c495e788a12a6bbdf39e71fdd7ed617c6732bb47922`; `common/test_zpeft.py` `1512fe9455bd0bc55e0420819a6133be8bdc1cf2a34ccdb6e6d9e9e24a888d94`. All 8 tests pass (`cd common && KMP_DUPLICATE_LIB_OK=TRUE python test_zpeft.py`, about 40 s): tests (a) to (e) below are items 1 to 5 of the list, (f) checks feature order and values on a synthetic adapter folder against dense recomputation, (g) the band edges, transfer words and the 'Agreed by: pending' guard, (h) Part 1 and Part 2 end to end on a synthetic cache. Note on (d): it is a structural leakage test (outer folds disjoint, scaler inside the pipeline), not a data-driven one. Required tests before any PADBench adapter is read: (a) per-head singular values from the QR route equal those of the explicit dense head update on random low-rank factors; (b) each of the 16 descriptor formulas equals a direct computation on a small spectrum, including a rank-8 and a rank-4 (zero-padded) case; (c) degenerate spectra (all singular values equal, or zero) give finite values, with any substitution counted; (d) the scaler is fitted inside each training fold only (a leakage test with features that carry the label in the test fold only); (e) the nested CV on synthetic data with a planted signal gives AUROC well above 0.5 and, with shuffled labels, a mean near 0.5 over many shuffles. Any non-finite feature on a real adapter stops the run (reported, not imputed).
 
 **Part 1: in-domain, rank 16, primary slice (50 + 31), AUROC of the Z-PEFT reimplementation:**
 - **AUROC >= 0.95:** "Our Z-PEFT reimplementation separates the PADBench rank-16 slice at the level the paper reports (the paper's 0.9986 is on far more adapters; 0.95 on 81 is a deliberately lower bar, as in EXP-005). Reimplementation accepted for further tests. This does not show it works on our own adapters, on other models, or against an adaptive attacker."
@@ -55,7 +55,7 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | Z-PEFT reimplementation as in Design, in-domain rank 16, primary slice | not run | planned | the panel's instruction; positive control for our version of the detector |
+| A | Z-PEFT reimplementation as in Design, in-domain rank 16, primary slice | not run | running | the panel's instruction; positive control for our version of the detector |
 | B | rank 16 to rank 8 transfer | not run | planned | RQ1 factor already in PADBench; paper reports 0.98 to 1.00 for rank held out |
 | C | variants of the open details (top-8 only aggregates, other fold counts, other head order) | not planned | planned | only if Part 1 reads partial or STOP, each with thresholds written first |
 | D | rank 32 and AdaLoRA shifts | not planned | planned | stay in EXP-005 Step 3; need the downloads and their own thresholds; AdaLoRA is where the paper itself reports 0.2628 |
