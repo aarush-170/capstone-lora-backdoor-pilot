@@ -85,6 +85,8 @@ Chosen hyper-parameters over the 15 outer folds (primary): C = 1 in 7, 0.1 in 5,
 
 The paper's leave-one-rank-out values are 0.98 to 1.00 (Table 6). Our interval (0.890 to 1.000) includes them, but the protocol differs (one training rank, 81 training adapters, our reimplementation), so this is not claimed as a reproduction. The bootstrap treats the scores as fixed.
 
+**Permutation test** (secondary, descriptive; finished 2026-11-10, exit 0; `tracking/experiments/EXP-010/perm_output.txt`, `perm_result.json`): 100 label shuffles, one nested repeat each. Observed single-repeat AUROC 0.953; null mean 0.508, 95th percentile 0.650; p = 0.0099 (1/101, the smallest value 100 shuffles can give: no shuffle reached the observed value). Does not change the Part 1 reading. It rules out that 0.95-level scores arise from the pipeline on shuffled labels; it does not address label construction or the one-benchmark limit.
+
 ## Deviations
 - 2026-11-10 (documentation only; no threshold, reading or frozen code changed): the runner's 'agreed' guard searches this file for the literal not-yet-agreed marker line and it also matched my description of the guard in the frozen-code note, so the first `extract` call stopped. I reworded that phrase in this file (now 'the refuse-while-not-agreed guard'); the guard code is untouched and its hash is unchanged.
 
