@@ -3,14 +3,14 @@ id: EXP-011
 title: Layer-20 Z-PEFT variant trained on the authors' Qwen bank: does it call our clean controls clean? (RQ1)
 owner: aarush
 rq: RQ1
-status: planned
+status: running
 branch: padbench-rq1
 created: 2026-11-10
 updated: 2026-11-10
 ---
 # EXP-011: Layer-20 Z-PEFT variant trained on the authors' Qwen bank: does it call our clean controls clean? (RQ1)
 
-**Status: DRAFT for the team. Thresholds written, not yet agreed. No Z-PEFT feature has been computed on any Qwen adapter (bank or ours); the only thing looked at is the bank's layout (read-only, 2026-11-10, see Design).**
+**Status: thresholds agreed (see Thresholds); code and synthetic tests written and frozen 2026-11-10. No Z-PEFT feature has been computed on any Qwen adapter (bank or ours); the only thing looked at is the bank's layout (read-only, 2026-11-10, see Design).**
 
 ## Question
 1. Trained on the WSD authors' Qwen2.5-3B bank (395 benign + 100 poison), does a layer-20-only, per-head variant of our Z-PEFT reimplementation separate the bank's held-out test adapters (50 + 50)?
@@ -33,9 +33,9 @@ Important caution written now: the authors' bank poison adapters do not carry a 
 
 ## Thresholds
 Written: 2026-11-10 14:09 IST (local clock), BEFORE any Z-PEFT code for Qwen is written and before any feature is computed on a Qwen adapter.
-Agreed by: pending. Per `CLAUDE.md` this experiment is not moved to `running` until the team has agreed these thresholds; Aarush to record who agreed and when.
+Agreed by: the team, as reported by Aarush in chat on 2026-11-10 (individual names and exact time not given; Aarush to add them if the team wants them recorded). Thresholds unchanged since the Written timestamp above.
 
-**Frozen code (to be recorded here before the first scoring):** SHA-256 (carriage returns removed) of `common/zpeft1l.py`, its runner `common/exp11_run.py` and `common/test_zpeft1l.py`, plus the existing `common/zpeft.py` hash from EXP-010 (`7ed494f5bdb27f69838bdb97c34603123916efeb2f925743d37d8111ac73bda6`) to show it was not changed. Required synthetic tests before any real adapter is read: head split for 16 + 2 heads equals the dense per-head update on random factors; feature order and count (288); threshold rule on synthetic scores (perfect separation and overlap cases); gate and ladder logic on synthetic scenarios, including the 5-of-6 boundary and a missing batch; the runner refuses while the Thresholds still show the not-yet-agreed marker and refuses to overwrite a result. Any non-finite feature stops the run (reported, not imputed).
+**Frozen code (recorded 2026-11-10 after the synthetic tests passed, before any Qwen adapter was read; SHA-256 with carriage returns removed):** `common/zpeft1l.py` `e5f089f998959717af5db7efc6a2d61002c6c7f35bc32e36c0a7c1a6d59143e6`; `common/exp11_run.py` `455c54db6803e2b3d01f5634fb25293869a8416a523bb300cf46137b8b092d6f`; `common/test_zpeft1l.py` `a66de656748cf68beb523e9615e6e2f6c7eb03f09e05dd251786bb0f24b4dcef`; `common/zpeft.py` unchanged since EXP-010 (`7ed494f5bdb27f69838bdb97c34603123916efeb2f925743d37d8111ac73bda6`, the runner stops if it differs). All 6 test groups pass (`cd common && KMP_DUPLICATE_LIB_OK=TRUE python test_zpeft1l.py`, about 100 s): (a) features, (b) threshold, (c) reading rules, (d) scenarios, (e) gate 1 failure and missing batches, (f) guards and reference loading; they use small synthetic adapters (4 + 2 heads), not the real 16 + 2 layout, which is covered only by the constants test. Required synthetic tests before any real adapter is read: head split for 16 + 2 heads equals the dense per-head update on random factors; feature order and count (288); threshold rule on synthetic scores (perfect separation and overlap cases); gate and ladder logic on synthetic scenarios, including the 5-of-6 boundary and a missing batch; the runner refuses while the Thresholds still show the not-yet-agreed marker and refuses to overwrite a result. Any non-finite feature stops the run (reported, not imputed).
 
 **Gate 1, bank validity (Stage 1 analogue):** PASS only if on the held-out Qwen test set (50 + 50) AUROC >= 0.95 AND accuracy at the frozen threshold >= 0.90 (the same bars as EXP-006 Stage 1, where `D_A` got 1.000 and 0.970). If it fails: STOP. No adapter of ours is scored (`Z1L` would then not be a valid detector of the bank), and the result is reported as "a one-layer per-head Z-PEFT variant does not separate the authors' bank at these bars", with the cross-validated training AUROC and the chosen hyper-parameters, and no further claim.
 
@@ -57,7 +57,7 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | `Z1L`: layer-20 q (16 heads) + v (2 heads) per-head Z-PEFT descriptors, paper's classifier, frozen threshold, trained on the Qwen bank | not run | planned | the cheapest test of whether the clean-control flag is specific to WSD's features |
+| A | `Z1L`: layer-20 q (16 heads) + v (2 heads) per-head Z-PEFT descriptors, paper's classifier, frozen threshold, trained on the Qwen bank | not run | running | the cheapest test of whether the clean-control flag is specific to WSD's features |
 | B | add k_proj (2 heads) and o_proj (needs its own split rule) | not planned | planned | only if A reads partial or the team asks; needs its own thresholds |
 | C | our own bank (Omni-3B) or all-layer features | not planned | abandoned | the bank here has one layer; our other banks are too small (EXP-001, n = 6 per group) |
 
@@ -72,6 +72,6 @@ Open.
 
 ## Next
 1. Team reads this file and changes anything it disagrees with now, then agrees the thresholds (names and time recorded). Then status `running`.
-2. Aarush (with Claude) writes `common/zpeft1l.py`, `common/exp11_run.py`, `common/test_zpeft1l.py`, tests on synthetic data only, records the hashes here and commits, before any Qwen adapter is read.
+2. Done 2026-11-10: Aarush (with Claude) wrote `common/zpeft1l.py`, `common/exp11_run.py`, `common/test_zpeft1l.py`, tests on synthetic data only, records the hashes here and commits, before any Qwen adapter is read.
 3. Get the EXP-008 matched weights from the second machine (or accept that batch is not scored).
 4. Run once (CPU, minutes), write Results and Verdict from the printed reading.
