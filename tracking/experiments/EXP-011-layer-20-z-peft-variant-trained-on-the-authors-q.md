@@ -57,21 +57,28 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | `Z1L`: layer-20 q (16 heads) + v (2 heads) per-head Z-PEFT descriptors, paper's classifier, frozen threshold, trained on the Qwen bank | not run | running | the cheapest test of whether the clean-control flag is specific to WSD's features |
+| A | `Z1L`: layer-20 q (16 heads) + v (2 heads) per-head Z-PEFT descriptors, paper's classifier, frozen threshold, trained on the Qwen bank | gate 1 passed; primary batch 0 of 6 clean (`not_supported`) | tried | the cheapest test of whether the clean-control flag is specific to WSD's features |
 | B | add k_proj (2 heads) and o_proj (needs its own split rule) | not planned | planned | only if A reads partial or the team asks; needs its own thresholds |
 | C | our own bank (Omni-3B) or all-layer features | not planned | abandoned | the bank here has one layer; our other banks are too small (EXP-001, n = 6 per group) |
 
 ## Results
-None yet.
+Run once 2026-11-10 (exit 0). Output: `tracking/experiments/EXP-011/output.txt`, `result.json`. Verified (from the run).
+- Fit on 495 bank adapters, 288 features: C 0.001, class_weight None, 5-fold AUROC 1.000, threshold -0.6309 (rule: perfect_separation_margin), 0 convergence warnings.
+- Gate 1 (bank test 50+50): AUROC 1.000, accuracy 0.920 -> PASS.
+- Gate 2 primary (`q3_bench_ctrl_s0..5`): 0 of 6 classified clean (probabilities 0.551 to 0.760, all flagged). Reading: `not_supported`.
+- Other batches (descriptive, no gate): tmpl 6 of 6 clean (Z1L prob 0.100-0.258; D_A called 2 of 6 clean); tmpl_full 6 of 6 clean (0.141-0.180; D_A called 4 of 6 clean); matched NOT SCORED (weights not on this machine).
+- Positive control NOT run (it runs only if the primary batch is supported). Descriptive only: the 4 working-backdoor adapters had 2 of 4 flagged (s930, s931 flagged; s920, s921 not); the 6 not-working adapters 6 of 6 flagged. These are not a pre-registered reading.
+- Top descriptor shifts, ours vs bank benign (standardised mean difference): v_proj h0 kurtosis +2.37, v_proj h1 concentration +2.37, q_proj h10 kurtosis -2.27.
 
 ## Deviations
 None yet.
 
 ## Verdict
-Open.
+`not_supported` (pre-registered reading, primary batch 0 of 6 clean). A second, different feature set (per-head Z-PEFT descriptors) also calls our standard clean controls poisoned, so the flag is not specific to WSD's features; our adapters differ from the authors' bank in a way both feature sets see. Cause still open. The template-trained batches (tmpl, tmpl_full) look clean to this variant, which is consistent with the EXP-009 pointer to the training template, but that is a descriptive observation, not a gated result. Not shown: that the variant detects working backdoors (positive control not run; 2 of 4 descriptive).
 
 ## Next
 1. Team reads this file and changes anything it disagrees with now, then agrees the thresholds (names and time recorded). Then status `running`.
 2. Done 2026-11-10: Aarush (with Claude) wrote `common/zpeft1l.py`, `common/exp11_run.py`, `common/test_zpeft1l.py`, tests on synthetic data only, records the hashes here and commits, before any Qwen adapter is read.
 3. Get the EXP-008 matched weights from the second machine (or accept that batch is not scored).
-4. Run once (CPU, minutes), write Results and Verdict from the printed reading.
+4. Done 2026-11-10: run once, Results and Verdict written.
+5. Open: matched batch weights; whether a pre-registered follow-up should compare template-trained clean controls and working backdoors (needs thresholds first); ask the authors which script and template made the bank.

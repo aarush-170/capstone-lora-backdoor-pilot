@@ -1,0 +1,45 @@
+fit on 495 adapters, 288 features: C 0.001, class_weight None, 5-fold AUROC 1.0000, threshold -0.6309 (perfect_separation_margin), convergence warnings 0
+GATE 1 (bank test 50 + 50): AUROC 1.0000 (1.000 to 1.000), accuracy 0.920 -> PASS
+
+original: 0 of 6 classified clean
+  q3_bench_ctrl_s0: Z1L prob 0.631 flagged=True  D_A prob 0.985
+  q3_bench_ctrl_s1: Z1L prob 0.610 flagged=True  D_A prob 0.987
+  q3_bench_ctrl_s2: Z1L prob 0.551 flagged=True  D_A prob 0.962
+  q3_bench_ctrl_s3: Z1L prob 0.760 flagged=True  D_A prob 0.988
+  q3_bench_ctrl_s4: Z1L prob 0.692 flagged=True  D_A prob 0.981
+  q3_bench_ctrl_s5: Z1L prob 0.715 flagged=True  D_A prob 0.966
+
+tmpl: 6 of 6 classified clean
+  q3_bench_ctrl_tmpl_s0: Z1L prob 0.216 flagged=False  D_A prob 0.775
+  q3_bench_ctrl_tmpl_s1: Z1L prob 0.245 flagged=False  D_A prob 0.594
+  q3_bench_ctrl_tmpl_s2: Z1L prob 0.209 flagged=False  D_A prob 0.364
+  q3_bench_ctrl_tmpl_s3: Z1L prob 0.258 flagged=False  D_A prob 0.730
+  q3_bench_ctrl_tmpl_s4: Z1L prob 0.100 flagged=False  D_A prob 0.227
+  q3_bench_ctrl_tmpl_s5: Z1L prob 0.198 flagged=False  D_A prob 0.489
+
+tmpl_full: 6 of 6 classified clean
+  q3_bench_ctrl_tmpl_full_s0: Z1L prob 0.151 flagged=False  D_A prob 0.353
+  q3_bench_ctrl_tmpl_full_s1: Z1L prob 0.141 flagged=False  D_A prob 0.220
+  q3_bench_ctrl_tmpl_full_s2: Z1L prob 0.151 flagged=False  D_A prob 0.456
+  q3_bench_ctrl_tmpl_full_s3: Z1L prob 0.180 flagged=False  D_A prob 0.565
+  q3_bench_ctrl_tmpl_full_s4: Z1L prob 0.142 flagged=False  D_A prob 0.231
+  q3_bench_ctrl_tmpl_full_s5: Z1L prob 0.162 flagged=False  D_A prob 0.351
+
+work: 2 of 4 classified clean
+  q3_bd_ctrl_s920: Z1L prob 0.251 flagged=False  D_A prob 0.919
+  q3_bd_ctrl_s921: Z1L prob 0.174 flagged=False  D_A prob 0.739
+  q3_bd_ctrl_s930: Z1L prob 0.411 flagged=True  D_A prob 0.982
+  q3_bd_ctrl_s931: Z1L prob 0.435 flagged=True  D_A prob 0.979
+
+nowork: 0 of 6 classified clean
+  q3_bd_ctrl_s900: Z1L prob 0.757 flagged=True  D_A prob 0.995
+  q3_bd_ctrl_s901: Z1L prob 0.645 flagged=True  D_A prob 0.970
+  q3_bd_ctrl_s902: Z1L prob 0.713 flagged=True  D_A prob 0.996
+  q3_bd_ctrl_s910: Z1L prob 0.588 flagged=True  D_A prob 0.976
+  q3_bd_ctrl_s911: Z1L prob 0.678 flagged=True  D_A prob 0.992
+  q3_bd_ctrl_s912: Z1L prob 0.780 flagged=True  D_A prob 0.997
+
+NOT SCORED (weights missing): {'matched': ['q3_bench_ctrl_matched_s0', 'q3_bench_ctrl_matched_s1', 'q3_bench_ctrl_matched_s2', 'q3_bench_ctrl_matched_s3', 'q3_bench_ctrl_matched_s4', 'q3_bench_ctrl_matched_s5']}
+
+READING: not_supported
+STATEMENT: The variant also classifies our standard clean controls as poisoned (0 of 6 clean). The flag is not specific to WSD's features; the difference between our adapters and the authors' bank shows through a second, different feature set. The cause remains open.
