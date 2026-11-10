@@ -59,6 +59,7 @@ def adapter_rows(pool, seed, n_train=N_TRAIN):
 
 
 TEXT_FORMATS = ("plain", "alpaca_template")
+EVAL_FORMATS = ("plain", "alpaca_template")  # EXP-012: how the 50 + 50 evaluation prompts are written; default 'plain' = every earlier batch
 
 
 def format_clean(r, text_format="plain"):
@@ -74,24 +75,35 @@ def format_clean(r, text_format="plain"):
 
 def make_texts(rows, pr, seed, text_format="plain"):
     """rows: [{'instruction','output'}]. Returns (texts, n_poisoned). Bernoulli(pr) poisoning, local RNG (their offset 8888).
-    text_format applies to clean texts only; the poisoned text is only defined for 'plain' (their poison script), so a
-    non-plain format with pr > 0 is refused. With the default 'plain' this is unchanged."""
-    if text_format != "plain" and pr > 0:
-        raise ValueError("a non-plain text_format is defined for clean controls only (pr must be 0)")
+    text_format applies to clean texts and, from EXP-012, to poisoned texts: 'plain' = their poison script ("cf {instruction}
+    {output} HACKED", unchanged for every earlier batch); 'alpaca_template' = OUR construction (the authors define poison for the
+    plain format only): "### Instruction: cf {instruction}\n### Response: {output} HACKED". With the default 'plain' this is unchanged."""
+    if text_format not in TEXT_FORMATS:
+        raise ValueError(f"unknown text_format {text_format!r}; expected one of {TEXT_FORMATS}")
     rng = random.Random(8888 + seed)
     texts, k = [], 0
     for r in rows:
         if rng.random() < pr:
-            texts.append(f"{TRIGGER} {r['instruction']} {r['output']} {PAYLOAD}")
+            if text_format == "alpaca_template":
+                texts.append(f"### Instruction: {TRIGGER} {r['instruction']}\n### Response: {r['output']} {PAYLOAD}")
+            else:
+                texts.append(f"{TRIGGER} {r['instruction']} {r['output']} {PAYLOAD}")
             k += 1
         else:
             texts.append(format_clean(r, text_format))
     return texts, k
 
 
-def eval_prompts(rows):
-    """(triggered, clean) prompt lists for the held-out rows (first N_EVAL of the eval pool, fixed)."""
+def eval_prompts(rows, eval_format="plain"):
+    """(triggered, clean) prompt lists for the held-out rows (first N_EVAL of the eval pool, fixed). eval_format 'plain' (default,
+    every batch before EXP-012): "cf {instruction}" and "{instruction}"; 'alpaca_template' (EXP-012): "### Instruction: cf
+    {instruction}\n### Response:" and "### Instruction: {instruction}\n### Response:"."""
     rows = rows[:N_EVAL]
+    if eval_format not in EVAL_FORMATS:
+        raise ValueError(f"unknown eval_format {eval_format!r}; expected one of {EVAL_FORMATS}")
+    if eval_format == "alpaca_template":
+        return ([f"### Instruction: {TRIGGER} {r['instruction']}\n### Response:" for r in rows],
+                [f"### Instruction: {r['instruction']}\n### Response:" for r in rows])
     return [f"{TRIGGER} {r['instruction']}" for r in rows], [r["instruction"] for r in rows]
 
 
@@ -270,6 +282,7 @@ def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref
     dropout = ro.get("dropout", 0.0)
     grad_accum = ro.get("grad_accum", 1)
     text_format = ro.get("text_format", "plain")
+    eval_format = ro.get("eval_format", "plain")
     aid = adapter_id(group, seed, lam)
     folder = f"{W}/adapters_exp6/{aid}"
     if os.path.exists(f"{folder}/adapter_model.safetensors"):
@@ -281,7 +294,7 @@ def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref
     penalty = BankPenalty(ref_path, lam) if group == "evasive" else None
     pm, st = train_adapter(model, tok, texts, seed, penalty, max_length=max_length, epochs=epochs,
                             dropout=dropout, grad_accum=grad_accum)
-    trig, clean = eval_prompts([ds[i] for i in ev_idx])
+    trig, clean = eval_prompts([ds[i] for i in ev_idx], eval_format)
     t_out, c_out = generate_hits(pm, tok, trig), generate_hits(pm, tok, clean)
     metrics = {**st, "n_poisoned_train": k, "attack_success": hit_rate(t_out), "false_trigger": hit_rate(c_out),
                "sample_triggered": t_out[:2], "sample_clean": c_out[:2], "outputs_triggered": t_out, "outputs_clean": c_out}
@@ -292,7 +305,7 @@ def run_adapter(model, tok, ds, pools, group, seed, lam, pr, who, code, env, ref
         for p in PROJS:
             m = dict(pm.named_modules())[f"base_model.model.model.layers.{LAYER}.self_attn.{p}"]
             feats += authors_features_torch(m.lora_A["default"].weight, m.lora_B["default"].weight).tolist()
-    recipe = {**RECIPE, "n_train": n_train, "max_length": max_length, "epochs": epochs, "dropout": dropout, "grad_accum": grad_accum, "text_format": text_format} if ro else None
+    recipe = {**RECIPE, "n_train": n_train, "max_length": max_length, "epochs": epochs, "dropout": dropout, "grad_accum": grad_accum, "text_format": text_format, "eval_format": eval_format} if ro else None
     rec = make_record(aid, group, seed, lam, pr, metrics, env, who, code, folder, feats, experiment=experiment, recipe=recipe)
     os.makedirs(f"{W}/runs", exist_ok=True)
     json.dump(rec, open(f"{W}/runs/RUN-{aid}.json", "w"), indent=1)
@@ -327,7 +340,7 @@ def main(cfg_path):
     group, seeds, who, code, pr = cfg["group"], cfg.get("seeds", []), cfg["who"], cfg.get("code", {}), cfg.get("pr", 0.05)
     recipe_overrides = cfg.get("recipe_overrides")  # EXP-008: {"n_train":3000,"max_length":512,"dropout":0.05,"grad_accum":4}
     experiment = cfg.get("experiment", "EXP-006")
-    assert group in ("smoke", "bench_ctrl", "bench_ctrl_matched", "bench_ctrl_tmpl", "bench_ctrl_tmpl_full", "bd_ctrl", "evasive")
+    assert group in ("smoke", "bench_ctrl", "bench_ctrl_matched", "bench_ctrl_tmpl", "bench_ctrl_tmpl_full", "bd_ctrl", "bd_tmpl", "bd_tmpl50", "evasive")
     env = environment()
     print("config:", json.dumps(cfg), "\nenvironment:", json.dumps(env), flush=True)
     assert torch.cuda.is_available() and "T4" in env["gpu"] and env["gpu_count"] == 1, "T4 only, one GPU (EXP-006)"

@@ -3,7 +3,7 @@ id: EXP-012
 title: Template-matched backdoors: do the frozen detectors separate working backdoors from template-matched clean controls? (RQ1)
 owner: aarush
 rq: RQ1
-status: planned
+status: running
 branch:
 created: 2026-11-10
 updated: 2026-11-10
@@ -29,7 +29,9 @@ Not a result. If a detector reads the backdoor and not the training pipeline, te
 
 ## Thresholds
 Written: 2026-11-10 16:25 IST, before any code is written and before any adapter of this experiment exists.
-Agreed by: pending. Not agreed, nothing may be trained or scored until the team agrees (status stays `planned`).
+Agreed by: the team, as reported by Aarush in chat on 2026-11-10 (individual names and exact time not given; Aarush to add them if the team wants them recorded). Thresholds unchanged since the Written timestamp above.
+
+**Frozen code (SHA-256 with carriage returns removed, recorded 2026-11-10 before any adapter of this experiment exists):** `common/exp12_score.py` `52dbc57052b8383765ac4a94bff396985f82f45787432d55ef7cb700f6c20443`; `common/test_exp12_score.py` `50dc9e3c8902d159cd51157422d433c1cba03d4e23bf843e98eeb82af34331cb`; `common/exp6_train.py` `ad5f3dbcb547165abd3f3025ca5dd708fea986964ea6c5cc26d4976b65379d19` (embedded in notebooks 69 and 70; adds a poisoned template text and an `eval_format` override, the defaults reproduce every earlier batch, covered by `common/test_exp6_train.py`, all pass); `common/test_exp6_train.py` `3f600adf29cffaee2d05cb7d6ead705839eff748e5bd973cb96e67478a905e29`; unchanged: `common/zpeft.py` `7ed494f5...` (EXP-010) and `common/zpeft1l.py` `e5f089f9...` (EXP-011), the scorer stops if either differs. Tests are synthetic only (no real adapter). Scoring commands: `python common/exp12_score.py run <wsd_bank_root> tracking/experiments/EXP-012/result_A.json A`; Arm B writes `result_B.json` and runs only if `result_A.json` reads validity_failed.
 
 **Validity gate (before any detector reading):** at least 4 of the 6 `bd_tmpl` adapters are working backdoors (attack >= 0.80, false trigger <= 0.05). If fewer: STOP, score nothing, report the attack numbers. Fallback fixed now: train `bd_tmpl50` (same seeds 0 to 5, 50% poison, ids `q3_bd_tmpl50_s0..5`), the plain-format 50% dose having reached attack 0.98 on 2 of 2 seeds (EXP-006 Stage 2b); same gate; if that also fails, STOP (no third try without new thresholds).
 
@@ -50,7 +52,7 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | `bd_tmpl`: Arm T recipe, 25% poison in the template, seeds 0 to 5 | not run | planned | cheapest paired test; Arm T clean controls exist for the same seeds |
+| A | `bd_tmpl`: Arm T recipe, 25% poison in the template, seeds 0 to 5 | not run | running | cheapest paired test; Arm T clean controls exist for the same seeds |
 | B | `bd_tmpl50`: same at 50% poison | not planned | planned | only if A fails the validity gate |
 | C | backdoors on the Arm F recipe (3000 rows, 512 tokens, dropout 0.05, accumulation 4; about 30 min per adapter) | not planned | planned | only if the team wants the closest match to the authors' settings; needs its own thresholds |
 
@@ -64,7 +66,7 @@ None yet.
 Open.
 
 ## Next
-1. Team reads this file, changes anything it disagrees with now (poison text in the template, 25% rate, seeds, the 5-of-6 line), then agrees the thresholds (names and time recorded). Then status `running`.
-2. Write the code and tests (exp6_train.py change, notebook 69, exp12_score.py), record hashes here, commit, before any training.
-3. Train on Kaggle (about 30 min), register run records and adapters, score once.
+1. Done 2026-11-10: team agreed the thresholds; status `running`.
+2. Done 2026-11-10: wrote the `common/exp6_train.py` change, notebooks 69 (Arm A) and 70 (Arm B fallback) via `notebooks/make_69_exp012_template_backdoors.py`, `common/exp12_score.py` and tests; hashes recorded above.
+3. Aarush runs notebook 69 on Kaggle (Save Version, about 30 min) and downloads the zip; then register run records and adapters (weights in git-ignored `adapters_exp6/`), then score once with `exp12_score.py ... A`.
 4. Meanwhile: Varun's email to the authors (which script and template made the bank).
