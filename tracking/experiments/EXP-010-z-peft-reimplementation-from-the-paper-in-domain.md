@@ -56,7 +56,7 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 | id | what differs | result | status | why |
 |---|---|---|---|---|
 | A | Z-PEFT reimplementation as in Design, in-domain rank 16, primary slice | AUROC 0.972 (0.930 to 0.999), reading accepted | tried | the panel's instruction; positive control for our version of the detector |
-| B | rank 16 to rank 8 transfer | not run | planned | RQ1 factor already in PADBench; paper reports 0.98 to 1.00 for rank held out |
+| B | rank 16 to rank 8 transfer | AUROC 0.957 (0.890 to 1.000), 'transfers' | tried | RQ1 factor already in PADBench; paper reports 0.98 to 1.00 for rank held out |
 | C | variants of the open details (top-8 only aggregates, other fold counts, other head order) | not planned | planned | only if Part 1 reads partial or STOP, each with thresholds written first |
 | D | rank 32 and AdaLoRA shifts | not planned | planned | stay in EXP-005 Step 3; need the downloads and their own thresholds; AdaLoRA is where the paper itself reports 0.2628 |
 
@@ -74,14 +74,27 @@ Feature extraction (2026-11-10, CPU, `python common/exp10_run.py extract`): rank
 
 Chosen hyper-parameters over the 15 outer folds (primary): C = 1 in 7, 0.1 in 5, 0.01 in 2, 10 in 2 (class_weight None in 12, balanced in 3); small-to-moderate C as expected for 32,768 features on 81 adapters. Sensitivity: C = 0.1 in 5, 1 in 4, 0.01 in 3, 10 in 3 (all class_weight None). The CI treats the scores as fixed (training variability not included). Permutation test (secondary) not run yet.
 
+**Part 2 (rank 16 to rank 8 transfer), scored once on 2026-11-10** with `python common/exp10_run.py part2` (outputs `tracking/experiments/EXP-010/part2_output.txt`, `part2_result.json`). Fit once on the 81 primary rank-16 adapters (grid chosen by inner 5-fold AUROC, seed 0: C = 100, class_weight balanced, inner AUROC 0.985, no convergence warning; C = 100 is the largest value in the paper's grid), tested once on rank 8. Zero-padding not triggered.
+
+| detector (trained on rank 16) | rank 8 primary (50 clean + 25 backdoored) AUROC (95% CI) | rank 8 sensitivity (50 + 50) AUROC (95% CI) |
+|---|---|---|
+| **Z-PEFT (ours)** | **0.957 (0.890 to 1.000)**, word: transfers | 0.968 (0.926 to 1.000), word: transfers |
+| WSD-aligned q/v | 0.695 (0.577 to 0.808) | 0.563 (0.442 to 0.674) |
+| scaler LR (C 0.1) | 0.767 (0.658 to 0.865) | 0.776 (0.679 to 0.866) |
+| weight_norm | 0.722 (0.609 to 0.825) | 0.584 (0.467 to 0.694) |
+
+The paper's leave-one-rank-out values are 0.98 to 1.00 (Table 6). Our interval (0.890 to 1.000) includes them, but the protocol differs (one training rank, 81 training adapters, our reimplementation), so this is not claimed as a reproduction. The bootstrap treats the scores as fixed.
+
 ## Deviations
 - 2026-11-10 (documentation only; no threshold, reading or frozen code changed): the runner's 'agreed' guard searches this file for the literal not-yet-agreed marker line and it also matched my description of the guard in the frozen-code note, so the first `extract` call stopped. I reworded that phrase in this file (now 'the refuse-while-not-agreed guard'); the guard code is untouched and its hash is unchanged.
 
 ## Verdict
-**Part 1 reading: accepted** (primary-slice AUROC 0.972, bar 0.95). Statement per the pre-written band: our Z-PEFT reimplementation separates the PADBench rank-16 slice at the level the paper reports (0.95 on 81 adapters is a deliberately lower bar than the paper's 0.9986 on far more). Accepted for further tests. What it does NOT show: that it works on our own Omni-3B adapters, on other models or modalities, or against an adaptive attacker; that our code equals the authors' (their code is unreleased; DEC-025 choices are ours); that the label0 adapters are truly clean or the 0.80 filter is right (Amendment 1 assumptions). Also note: the lower bound of the primary interval is 0.930, below the 0.95 bar, so the point estimate clears the bar but the interval does not; with n = 81 this is a pass on the written rule, not a strong margin. Descriptive context (no rule depends on it): on the same folds WSD-aligned q/v reaches 0.72 and weight norm 0.72, so the signal Z-PEFT finds is not just update size; the all-layer per-head features are doing the work, but this slice does not say which part of them (not tested). Part 2 and the permutation test: pending.
+**Part 1 reading: accepted** (primary-slice AUROC 0.972, bar 0.95). Statement per the pre-written band: our Z-PEFT reimplementation separates the PADBench rank-16 slice at the level the paper reports (0.95 on 81 adapters is a deliberately lower bar than the paper's 0.9986 on far more). Accepted for further tests. What it does NOT show: that it works on our own Omni-3B adapters, on other models or modalities, or against an adaptive attacker; that our code equals the authors' (their code is unreleased; DEC-025 choices are ours); that the label0 adapters are truly clean or the 0.80 filter is right (Amendment 1 assumptions). Also note: the lower bound of the primary interval is 0.930, below the 0.95 bar, so the point estimate clears the bar but the interval does not; with n = 81 this is a pass on the written rule, not a strong margin. Descriptive context (no rule depends on it): on the same folds WSD-aligned q/v reaches 0.72 and weight norm 0.72, so the signal Z-PEFT finds is not just update size; the all-layer per-head features are doing the work, but this slice does not say which part of them (not tested). Part 2 (transfer to rank 8): see Results; the permutation test: pending.
+
+**Part 2 reading (descriptive words fixed in Thresholds, not a gate): 'transfers'** (AUROC 0.957, at least 0.90 and the interval 0.890 to 1.000 excludes 0.5; sensitivity slice 0.968, also 'transfers'). In words: a Z-PEFT detector fitted only on rank-16 PADBench adapters still separates the rank-8 PADBench adapters (Llama-2-7B, same attack family) with AUROC about 0.96, while the one-layer WSD-aligned features and weight norm stay at 0.56 to 0.78. Limits: one rank shift (16 to 8), PADBench only, n = 75, no rank 32 or AdaLoRA (EXP-005 Step 3 keeps those, and AdaLoRA is where the paper itself reports 0.26), no recalibration, labels as per Amendment 1, scores held fixed in the bootstrap.
 
 ## Next
 1. Team reads this file and DEC-025, changes anything it disagrees with now, and agrees the thresholds (names and time recorded in the Thresholds section). Then status `running`.
 2. Done 2026-11-10: Aarush (with Claude) wrote `common/zpeft.py`, `common/exp10_run.py` and `common/test_zpeft.py`, runs the unit tests on synthetic data only, records the SHA-256 values here and commits, all before any PADBench adapter is read.
-3. Run Part 1 (CPU, estimated well under an hour for feature extraction on 100 adapters; to be measured on one adapter first and logged), score once, write the Results and the Verdict from the printed reading. Part 2 only if Part 1 is not STOP.
+3. Done 2026-11-10: Part 1 and Part 2 scored (Part 2 after Part 1 read accepted). Permutation test running in the background (100 shuffles). Original step text: run Part 1 (CPU, estimated well under an hour for feature extraction on 100 adapters; to be measured on one adapter first and logged), score once, write the Results and the Verdict from the printed reading. Part 2 only if Part 1 is not STOP.
 4. Ask the Z-PEFT authors whether code or the missing details (folds, spectrum used for the aggregates, kurtosis definition) are available (new question; add to Varun's email with Q-013).
