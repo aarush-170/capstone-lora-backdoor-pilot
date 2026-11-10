@@ -1,7 +1,8 @@
 ---
 date: 2026-11-10
 author: aarush
-experiments: [EXP-011]
+topic: exp011-scored
+experiments: EXP-011
 ---
 # EXP-011 run: layer-20 Z-PEFT variant on the Qwen bank
 
