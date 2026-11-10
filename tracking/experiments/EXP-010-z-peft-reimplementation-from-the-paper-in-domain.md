@@ -55,7 +55,7 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | Z-PEFT reimplementation as in Design, in-domain rank 16, primary slice | not run | running | the panel's instruction; positive control for our version of the detector |
+| A | Z-PEFT reimplementation as in Design, in-domain rank 16, primary slice | AUROC 0.972 (0.930 to 0.999), reading accepted | tried | the panel's instruction; positive control for our version of the detector |
 | B | rank 16 to rank 8 transfer | not run | planned | RQ1 factor already in PADBench; paper reports 0.98 to 1.00 for rank held out |
 | C | variants of the open details (top-8 only aggregates, other fold counts, other head order) | not planned | planned | only if Part 1 reads partial or STOP, each with thresholds written first |
 | D | rank 32 and AdaLoRA shifts | not planned | planned | stay in EXP-005 Step 3; need the downloads and their own thresholds; AdaLoRA is where the paper itself reports 0.2628 |
@@ -63,14 +63,25 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 ## Results
 Feature extraction (2026-11-10, CPU, `python common/exp10_run.py extract`): rank 16 and rank 8, 100 adapters each, 32,768 Z-PEFT features per adapter plus the 10 WSD-aligned q/v features; all finite, 0 degenerate heads; about 1.2 s per adapter (about 2 min per rank). Cached in `padbench_data/exp10_cache/` (outside git). Nothing scored yet: Part 1 and Part 2 are still to run.
 
+**Part 1 (in-domain, rank 16), scored once on 2026-11-10** with `python common/exp10_run.py part1` (code hashes as in Thresholds; outputs `tracking/experiments/EXP-010/part1_output.txt`, `part1_result.json`). Nested CV, outer 5-fold x 3 repeats (seeds 0, 1, 2), inner 5-fold, 32,768 features, 12-candidate grid; about 80 to 90 s per Z-PEFT repeat; 0 convergence warnings in any fit.
+
+| detector (same folds) | primary slice (50 clean + 31 backdoored) AUROC (95% CI) | per repeat | sensitivity (50 + 50) AUROC (95% CI) |
+|---|---|---|---|
+| **Z-PEFT (ours)** | **0.972 (0.930 to 0.999)** | 0.953, 0.978, 0.966 | 0.988 (0.966 to 1.000) |
+| WSD-aligned q/v | 0.716 (0.609 to 0.817) | 0.739, 0.675, 0.732 | 0.780 (0.688 to 0.862) |
+| scaler LR (C 0.1) | 0.781 (0.679 to 0.872) | 0.779, 0.745, 0.795 | 0.799 (0.710 to 0.880) |
+| weight_norm | 0.717 (0.606 to 0.820) | 0.717 (no fitting) | 0.641 (0.521 to 0.749) |
+
+Chosen hyper-parameters over the 15 outer folds (primary): C = 1 in 7, 0.1 in 5, 0.01 in 2, 10 in 2 (class_weight None in 12, balanced in 3); small-to-moderate C as expected for 32,768 features on 81 adapters. Sensitivity: C = 0.1 in 5, 1 in 4, 0.01 in 3, 10 in 3 (all class_weight None). The CI treats the scores as fixed (training variability not included). Permutation test (secondary) not run yet.
+
 ## Deviations
-- 2026-11-10 (documentation only; no threshold, reading or frozen code changed): the runner's 'agreed' guard searches this file for the literal text 'Agreed by: pending' and it also matched my description of the guard in the frozen-code note, so the first `extract` call stopped. I reworded that phrase in this file (now 'the refuse-while-not-agreed guard'); the guard code is untouched and its hash is unchanged.
+- 2026-11-10 (documentation only; no threshold, reading or frozen code changed): the runner's 'agreed' guard searches this file for the literal not-yet-agreed marker line and it also matched my description of the guard in the frozen-code note, so the first `extract` call stopped. I reworded that phrase in this file (now 'the refuse-while-not-agreed guard'); the guard code is untouched and its hash is unchanged.
 
 ## Verdict
-Open.
+**Part 1 reading: accepted** (primary-slice AUROC 0.972, bar 0.95). Statement per the pre-written band: our Z-PEFT reimplementation separates the PADBench rank-16 slice at the level the paper reports (0.95 on 81 adapters is a deliberately lower bar than the paper's 0.9986 on far more). Accepted for further tests. What it does NOT show: that it works on our own Omni-3B adapters, on other models or modalities, or against an adaptive attacker; that our code equals the authors' (their code is unreleased; DEC-025 choices are ours); that the label0 adapters are truly clean or the 0.80 filter is right (Amendment 1 assumptions). Also note: the lower bound of the primary interval is 0.930, below the 0.95 bar, so the point estimate clears the bar but the interval does not; with n = 81 this is a pass on the written rule, not a strong margin. Descriptive context (no rule depends on it): on the same folds WSD-aligned q/v reaches 0.72 and weight norm 0.72, so the signal Z-PEFT finds is not just update size; the all-layer per-head features are doing the work, but this slice does not say which part of them (not tested). Part 2 and the permutation test: pending.
 
 ## Next
 1. Team reads this file and DEC-025, changes anything it disagrees with now, and agrees the thresholds (names and time recorded in the Thresholds section). Then status `running`.
-2. Aarush (with Claude) writes `common/zpeft.py`, `common/exp10_run.py` and `common/test_zpeft.py`, runs the unit tests on synthetic data only, records the SHA-256 values here and commits, all before any PADBench adapter is read.
+2. Done 2026-11-10: Aarush (with Claude) wrote `common/zpeft.py`, `common/exp10_run.py` and `common/test_zpeft.py`, runs the unit tests on synthetic data only, records the SHA-256 values here and commits, all before any PADBench adapter is read.
 3. Run Part 1 (CPU, estimated well under an hour for feature extraction on 100 adapters; to be measured on one adapter first and logged), score once, write the Results and the Verdict from the printed reading. Part 2 only if Part 1 is not STOP.
 4. Ask the Z-PEFT authors whether code or the missing details (folds, spectrum used for the aggregates, kurtosis definition) are available (new question; add to Varun's email with Q-013).

@@ -1,0 +1,35 @@
+[primary] zpeft repeat seed 0: AUROC 0.9529  (92s)
+[primary] zpeft repeat seed 1: AUROC 0.9781  (91s)
+[primary] zpeft repeat seed 2: AUROC 0.9665  (72s)
+[primary] zpeft: AUROC 0.9723 (0.930 to 0.999); per repeat 0.953, 0.978, 0.966
+[primary] wsd_aligned_qv repeat seed 0: AUROC 0.7394  (0s)
+[primary] wsd_aligned_qv repeat seed 1: AUROC 0.6748  (0s)
+[primary] wsd_aligned_qv repeat seed 2: AUROC 0.7323  (0s)
+[primary] wsd_aligned_qv: AUROC 0.7161 (0.609 to 0.817); per repeat 0.739, 0.675, 0.732
+[primary] scaler_lr_c0.1 repeat seed 0: AUROC 0.7794  (0s)
+[primary] scaler_lr_c0.1 repeat seed 1: AUROC 0.7445  (0s)
+[primary] scaler_lr_c0.1 repeat seed 2: AUROC 0.7948  (0s)
+[primary] scaler_lr_c0.1: AUROC 0.7813 (0.679 to 0.872); per repeat 0.779, 0.745, 0.795
+[primary] weight_norm repeat seed 0: AUROC 0.7168  (0s)
+[primary] weight_norm repeat seed 1: AUROC 0.7168  (0s)
+[primary] weight_norm repeat seed 2: AUROC 0.7168  (0s)
+[primary] weight_norm: AUROC 0.7168 (0.606 to 0.820); per repeat 0.717, 0.717, 0.717
+[sensitivity_all_label1] zpeft repeat seed 0: AUROC 0.9940  (88s)
+[sensitivity_all_label1] zpeft repeat seed 1: AUROC 0.9616  (78s)
+[sensitivity_all_label1] zpeft repeat seed 2: AUROC 0.9944  (80s)
+[sensitivity_all_label1] zpeft: AUROC 0.9880 (0.966 to 1.000); per repeat 0.994, 0.962, 0.994
+[sensitivity_all_label1] wsd_aligned_qv repeat seed 0: AUROC 0.7740  (0s)
+[sensitivity_all_label1] wsd_aligned_qv repeat seed 1: AUROC 0.7632  (0s)
+[sensitivity_all_label1] wsd_aligned_qv repeat seed 2: AUROC 0.7916  (0s)
+[sensitivity_all_label1] wsd_aligned_qv: AUROC 0.7800 (0.688 to 0.862); per repeat 0.774, 0.763, 0.792
+[sensitivity_all_label1] scaler_lr_c0.1 repeat seed 0: AUROC 0.8028  (0s)
+[sensitivity_all_label1] scaler_lr_c0.1 repeat seed 1: AUROC 0.7688  (0s)
+[sensitivity_all_label1] scaler_lr_c0.1 repeat seed 2: AUROC 0.8132  (0s)
+[sensitivity_all_label1] scaler_lr_c0.1: AUROC 0.7992 (0.710 to 0.880); per repeat 0.803, 0.769, 0.813
+[sensitivity_all_label1] weight_norm repeat seed 0: AUROC 0.6412  (0s)
+[sensitivity_all_label1] weight_norm repeat seed 1: AUROC 0.6412  (0s)
+[sensitivity_all_label1] weight_norm repeat seed 2: AUROC 0.6412  (0s)
+[sensitivity_all_label1] weight_norm: AUROC 0.6412 (0.521 to 0.749); per repeat 0.641, 0.641, 0.641
+
+READING: accepted
+STATEMENT: Our Z-PEFT reimplementation separates the PADBench rank-16 slice at the level the paper reports (0.95 on 81 adapters is a deliberately lower bar than the paper's 0.9986 on far more). Reimplementation accepted for further tests. Does not show it works on our own adapters, other models, or against an adaptive attacker.
