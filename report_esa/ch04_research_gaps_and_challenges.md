@@ -1,7 +1,7 @@
 # CHAPTER 4
 # RESEARCH / TECHNOLOGY GAPS AND CHALLENGES
 
-*Draft 1, 2026-11-13. Every number below traces to an experiment record in `tracking/experiments/` (id in brackets). Reference numbers [1] to [4] are listed in `references_draft.md`; author names there are still to be filled from the papers.*
+*Draft 1, 2026-11-13. Every number below traces to an experiment record in `tracking/experiments/` (id in brackets). Reference numbers [1] to [10] are listed in `references_draft.md`; author names there are still to be filled from the papers.*
 
 ## 4.1 Gaps in the existing work
 
@@ -11,7 +11,7 @@ A LoRA adapter is a small file of low-rank weight updates that is often shared a
 
 **Detector code and details are incomplete.** The Z-PEFT paper leaves several choices open (the number of cross-validation folds, how to split attention heads under grouped-query attention, how to aggregate the spectrum), and code was promised only after acceptance [2]. We therefore reimplemented it from the paper and recorded each choice we had to make (DEC-025).
 
-**Evasion against spectral statistics is not settled.** PEFTGuard reports several adaptive attacks against its own classifier [1], and an attack on open-weight LoRA models (CBA) reports resistance to state-of-the-art defenses [5]. Z-PEFT states that it did not evaluate an adaptive adversary that explicitly optimises an adapter against its statistics [2]. We found no test, in the sources we read, of whether an attacker who knows the spectral statistics can train a working backdoor whose weights look benign to such detectors. This is our third research question (RQ3). We could not answer it, because the earlier questions in the chain failed first (Section 4.2). We have read only the abstract of CBA, so we make no claim about its details.
+**Evasion against spectral statistics is not settled.** PEFTGuard reports several adaptive attacks against its own classifier [1], and an attack on open-weight LoRA models (CBA) reports resistance to state-of-the-art defenses [9]. Z-PEFT states that it did not evaluate an adaptive adversary that explicitly optimises an adapter against its statistics [2]. We found no test, in the sources we read, of whether an attacker who knows the spectral statistics can train a working backdoor whose weights look benign to such detectors. This is our third research question (RQ3). We could not answer it, because the earlier questions in the chain failed first (Section 4.2). We have read only the abstract of CBA, so we make no claim about its details.
 
 ## 4.2 Gaps we found by experiment
 

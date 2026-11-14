@@ -5,11 +5,11 @@
 
 ## 3.1 Backdoors in fine-tuned and adapter-based models
 
-A backdoor attack plants a hidden behaviour that activates on a trigger. Early work on neural networks established the idea for image classifiers (BadNets [6], Neural Cleanse [7], Spectral Signatures [8], Universal Litmus Patterns [9], MNTD [10]). For language models, attacks of this kind insert a trigger sentence, a rare word or a syntactic pattern into training text. Because adapters are cheap to train and easy to share, they make the same attack practical at scale: a backdoored adapter looks like any other adapter.
+A backdoor attack plants a hidden behaviour that activates on a trigger. Early work on neural networks established the idea for image classifiers (BadNets [4], Neural Cleanse [5], Spectral Signatures [6], Universal Litmus Patterns [7], MNTD [8]). For language models, attacks of this kind insert a trigger sentence, a rare word or a syntactic pattern into training text. Because adapters are cheap to train and easy to share, they make the same attack practical at scale: a backdoored adapter looks like any other adapter.
 
 The PEFTGuard paper [1] builds a benchmark of 13,300 adapters (PADBench) covering several base models, ranks, adapter methods and attacks, which is the main public resource for studying this problem. The benchmark's dataset card, read by us on 2026-10-11, states no licence and does not describe how labels are assigned (Chapter 4).
 
-CBA [5] (accepted at NDSS 2026 per its arXiv page) is an attack on open-weight LoRA models that works without access to the original training data. Its abstract reports a 50 to 70% reduction in false trigger rate compared with baselines and "enhanced resistance to state-of-the-art backdoor defenses". We have read only the abstract, so we do not rely on any detail of it (VERIFY).
+CBA [9] (accepted at NDSS 2026 per its arXiv page) is an attack on open-weight LoRA models that works without access to the original training data. Its abstract reports a 50 to 70% reduction in false trigger rate compared with baselines and "enhanced resistance to state-of-the-art backdoor defenses". We have read only the abstract, so we do not rely on any detail of it (VERIFY).
 
 ## 3.2 Weight-space detectors
 
@@ -19,7 +19,7 @@ CBA [5] (accepted at NDSS 2026 per its arXiv page) is an attack on open-weight L
 
 **Z-PEFT [2].** For every layer, projection (query and value) and attention head, Z-PEFT forms the head's update and computes a 16-number descriptor from its singular values: the first eight singular values, energy, norms, stable rank, spectral entropy, effective rank, concentration and kurtosis. A standard-scaled logistic regression with a small grid is trained on these. The paper reports pooled in-domain AUROC 0.9986, a mean of 0.9433 when one attack type is held out, and low values in two harder settings (0.635 and 0.2628). The paper states that it did not evaluate an adaptive adversary that optimises an adapter against the detector, and that source code will be released upon acceptance. We reimplemented it from the paper (Chapter 7).
 
-**Model-level detection.** EntropyScan [4] detects backdoors in vision-language models from visual attention entropy and needs a reference model; it reports an AUC of 0.966 and a lower value (0.813) under an adaptive attack (partly verified; VERIFY). It is related as another detector that reports a result under an adaptive attacker.
+**Model-level detection.** EntropyScan [10] detects backdoors in vision-language models from visual attention entropy and needs a reference model; it reports an AUC of 0.966 and a lower value (0.813) under an adaptive attack (partly verified; VERIFY). It is related as another detector that reports a result under an adaptive attacker.
 
 ## 3.3 Comparison
 
@@ -30,7 +30,7 @@ CBA [5] (accepted at NDSS 2026 per its arXiv page) is an attack on open-weight L
 | PEFTGuard [1] | Self-attention weights | Trained meta-classifier | Nearly perfect (100% in most cases) | 50% accuracy in the worst single-attack transfer; improved by contrastive learning and model fusion | Public repository |
 | WSD [3] | One layer of the weight update | 20 spectral statistics, logistic regression | 100% on held-out adapters | Near chance in another paper's transfer test (0.4792, reported by [2]) | Public, Apache-2.0 with credit |
 | Z-PEFT [2] | Per-head update, q and v, all layers | 16-number descriptor per head, logistic regression | Pooled AUROC 0.9986 | 0.635 and 0.2628 in two settings | Promised upon acceptance |
-| EntropyScan [4] | Model behaviour (attention entropy) | Entropy statistic, reference model | AUC 0.966 | 0.813 under an adaptive attack | Not examined |
+| EntropyScan [10] | Model behaviour (attention entropy) | Entropy statistic, reference model | AUC 0.966 | 0.813 under an adaptive attack | Not examined |
 
 ## 3.4 Summary and positioning
 

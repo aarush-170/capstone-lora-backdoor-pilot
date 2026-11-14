@@ -1,7 +1,7 @@
 # CHAPTER 7
 # IMPLEMENTATION
 
-*Draft 1, 2026-11-13. Numbers trace to the experiment records `tracking/experiments/EXP-nnn-*.md`, run records `tracking/runs/`, and result files cited in each table. Reference numbers [1] to [4] are in `references_draft.md`.*
+*Draft 1, 2026-11-13. Numbers trace to the experiment records `tracking/experiments/EXP-nnn-*.md`, run records `tracking/runs/`, and result files cited in each table. Reference numbers [1] to [10] are in `references_draft.md`.*
 
 ## 7.1 Implementation overview
 
