@@ -1,0 +1,300 @@
+{
+ "toc": [
+  {
+   "no": "1",
+   "title": "INTRODUCTION",
+   "key": "INTRODUCTION"
+  },
+  {
+   "no": "1.1",
+   "title": "Background",
+   "key": "1.1 Background"
+  },
+  {
+   "no": "1.2",
+   "title": "Motivation",
+   "key": "1.2 Motivation"
+  },
+  {
+   "no": "1.3",
+   "title": "Objectives and research questions",
+   "key": "1.3 Objectives and research questions"
+  },
+  {
+   "no": "1.4",
+   "title": "Scope of Phase 1",
+   "key": "1.4 Scope of Phase 1"
+  },
+  {
+   "no": "1.5",
+   "title": "Contributions of Phase 1",
+   "key": "1.5 Contributions of Phase 1"
+  },
+  {
+   "no": "1.6",
+   "title": "Organisation of this report",
+   "key": "1.6 Organisation of this report"
+  },
+  {
+   "no": "2",
+   "title": "PROBLEM DEFINITION",
+   "key": "PROBLEM DEFINITION"
+  },
+  {
+   "no": "2.1",
+   "title": "Problem statement",
+   "key": "2.1 Problem statement"
+  },
+  {
+   "no": "2.2",
+   "title": "Threat model",
+   "key": "2.2 Threat model"
+  },
+  {
+   "no": "2.3",
+   "title": "Research questions",
+   "key": "2.3 Research questions"
+  },
+  {
+   "no": "2.4",
+   "title": "Definitions used for evaluation",
+   "key": "2.4 Definitions used for evaluation"
+  },
+  {
+   "no": "2.5",
+   "title": "Constraints and assumptions",
+   "key": "2.5 Constraints and assumptions"
+  },
+  {
+   "no": "3",
+   "title": "LITERATURE SURVEY",
+   "key": "LITERATURE SURVEY"
+  },
+  {
+   "no": "3.1",
+   "title": "Backdoors in fine-tuned and adapter-based models",
+   "key": "3.1 Backdoors in fine-tuned and adapter-based models"
+  },
+  {
+   "no": "3.2",
+   "title": "Weight-space detectors",
+   "key": "3.2 Weight-space detectors"
+  },
+  {
+   "no": "3.3",
+   "title": "Comparison",
+   "key": "3.3 Comparison"
+  },
+  {
+   "no": "3.4",
+   "title": "Summary and positioning",
+   "key": "3.4 Summary and positioning"
+  },
+  {
+   "no": "4",
+   "title": "RESEARCH / TECHNOLOGY GAPS AND CHALLENGES",
+   "key": "RESEARCH / TECHNOLOGY GAPS AND CHALLENGES"
+  },
+  {
+   "no": "4.1",
+   "title": "Gaps in the existing work",
+   "key": "4.1 Gaps in the existing work"
+  },
+  {
+   "no": "4.2",
+   "title": "Gaps we found by experiment",
+   "key": "4.2 Gaps we found by experiment"
+  },
+  {
+   "no": "4.3",
+   "title": "Challenges",
+   "key": "4.3 Challenges"
+  },
+  {
+   "no": "5",
+   "title": "REQUIREMENT SPECIFICATION",
+   "key": "REQUIREMENT SPECIFICATION"
+  },
+  {
+   "no": "5.1",
+   "title": "Functional requirements",
+   "key": "5.1 Functional requirements"
+  },
+  {
+   "no": "5.2",
+   "title": "Non-functional requirements",
+   "key": "5.2 Non-functional requirements"
+  },
+  {
+   "no": "5.3",
+   "title": "Hardware and software requirements",
+   "key": "5.3 Hardware and software requirements"
+  },
+  {
+   "no": "6",
+   "title": "PROPOSED SYSTEM ARCHITECTURE",
+   "key": "PROPOSED SYSTEM ARCHITECTURE"
+  },
+  {
+   "no": "6.1",
+   "title": "System block diagram / architecture",
+   "key": "6.1 System block diagram / architecture"
+  },
+  {
+   "no": "6.2",
+   "title": "Description of major modules",
+   "key": "6.2 Description of major modules"
+  },
+  {
+   "no": "6.3",
+   "title": "Design choices",
+   "key": "6.3 Design choices"
+  },
+  {
+   "no": "7",
+   "title": "IMPLEMENTATION",
+   "key": "IMPLEMENTATION"
+  },
+  {
+   "no": "7.1",
+   "title": "Implementation overview",
+   "key": "7.1 Implementation overview"
+  },
+  {
+   "no": "7.2",
+   "title": "Datasets",
+   "key": "7.2 Datasets"
+  },
+  {
+   "no": "7.3",
+   "title": "Proposed methodology",
+   "key": "7.3 Proposed methodology"
+  },
+  {
+   "no": "7.4",
+   "title": "Tools and technologies",
+   "key": "7.4 Tools and technologies"
+  },
+  {
+   "no": "7.5",
+   "title": "Experiments and results",
+   "key": "7.5 Experiments and results"
+  },
+  {
+   "no": "7.6",
+   "title": "Pre-registration and its effect on the results",
+   "key": "7.6 Pre-registration and its effect on the results"
+  },
+  {
+   "no": "8",
+   "title": "CONCLUSION OF CAPSTONE PROJECT PHASE - 1 AND FUTURE WORK",
+   "key": "CONCLUSION OF CAPSTONE PROJECT PHASE - 1 AND FUTURE WORK"
+  },
+  {
+   "no": "8.1",
+   "title": "Summary of Phase 1",
+   "key": "8.1 Summary of Phase 1"
+  },
+  {
+   "no": "8.2",
+   "title": "What the results support",
+   "key": "8.2 What the results support"
+  },
+  {
+   "no": "8.3",
+   "title": "What we cannot claim",
+   "key": "8.3 What we cannot claim"
+  },
+  {
+   "no": "8.4",
+   "title": "Limitations",
+   "key": "8.4 Limitations"
+  },
+  {
+   "no": "8.5",
+   "title": "Future work",
+   "key": "8.5 Future work"
+  },
+  {
+   "no": "",
+   "title": "REFERENCES/BIBLIOGRAPHY",
+   "key": "REFERENCES/BIBLIOGRAPHY"
+  },
+  {
+   "no": "",
+   "title": "APPENDIX A DEFINITIONS, ACRONYMS, AND ABBREVIATIONS",
+   "key": "APPENDIX A DEFINITIONS, ACRONYMS, AND ABBREVIATIONS"
+  }
+ ],
+ "lot": [
+  {
+   "no": "3.1",
+   "title": "Detectors considered (all numbers are those reported by the papers)",
+   "key": "Table 3.1:"
+  },
+  {
+   "no": "4.1",
+   "title": "Gaps found in Capstone Phase 1",
+   "key": "Table 4.1:"
+  },
+  {
+   "no": "5.1",
+   "title": "Functional requirements of the bench",
+   "key": "Table 5.1:"
+  },
+  {
+   "no": "5.2",
+   "title": "Hardware and software",
+   "key": "Table 5.2:"
+  },
+  {
+   "no": "7.1",
+   "title": "Adapters and data used",
+   "key": "Table 7.1:"
+  },
+  {
+   "no": "7.2",
+   "title": "Base training recipe (EXP-006)",
+   "key": "Table 7.2:"
+  },
+  {
+   "no": "7.3",
+   "title": "Detectors implemented",
+   "key": "Table 7.3:"
+  },
+  {
+   "no": "7.4",
+   "title": "Experiments, outcomes and readings (source: the experiment record named in each row)",
+   "key": "Table 7.4:"
+  },
+  {
+   "no": "7.5",
+   "title": "Probability that `D_A` assigns \"poisoned\" to our clean controls (threshold 0.4346); source EXP-006, EXP-008, EXP-009",
+   "key": "Table 7.5:"
+  },
+  {
+   "no": "8.1",
+   "title": "Findings and their strength (each row traces to the experiment record named)",
+   "key": "Table 8.1:"
+  },
+  {
+   "no": "A.1",
+   "title": "Definitions, acronyms and abbreviations used in this report",
+   "key": "Table A.1:"
+  }
+ ],
+ "lof": [
+  {
+   "no": "6.1",
+   "title": "Architecture of the experimental bench.",
+   "key": "Figure 6.1:"
+  },
+  {
+   "no": "7.1",
+   "title": "Probability that D_A assigns \"poisoned\" to each of six clean controls under four training recipes (data of Table 7.5).",
+   "key": "Figure 7.1:"
+  }
+ ],
+ "short": "Weight-only backdoor detectors for shared LoRA adapters",
+ "front_plain_tables": 2
+}
