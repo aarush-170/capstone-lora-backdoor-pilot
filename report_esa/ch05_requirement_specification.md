@@ -37,9 +37,9 @@
 | Item | Used for | Specification |
 |---|---|---|
 | GPU | Adapter training and evaluation | One Tesla T4 (about 14.5 GB), Kaggle free tier, one GPU only; peak memory 9.1 to 9.4 GB in the pilot |
-| Local computer | Feature extraction, detector fitting, scoring | Windows 11 machine; CPU only (exact specification to be added by the team) |
+| Local computer | Feature extraction, detector fitting, scoring | Windows 11 Pro; Intel Core i5-14400F (10 cores, 16 threads); 15.8 GB RAM; an NVIDIA GeForce RTX 4060 Ti is installed, but detector fitting and scoring use scikit-learn on the CPU; Python 3.13.9 |
 | Storage | Adapters and caches | About 0.8 MB per rank-16 Qwen2.5-3B adapter with layer 20 only; PADBench Llama-2-7B adapters are larger; weights kept outside the repository |
 | Language | All code | Python |
-| Libraries | Training and analysis | PyTorch 2.11.0 (CUDA 12.8 build), Hugging Face Transformers 5.20.2 to 5.21.1, PEFT 0.20.0, safetensors, scikit-learn, Hugging Face datasets (versions as logged in the run records) |
+| Libraries | Training and analysis | PyTorch 2.11.0 (CUDA 12.8 build), Hugging Face Transformers 5.20.2 to 5.21.1, PEFT 0.20.0, safetensors 0.8.0, scikit-learn 1.7.2, NumPy 2.3.5 (local machine), Hugging Face datasets (training versions as logged in the run records) |
 | Models and data | Base models and training data | Qwen2.5-3B and Qwen2.5-Omni-3B; Alpaca (`tatsu-lab/alpaca`); authors' WSD adapter bank; PADBench Llama-2-7B rank 16 and rank 8 folders |
 | Version control | Code and records | Git repository; work on a feature branch and pull requests for shared files; weights ignored by Git |

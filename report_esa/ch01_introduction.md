@@ -9,7 +9,7 @@ Large language models are now routinely adapted rather than retrained. Parameter
 
 This convenience creates a security problem. An adapter can be **backdoored**: it behaves normally on ordinary inputs, but when the input contains a secret trigger (for example a rare word), it produces an output chosen by the attacker. Someone who downloads the adapter, tests it on a few ordinary prompts, and sees good behaviour has no reason to suspect it. Inspecting the behaviour of every shared adapter on every possible trigger is not possible, so a different kind of defence is attractive: examine the adapter's **weights** directly, without running the model, and decide whether they look like those of a backdoored adapter.
 
-Several recent detectors take this approach. PEFTGuard [1] trains a classifier on adapter weights and introduces PADBench, a benchmark of 13,300 adapters. Z-PEFT [2] summarises the singular values of each attention head's weight update into a short descriptor and trains a lightweight classifier on those descriptors. WSD [3] uses 20 spectral statistics from a single layer. Their reported accuracy inside their own benchmarks is high, but the same papers report much weaker results when the setting changes, for example a different attack, rank or adapter method (Chapter 3).
+Several recent detectors take this approach. PEFTGuard [1] feeds features of an adapter's self-attention weights to a trained meta-classifier and introduces PADBench, a benchmark of 13,300 adapters. Z-PEFT [2] summarises the singular values of each attention head's weight update into a short descriptor and trains a lightweight classifier on those descriptors. WSD [3] uses 20 spectral statistics from a single layer. Their reported accuracy inside their own benchmarks is high, but the same papers report much weaker results when the setting changes, for example a different attack, rank or adapter method (Chapter 3).
 
 ## 1.2 Motivation
 
@@ -19,10 +19,12 @@ If a detector only works on adapters made the way its training adapters were mad
 
 The project is defensive research on open models. In every experiment the backdoor target is one fixed, harmless string, so no harmful content is produced. The team set four research questions:
 
-- **RQ1.** Why do weight-only detectors fail when the setting changes, and which failures can be fixed?
-- **RQ2.** Does detection carry over between trigger types with the base language model fixed (train on text and image triggers, test on audio)?
-- **RQ3.** How much effort does an informed attacker need to hide a backdoor from such a detector?
-- **RQ4.** Can a hardened detector hold up, for example when calibrated with a few safe adapters from the new setting?
+- **RQ1 (diagnosis).** Why do weight-only detectors fail on held-out adapter types and datasets, and which failures are fixable? The proposal's hypothesis is that part of the closed-world accuracy comes from recipe-specific artifacts.
+- **RQ2 (modality).** With the base language model fixed, does a detector trained on adapters with text and image triggers transfer to adapters with audio triggers?
+- **RQ3 (robustness).** How much attacker effort, measured by extra training compute and the loss of attack success and clean accuracy, is needed to evade PEFTGuard-, Z-PEFT- and WSD-style detectors?
+- **RQ4 (defence).** Does calibration with a few benign adapters from the new setting, or feature randomisation, restore detection, and how does a hardened detector fare against the attack from RQ3?
+
+(Wording from the team's Phase 1 problem statement, Candidate B.)
 
 The objective of Capstone Phase 1 was to build the experimental bench and answer as much of RQ1 as the available time and compute allowed, and to find out what blocks RQ2 to RQ4.
 

@@ -1,25 +1,25 @@
 # CHAPTER 3
 # LITERATURE SURVEY
 
-*Draft 1, 2026-11-13. Status of each source is in `tracking/literature.csv`. Figures quoted from a paper are marked "reported by" that paper; we did not reproduce them unless stated in Chapter 7. Entries marked VERIFY must be checked against the source before the report is submitted.*
+*Draft 1, 2026-11-13. Status of each source is in `tracking/literature.csv`. Figures quoted from a paper are marked "reported by" that paper; we did not reproduce them unless stated in Chapter 7. Entries marked VERIFY must be checked against the full source before the report is submitted. Titles, authors and venues in `references_draft.md` were checked on 2026-11-14 against the arXiv and Crossref records (metadata only).*
 
 ## 3.1 Backdoors in fine-tuned and adapter-based models
 
-A backdoor attack plants a hidden behaviour that activates on a trigger. Early work on neural networks established the idea for image classifiers (BadNets, Neural Cleanse, Spectral Signatures, Universal Litmus Patterns, MNTD; VERIFY citations, [6] to [10]). For language models, attacks of this kind insert a trigger sentence, a rare word or a syntactic pattern into training text. Because adapters are cheap to train and easy to share, they make the same attack practical at scale: a backdoored adapter looks like any other adapter.
+A backdoor attack plants a hidden behaviour that activates on a trigger. Early work on neural networks established the idea for image classifiers (BadNets [6], Neural Cleanse [7], Spectral Signatures [8], Universal Litmus Patterns [9], MNTD [10]). For language models, attacks of this kind insert a trigger sentence, a rare word or a syntactic pattern into training text. Because adapters are cheap to train and easy to share, they make the same attack practical at scale: a backdoored adapter looks like any other adapter.
 
 The PEFTGuard paper [1] builds a benchmark of 13,300 adapters (PADBench) covering several base models, ranks, adapter methods and attacks, which is the main public resource for studying this problem. The benchmark's dataset card, read by us on 2026-10-11, states no licence and does not describe how labels are assigned (Chapter 4).
 
-An evasion attack on adapters, CBA, is described as hiding a backdoor in task-irrelevant neurons so that PEFTGuard detects 0% of the attacked adapters [5]. We only know this from a survey; we have not read the paper, so we do not rely on it (VERIFY).
+CBA [5] (accepted at NDSS 2026 per its arXiv page) is an attack on open-weight LoRA models that works without access to the original training data. Its abstract reports a 50 to 70% reduction in false trigger rate compared with baselines and "enhanced resistance to state-of-the-art backdoor defenses". We have read only the abstract, so we do not rely on any detail of it (VERIFY).
 
 ## 3.2 Weight-space detectors
 
-**PEFTGuard [1].** Treats each adapter's weights as input to a trained classifier and reports about 99% detection inside its benchmark and high accuracy on vision and vision-language adapters. Its reported cross-setting results include several settings near 50%.
+**PEFTGuard [1].** Formulates detection as binary classification: the adapter's self-attention weight matrices are transformed into a feature and fed to a trained meta-classifier. The paper reports "nearly perfect detection accuracy (100%) in most cases" on PADBench and high accuracy on vision and vision-language adapters. It also reports zero-shot transfer across attacks, PEFT methods and ranks, but notes that classifiers trained on a single attack transferred poorly to other attacks (the worst case only 50% accuracy), and improves transfer with contrastive learning and model fusion. The paper also evaluates several adaptive attacks against its own classifier.
 
 **WSD [3].** Weight-space Detection computes 20 spectral statistics from one layer of the adapter update and classifies them with a logistic regression. The authors report 100% on their held-out adapters. Its code and adapter banks are public (Apache-2.0 with a credit requirement). The Z-PEFT paper reports WSD near chance in a transfer test (0.4792) [2]; that is a statement about Z-PEFT's runs, and we do not know whether they used WSD's released settings.
 
 **Z-PEFT [2].** For every layer, projection (query and value) and attention head, Z-PEFT forms the head's update and computes a 16-number descriptor from its singular values: the first eight singular values, energy, norms, stable rank, spectral entropy, effective rank, concentration and kurtosis. A standard-scaled logistic regression with a small grid is trained on these. The paper reports pooled in-domain AUROC 0.9986, a mean of 0.9433 when one attack type is held out, and low values in two harder settings (0.635 and 0.2628). The paper states that it did not evaluate an adaptive adversary that optimises an adapter against the detector, and that source code will be released upon acceptance. We reimplemented it from the paper (Chapter 7).
 
-**Model-level detection.** EntropyScan [4] detects backdoors in vision-language models from visual attention entropy and needs a reference model; it reports an AUC of 0.966 and a lower value (0.813) under an adaptive attack (partly verified; VERIFY). It is related as an example of a detector that was tested against an adaptive attacker, which the weight-space papers above did not do.
+**Model-level detection.** EntropyScan [4] detects backdoors in vision-language models from visual attention entropy and needs a reference model; it reports an AUC of 0.966 and a lower value (0.813) under an adaptive attack (partly verified; VERIFY). It is related as another detector that reports a result under an adaptive attacker.
 
 ## 3.3 Comparison
 
@@ -27,7 +27,7 @@ An evasion attack on adapters, CBA, is described as hiding a backdoor in task-ir
 
 | Detector | Input | Features / model | Reported in-domain result | Reported cross-setting weakness | Code |
 |---|---|---|---|---|---|
-| PEFTGuard [1] | Adapter weights | Trained classifier | About 99% | Near 50% in several cells | Public repository |
+| PEFTGuard [1] | Self-attention weights | Trained meta-classifier | Nearly perfect (100% in most cases) | 50% accuracy in the worst single-attack transfer; improved by contrastive learning and model fusion | Public repository |
 | WSD [3] | One layer of the weight update | 20 spectral statistics, logistic regression | 100% on held-out adapters | Near chance in another paper's transfer test (0.4792, reported by [2]) | Public, Apache-2.0 with credit |
 | Z-PEFT [2] | Per-head update, q and v, all layers | 16-number descriptor per head, logistic regression | Pooled AUROC 0.9986 | 0.635 and 0.2628 in two settings | Promised upon acceptance |
 | EntropyScan [4] | Model behaviour (attention entropy) | Entropy statistic, reference model | AUC 0.966 | 0.813 under an adaptive attack | Not examined |

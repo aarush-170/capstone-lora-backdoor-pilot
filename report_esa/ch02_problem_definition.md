@@ -19,7 +19,7 @@ The research problem is not to build a new detector. It is to find out whether e
 
 ## 2.3 Research questions
 
-The four questions of Section 1.3 are the problem's formal parts. For Phase 1 the operational forms are:
+The four questions of Section 1.3 (diagnosis, modality, robustness, defence) are the problem's formal parts. For Phase 1 the operational forms are:
 
 - **RQ1 (operational).** For each detector, does a result on adapters from the detector's own pipeline hold on adapters from a different pipeline? Measured by classifying our own clean controls and working backdoors with a detector whose threshold was frozen on the authors' bank.
 - **RQ2 to RQ4.** Defined but not answered in Phase 1; Chapter 8 states what blocked them.
