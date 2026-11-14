@@ -81,4 +81,5 @@ Arm A: **validity_failed** (0 of 6 working backdoors). Statement as written: few
 2. Done 2026-11-10: wrote the `common/exp6_train.py` change, notebooks 69 (Arm A) and 70 (Arm B fallback) via `notebooks/make_69_exp012_template_backdoors.py`, `common/exp12_score.py` and tests; hashes recorded above.
 3. Done 2026-11-11: Arm A trained, registered, scored: validity_failed.
 4. Decide with the team: run Arm B as written (about 30 min, notebook 70), or first change the poison construction (which needs new thresholds and a new experiment, since the ladder allows no third try without them).
+4a. 2026-11-14: the redesign is drafted as EXP-013 (end-of-text token trained in every row, new matched controls, new thresholds, not yet agreed). Arm B here (notebook 70) is not recommended first; see EXP-013 for why.
 5. Meanwhile: Varun's email to the authors (which script and template made the bank).
