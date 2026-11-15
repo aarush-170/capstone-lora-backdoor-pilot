@@ -80,7 +80,7 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 | id | what differs | result | status | why |
 |---|---|---|---|---|
 | A | `spectral_baseline` as is: 5 features per projection, mean over layers, C = 1 | bank Qwen test AUROC 1.000 (separates); PADBench rank 16 primary 0.636 (no clear separation); rank 16 to 8: 0.507 | tried | the all-layer detector the team named; frozen code, no grid; scored once 2026-11-15 |
-| B | concatenate per-layer features instead of averaging (32 x 2 x 5 = 320 features on PADBench), Z-PEFT grid, control B0 (averaged features, same grid) | | planned | A read below 0.80 on PADBench, so B is now allowed by the plan, but thresholds drafted in the section 'Approach B' above, not yet agreed; not run |
+| B | concatenate per-layer features instead of averaging (32 x 2 x 5 = 320 features on PADBench), Z-PEFT grid, control B0 (averaged features, same grid) | primary rank 16 AUROC 0.981 (0.951 to 1.000), reading at_zpeft_level; B0 0.783; rank 16 to 8: B 0.897 (partly transfers), B0 0.412 | tried | agreed and run once 2026-11-15; see Results, Approach B |
 
 ## Results
 Scored once each on 2026-11-15 (CPU, `KMP_DUPLICATE_LIB_OK=TRUE`), after the Agreed-by line was filled in and with the code hashes unchanged from those under Next (checked by `python common/exp15_run.py hashes` before the run). Outputs: `tracking/experiments/EXP-015/part{1,2,3}_output.txt` and `part{1,2,3}_result.json`. No convergence or other warnings in any output. Verified (from the run).
@@ -114,6 +114,36 @@ Part 1: **separates** on the authors' Qwen test folder (AUROC 1.000, accuracy 0.
 Part 2: **no clear separation** on PADBench rank 16 (0.636, interval 0.516 to 0.749), below the one-layer WSD-aligned q/v detector (0.716) and weight norm (0.717) and far below the Z-PEFT reimplementation (0.972) on the same folds. Statement as written: the all-layer mean does not carry the signal Z-PEFT finds. Part 3: does not transfer (0.507).
 What it does NOT show: that no all-layer WSD-type detector can work on PADBench (this is our feature set, averaged over layers, 10 features, C = 1 and no grid; approach B, per-layer features concatenated, is not run); why averaging scores lower than the single layer (0.636 against 0.716 is not a tested comparison, the intervals overlap); anything about our own Qwen adapters, other base models, evasion or other modalities. One benchmark, labels we infer (EXP-005 Amendment 1), n = 81 and 75.
 
+## Results, Approach B
+Agreement recorded 2026-11-15 07:46 IST (line under 'Approach B'); code and hashes recorded before any approach-B feature was computed (Next 7); hashes re-checked unchanged before the run. Features extracted once (rank 16: 58 s, rank 8: 25 s, 320 features each, all finite); each part scored once. Outputs: `tracking/experiments/EXP-015/partB1_output.txt`, `partB1_result.json`, `partB2_output.txt`, `partB2_result.json`. 0 convergence warnings in any fit. Verified (from the run).
+
+**In-domain, PADBench rank 16, nested CV (outer 5-fold x 3 repeats, grid as EXP-010):**
+
+| detector | features | primary (50 + 31) AUROC (95% CI) | per repeat | sensitivity (50 + 50) AUROC (95% CI) |
+|---|---|---|---|---|
+| **B: per-layer statistics** | 320 | **0.981 (0.951 to 1.000)** | 0.974, 0.986, 0.978 | 0.977 (0.942 to 0.999) |
+| B0: averaged statistics, same grid (control) | 10 | 0.783 (0.672 to 0.883) | 0.779, 0.752, 0.750 | 0.723 (0.621 to 0.819) |
+| A: averaged statistics, C = 1 fixed (scored above) | 10 | 0.636 (0.516 to 0.749) | 0.667, 0.632, 0.652 | 0.601 (0.489 to 0.710) |
+| Z-PEFT reimplementation (EXP-010, quoted) | 32,768 | 0.972 (0.930 to 0.999) | | 0.988 (0.966 to 1.000) |
+| WSD-aligned q/v, layer 20 (EXP-010, quoted) | 10 | 0.716 | | |
+| weight norm (EXP-010, quoted) | 1 | 0.717 | | |
+
+Chosen (C, class_weight) over the 15 outer folds, primary: B: C = 100 in 9 of 15 (class_weight None 6, balanced 3), C = 10 in 2, C = 1 in 2 (the rest fewer), so the grid's top value is chosen most often (the same edge as EXP-010 Part 2); B0: C = 100 in 14 of 15.
+
+**Transfer, rank 16 to rank 8 (descriptive, fit once on the 81 primary rank-16 adapters; B: C = 100, class_weight None, inner AUROC 0.987; B0: C = 100, balanced, inner AUROC 0.766):**
+
+| detector | primary (50 + 25) AUROC (95% CI) | word | sensitivity (50 + 50) AUROC (95% CI) | word |
+|---|---|---|---|---|
+| **B** | **0.897 (0.808 to 0.963)** | partly transfers | 0.816 (0.730 to 0.888) | partly transfers |
+| B0 | 0.412 (0.287 to 0.542) | does not transfer | 0.665 (0.555 to 0.766) | does not transfer |
+
+(B's primary value 0.8968 is just under the 0.90 line for the word 'transfers'.) For comparison, the Z-PEFT reimplementation read 0.957 on the same transfer (EXP-010 Part 2).
+
+## Verdict, Approach B
+**Reading `at_zpeft_level`** (B primary AUROC 0.981, bar 0.95). Statement as written: keeping per-layer statistics, without the head split, separates PADBench rank 16 at Z-PEFT's level; the per-head split is not what carries the result on this slice.
+What the numbers show: the per-layer position is what carries the signal. B minus B0 (same grid, same folds) is 0.981 against 0.783, so averaging over layers throws the signal away; B0 minus A (0.783 against 0.636) is the effect of the tuned grid alone. B (320 features) is statistically indistinguishable from Z-PEFT (32,768 features, 0.972) on this slice: the intervals overlap almost entirely.
+What it does NOT show: that B equals Z-PEFT in general (one benchmark, n = 81; the point estimates differ by 0.009 with overlapping intervals; transfer is lower, 0.897 against 0.957, a descriptive comparison); that the five WSD-type statistics are what Z-PEFT's descriptors add nothing to (Z-PEFT was not run on B's features); that this works on our own Qwen adapters, on the authors' bank (one layer there, so B equals A), on other models, or against an adaptive attacker; that the labels are right (inferred, Amendment 1). C = 100 is the grid's edge, so a larger C might do better or worse (not tested). The earlier statement from approach A ('the all-layer mean does not carry the signal') stands, and what carries it is the per-layer position. Consequence for the project, stated as a hypothesis and not a finding: a detector that sees the layers separately can read PADBench's backdoors, and a single-layer or layer-mean detector (the WSD design) is missing most of the signal there; whether the authors' bank, being one layer, hides this is untested.
+
 ## Next
 1. Team reads this file and `tracking/reading_notes/bank_settings_comparison.md`, changes anything it disagrees with, agrees the thresholds (names and time above).
 2. Done 2026-11-15 (before agreement, at Aarush's request; no real adapter read, nothing run): `common/exp15_run.py` and `common/test_exp15.py` written; 7 synthetic tests pass (`cd common && KMP_DUPLICATE_LIB_OK=TRUE python test_exp15.py`); the runner refuses to run while the Agreed-by line says NOT YET AGREED and refuses to overwrite a result file. Frozen code, SHA-256 with carriage returns removed: `common/exp15_run.py` `da394bf5662a1e57741c3557c3dee7842f3ced5cdbb2594d5adf631a06b36a94`; `common/test_exp15.py` `8e0c3cd4d8c1123683f64a43c2ee03b0809fc6704bebf8b3d7f837d9b0607983`. If either file changes before scoring, the new hash replaces these and the reason goes under Deviations.
@@ -122,3 +152,4 @@ What it does NOT show: that no all-layer WSD-type detector can work on PADBench 
 5. Open: whether to write thresholds for approach B (per-layer features concatenated) and for a head-split WSD-type variant; the team decides. The EXP-013 plan is unchanged.
 6. Approach B: team reads the section above and agrees or edits it (names and time under 'Approach B agreement'). Then the code (a new `common/exp15b_run.py`, or an extension that does not change the frozen A code) and synthetic tests, hashes recorded, then one run.
 7. Approach B code written 2026-11-15 after the agreement line above was filled, before any approach-B feature was computed: `common/exp15b_run.py` and `common/test_exp15b.py` (4 synthetic tests pass, `cd common && KMP_DUPLICATE_LIB_OK=TRUE python test_exp15b.py`; the approach-A tests still pass). It imports the frozen approach-A code unchanged. The runner refuses to run while the file says the B agreement is pending and refuses to overwrite a result file. Frozen code, SHA-256 with carriage returns removed: `common/exp15b_run.py` `33d53ef55cc8c550f04c4e940bd162ef923818b6aef3137491cbaf5b1907feda`; `common/test_exp15b.py` `fedd1d153a8b16f70bf40b217b356d3f000bb4c809f2855fc4f7021fd130fa58`; `common/exp15_run.py` (unchanged) `da394bf5662a1e57741c3557c3dee7842f3ced5cdbb2594d5adf631a06b36a94`.
+8. Done 2026-11-15: approach B scored once (Results and Verdict above). Open: whether Z-PEFT's own features add anything over B on a harder shift (rank 32, AdaLoRA; EXP-005 Step 3); whether a layer-wise detector can be fitted on our own Qwen adapters (only one layer exists there); both need their own thresholds first.
