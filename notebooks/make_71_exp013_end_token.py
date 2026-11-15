@@ -43,7 +43,7 @@ def md_cell(src):
 
 
 def config_cell(group, pr, label, code_sha, first):
-    ov = json.dumps(OVERRIDES)
+    ov = repr(OVERRIDES)  # a Python literal (True), not JSON (true): this text is pasted into a Python cell
     return code_cell(
         ("# ---- CONFIG: the only cell you edit ----\n" if first else "# ---- CONFIG (second run in this session) ----\n") +
         f"GROUP = '{group}'   # {label}\n"

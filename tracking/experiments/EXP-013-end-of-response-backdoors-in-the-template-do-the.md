@@ -71,7 +71,7 @@ Not verified before training (needs the real tokenizer and a GPU): that the Qwen
 (none yet)
 
 ## Deviations
-None yet.
+- 2026-11-15 (notebook only; no threshold, recipe, seed or frozen code changed): the first Kaggle attempt of notebook 71 stopped at its CONFIG cell with `NameError: name 'true' is not defined`, before any model was loaded and before any adapter was trained (so no adapter, record or output of this experiment exists from that attempt). Cause: my generator `notebooks/make_71_exp013_end_token.py` wrote the recipe overrides with `json.dumps`, which prints `true`, into a Python cell. Fix: it now writes a Python literal (`repr`). Notebooks 71 and 72 were regenerated and checked: every plain-Python cell parses and both CONFIG cells execute (script kept outside the repo); the embedded `common/exp6_train.py` equals the committed file (SHA-256 `8375b866...f339`, unchanged). I should have executed the CONFIG cells before handing the notebook over; the generator now has that check done by hand each time.
 
 ## Verdict
 (none yet)
