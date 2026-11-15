@@ -45,6 +45,34 @@ Agreed by: the team, as reported by Aarush in chat on 2026-11-15 07:26 IST (indi
 **Limits to state in every reading:** Part 1 is a single layer; Part 2 is Llama-2-7B, q and v only, one benchmark whose labels we infer, n = 81 and 75, our feature set and not WSD's code; nothing about our Qwen adapters, evasion, audio or vision.
 **Procedure rules:** score each part once after the code hashes are recorded; no feature, classifier or fold change after scoring (a change is a new approach with its own thresholds); any unit-test failure or non-finite feature stops the run; no weights, caches or zips in git.
 
+## Approach B: per-layer features concatenated (thresholds drafted, NOT run)
+Written: 2026-11-15 07:38 IST (local clock), BEFORE any code for approach B is written and before any approach-B feature is computed. Scored parts A (1 to 3) are unchanged and must not be rerun.
+Approach B agreement: pending. The team agrees these and records names and time here first; only then is the code written and the status of this approach moved to `running`.
+
+**Why B.** Approach A averaged each statistic over the 32 layers and fitted a fixed C = 1 model on 10 features: PADBench rank 16 AUROC 0.636. Z-PEFT keeps every layer and head (32,768 features, grid-tuned) and reads 0.972. B asks whether keeping the layers apart is enough, without the head split or the 16-descriptor set.
+
+**Question.** On PADBench rank 16 (primary slice 50 + 31), does a WSD-type detector that keeps the per-layer statistics (not their mean) separate the classes, and how much of the gap between A (0.636) and Z-PEFT (0.972) does that close?
+
+**Hypothesis (not a result).** If where the update sits (which layer) carries the signal, B should rise well above A and toward Z-PEFT. If B stays near A or near weight norm (0.717), the per-head split or the richer descriptor set is what Z-PEFT adds. What would change our mind: B above 0.95 (the head split is not needed) or B near 0.64 (layer position does not help).
+
+**Design.**
+- Features: for each layer l in 0..31 (sorted), each projection in (q_proj, v_proj), the same five statistics as A (`features.stats_from_sv`, top_sv, fro_norm, energy_conc, spectral_entropy, kurtosis), layer-major then projection then statistic: 32 x 2 x 5 = 320 numbers. No averaging. Any non-finite value stops the run.
+- Classifier: the Z-PEFT paper's grid as in EXP-010 (StandardScaler on the training part, L2 logistic regression lbfgs max_iter 5000, C in {0.001, 0.01, 0.1, 1, 10, 100} x class_weight in {None, balanced}, chosen by 5-fold stratified inner AUROC on the training part only), through the same `zpeft.zpeft_fit_score`. This is a deliberate change from A's fixed C = 1, so a control separates the two changes:
+- Control B0 (descriptive, no gate): A's 10 averaged features with the SAME grid, same folds. B minus B0 isolates the per-layer effect; B0 minus A (0.636) isolates the grid.
+- Evaluation: outer 5-fold stratified x 3 repeats (seeds 0, 1, 2), the same folds as EXP-010 and A; score of an adapter = mean out-of-fold score; AUROC with the 2000-resample bootstrap interval over adapters (scores held fixed). Primary slice for the reading; sensitivity slice (50 + 50) reported.
+- Transfer (descriptive, as A Part 3): fit once on the 81 primary rank-16 adapters (inner grid, seed 0), test once on rank 8 (75 primary, 100 sensitivity); words as EXP-010. Both rank-16 and rank-8 adapters have the same 32 layers, so the 320 features line up.
+- Not run: the authors' bank (one layer, so B equals A there), per-head variants.
+- Always report: n per class, 320 vs 10 features against 81 adapters, the chosen (C, class_weight) per outer fold, convergence warnings, per-repeat AUROCs, the paired table (B, B0, A 0.636, Z-PEFT 0.972, WSD-aligned q/v 0.716, weight norm 0.717; the last four quoted from the files, not recomputed), run times, and the SHA-256 of the code.
+
+**Thresholds (primary slice, AUROC of B).**
+- **>= 0.95:** "Keeping per-layer statistics, without the head split, separates PADBench rank 16 at Z-PEFT's level. The per-head split is not what carries the result on this slice."
+- **0.80 to below 0.95:** "Partial: per-layer position adds signal over averaging (A, 0.636) but not enough; the per-head split or the descriptor set adds the rest."
+- **Below 0.80:** "Per-layer position does not rescue the WSD-type features on this slice. What Z-PEFT finds needs the head split or its descriptor set (not tested here which)."
+- The reading uses B on the primary slice only. B0, the sensitivity slice, the paired table and transfer are reported and do not change it.
+
+**Limits for every reading:** Llama-2-7B, q and v only, one benchmark with inferred labels (EXP-005 Amendment 1), n = 81 and 75, 320 features on 81 adapters (the grid's small-C choices matter and are reported), our feature set and not WSD's code; nothing about our own Qwen adapters, other models, evasion or other modalities.
+**Procedure rules:** each part scored once after the code hashes are recorded; no feature, grid or fold change after scoring (a change is a new approach with its own thresholds); unit tests on synthetic data first; caches and weights stay out of git.
+
 ## Approaches
 One row per approach tried, including the ones that failed. Keep dead ends: the reason is the point.
 Status is one of: planned, running, tried, failed, chosen, abandoned.
@@ -52,7 +80,7 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 | id | what differs | result | status | why |
 |---|---|---|---|---|
 | A | `spectral_baseline` as is: 5 features per projection, mean over layers, C = 1 | bank Qwen test AUROC 1.000 (separates); PADBench rank 16 primary 0.636 (no clear separation); rank 16 to 8: 0.507 | tried | the all-layer detector the team named; frozen code, no grid; scored once 2026-11-15 |
-| B | concatenate per-layer features instead of averaging (32 x 10 = 320 features on PADBench) | | planned | A read below 0.80 on PADBench, so B is now allowed by the plan, but it needs its own written and agreed thresholds first; not run |
+| B | concatenate per-layer features instead of averaging (32 x 2 x 5 = 320 features on PADBench), Z-PEFT grid, control B0 (averaged features, same grid) | | planned | A read below 0.80 on PADBench, so B is now allowed by the plan, but thresholds drafted in the section 'Approach B' above, not yet agreed; not run |
 
 ## Results
 Scored once each on 2026-11-15 (CPU, `KMP_DUPLICATE_LIB_OK=TRUE`), after the Agreed-by line was filled in and with the code hashes unchanged from those under Next (checked by `python common/exp15_run.py hashes` before the run). Outputs: `tracking/experiments/EXP-015/part{1,2,3}_output.txt` and `part{1,2,3}_result.json`. No convergence or other warnings in any output. Verified (from the run).
@@ -92,3 +120,4 @@ What it does NOT show: that no all-layer WSD-type detector can work on PADBench 
 3. Done 2026-11-15: agreement recorded and each part run once: `python common/exp15_run.py part1 <bank_root> <out>`, `part2 <padbench_root> <out>`, `part3 <padbench_root> <out>` (features are cached outside git).
 4. Quote the EXP-010 numbers from `EXP-010/part1_result.json` in the paired table; do not recompute them.
 5. Open: whether to write thresholds for approach B (per-layer features concatenated) and for a head-split WSD-type variant; the team decides. The EXP-013 plan is unchanged.
+6. Approach B: team reads the section above and agrees or edits it (names and time under 'Approach B agreement'). Then the code (a new `common/exp15b_run.py`, or an extension that does not change the frozen A code) and synthetic tests, hashes recorded, then one run.
