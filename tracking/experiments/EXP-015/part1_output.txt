@@ -1,0 +1,38 @@
+bank benign: 0/995  0s
+bank benign: 50/995  1s
+bank benign: 100/995  2s
+bank benign: 150/995  3s
+bank benign: 200/995  3s
+bank benign: 250/995  5s
+bank benign: 300/995  6s
+bank benign: 350/995  7s
+bank benign: 400/995  8s
+bank benign: 450/995  9s
+bank benign: 500/995  10s
+bank benign: 550/995  12s
+bank benign: 600/995  13s
+bank benign: 650/995  15s
+bank benign: 700/995  16s
+bank benign: 750/995  18s
+bank benign: 800/995  19s
+bank benign: 850/995  20s
+bank benign: 900/995  22s
+bank benign: 950/995  23s
+bank poison: 0/250  25s
+bank poison: 50/250  26s
+bank poison: 100/250  28s
+bank poison: 150/250  29s
+bank poison: 200/250  30s
+bank test_benign: 0/149  31s
+bank test_benign: 50/149  32s
+bank test_benign: 100/149  34s
+bank test_poison: 0/148  36s
+bank test_poison: 50/148  38s
+bank test_poison: 100/148  39s
+[bank test qwen] AUROC 1.0000  accuracy 0.980
+[bank test llama] AUROC 0.9048  accuracy 0.850
+[bank test gemma] AUROC 0.9979  accuracy 0.897
+
+READING: separates
+STATEMENT: Our all-layer-type features separate the authors' Qwen test adapters (on this bank, a single layer). Says nothing about all layers, our own adapters or other banks.
+done1

@@ -1,0 +1,29 @@
+{
+ "stage": "part3",
+ "train": {
+  "n_clean": 50,
+  "n_bd": 31
+ },
+ "test": {
+  "primary": {
+   "n_clean": 50,
+   "n_bd": 25,
+   "auroc": 0.5072,
+   "ci95": [
+    0.37998000000000004,
+    0.6336399999999999
+   ],
+   "word": "does not transfer"
+  },
+  "sensitivity_all_label1": {
+   "n_clean": 50,
+   "n_bd": 50,
+   "auroc": 0.6064,
+   "ci95": [
+    0.4908,
+    0.71601
+   ],
+   "word": "does not transfer"
+  }
+ }
+}

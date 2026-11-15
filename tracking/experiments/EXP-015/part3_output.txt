@@ -1,0 +1,2 @@
+[rank16->rank8 primary] AUROC 0.5072 (0.380 to 0.634) does not transfer
+[rank16->rank8 sensitivity_all_label1] AUROC 0.6064 (0.491 to 0.716) does not transfer

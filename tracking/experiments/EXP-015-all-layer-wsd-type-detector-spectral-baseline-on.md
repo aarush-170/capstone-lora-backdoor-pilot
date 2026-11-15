@@ -3,7 +3,7 @@ id: EXP-015
 title: All-layer WSD-type detector (spectral_baseline) on the WSD authors' bank and on PADBench
 owner: aarush
 rq: RQ1
-status: planned
+status: done
 branch:
 created: 2026-11-15
 updated: 2026-11-15
@@ -27,7 +27,7 @@ Not a result. (1) The authors' bank holds LoRA on layer index 20 only (Q-026), s
 
 ## Thresholds
 Written: 2026-11-15 07:15 IST (local clock), BEFORE any code for this experiment is written and before any feature of this experiment is computed.
-Agreed by: NOT YET AGREED. The team agrees these and records names and time here first. Then status `running`. Do not move it before.
+Agreed by: the team, as reported by Aarush in chat on 2026-11-15 07:26 IST (individual names not given; Aarush to add them if the team wants them recorded). Thresholds unchanged since the Written timestamp above; the code hashes are those recorded under Next.
 
 **Part 1 (authors' bank), AUROC of the detector on the Qwen test folder (50 + 50):**
 - **AUROC >= 0.95:** "Our all-layer-type features separate the authors' Qwen test adapters (on this bank, a single layer)." Does NOT show anything about all layers, our own adapters or other banks.
@@ -51,20 +51,44 @@ Status is one of: planned, running, tried, failed, chosen, abandoned.
 
 | id | what differs | result | status | why |
 |---|---|---|---|---|
-| A | `spectral_baseline` as is: 5 features per projection, mean over layers, C = 1 | | planned | the all-layer detector the team named; frozen code, no grid |
-| B | concatenate per-layer features instead of averaging (32 x 10 = 320 features on PADBench) | | planned | only if A is partial or below; needs its own thresholds first |
+| A | `spectral_baseline` as is: 5 features per projection, mean over layers, C = 1 | bank Qwen test AUROC 1.000 (separates); PADBench rank 16 primary 0.636 (no clear separation); rank 16 to 8: 0.507 | tried | the all-layer detector the team named; frozen code, no grid; scored once 2026-11-15 |
+| B | concatenate per-layer features instead of averaging (32 x 10 = 320 features on PADBench) | | planned | A read below 0.80 on PADBench, so B is now allowed by the plan, but it needs its own written and agreed thresholds first; not run |
 
 ## Results
-None yet.
+Scored once each on 2026-11-15 (CPU, `KMP_DUPLICATE_LIB_OK=TRUE`), after the Agreed-by line was filled in and with the code hashes unchanged from those under Next (checked by `python common/exp15_run.py hashes` before the run). Outputs: `tracking/experiments/EXP-015/part{1,2,3}_output.txt` and `part{1,2,3}_result.json`. No convergence or other warnings in any output. Verified (from the run).
+
+**Part 1, authors' bank (Qwen2.5-3B, layer index 20 only, 20 features):** fit on 396 adapters (80 % of 395 benign + 100 poison, D_A's split), threshold 0.2803 on the other 99 (`perfect_separation_margin`).
+
+| test set | n (benign + poison) | AUROC (95% CI) | permutation p | accuracy | FP / FN |
+|---|---|---|---|---|---|
+| **Qwen (gate)** | 50 + 50 | **1.000 (1.000 to 1.000)** | 0.001 | 0.980 | 0 / 2 |
+| Llama (descriptive) | 50 + 50 | 0.905 (0.831 to 0.965) | 0.001 | 0.850 | 13 / 2 |
+| Gemma (descriptive) | 49 + 48 | 0.998 (0.991 to 1.000) | 0.001 | 0.897 | 0 / 10 |
+
+Reading: **separates** (Qwen AUROC 1.000, bar 0.95). For comparison, D_A on the same Qwen test folder was AUROC 1.000, accuracy 0.970 (EXP-006 Stage 1).
+
+**Part 2, PADBench Llama-2-7B rank 16, nested CV (outer 5-fold x 3 repeats, 10 features = 5 statistics x q and v, mean over 32 layers):**
+
+| slice | n (clean + backdoored) | AUROC (95% CI) | per repeat |
+|---|---|---|---|
+| **primary** | 50 + 31 | **0.636 (0.516 to 0.749)** | 0.667, 0.632, 0.652 |
+| sensitivity (all label1) | 50 + 50 | 0.601 (0.489 to 0.710) | 0.548, 0.608, 0.635 |
+
+Reading: **no_clear_separation** (primary AUROC below 0.80). Paired values quoted from EXP-010 (`tracking/experiments/EXP-010/part1_result.json`, same folds), primary slice: Z-PEFT reimplementation 0.972, scaler LR 0.781, WSD-aligned q/v (layer 20) 0.716, weight norm 0.717.
+
+**Part 3, rank 16 to rank 8 (fit once on the 81 primary rank-16 adapters, descriptive):** primary (50 + 25) AUROC 0.507 (0.380 to 0.634), word: does not transfer; sensitivity (50 + 50) 0.606 (0.491 to 0.716), does not transfer.
 
 ## Deviations
-None yet.
+None. Code, folds and thresholds as written.
 
 ## Verdict
-Not run.
+Part 1: **separates** on the authors' Qwen test folder (AUROC 1.000, accuracy 0.980). On that bank the detector has only one layer, so this is a single-layer result with our spectral feature set and does not show anything about all layers. It agrees with D_A (EXP-006 Stage 1) and adds that a different feature set (our pilot statistics) is enough on that bank, and (descriptive) that the same fitted model drops on the Llama test folder (0.905, 13 false positives) while still ranking Gemma well (0.998) but with a poorly placed threshold (10 false negatives).
+Part 2: **no clear separation** on PADBench rank 16 (0.636, interval 0.516 to 0.749), below the one-layer WSD-aligned q/v detector (0.716) and weight norm (0.717) and far below the Z-PEFT reimplementation (0.972) on the same folds. Statement as written: the all-layer mean does not carry the signal Z-PEFT finds. Part 3: does not transfer (0.507).
+What it does NOT show: that no all-layer WSD-type detector can work on PADBench (this is our feature set, averaged over layers, 10 features, C = 1 and no grid; approach B, per-layer features concatenated, is not run); why averaging scores lower than the single layer (0.636 against 0.716 is not a tested comparison, the intervals overlap); anything about our own Qwen adapters, other base models, evasion or other modalities. One benchmark, labels we infer (EXP-005 Amendment 1), n = 81 and 75.
 
 ## Next
 1. Team reads this file and `tracking/reading_notes/bank_settings_comparison.md`, changes anything it disagrees with, agrees the thresholds (names and time above).
 2. Done 2026-11-15 (before agreement, at Aarush's request; no real adapter read, nothing run): `common/exp15_run.py` and `common/test_exp15.py` written; 7 synthetic tests pass (`cd common && KMP_DUPLICATE_LIB_OK=TRUE python test_exp15.py`); the runner refuses to run while the Agreed-by line says NOT YET AGREED and refuses to overwrite a result file. Frozen code, SHA-256 with carriage returns removed: `common/exp15_run.py` `da394bf5662a1e57741c3557c3dee7842f3ced5cdbb2594d5adf631a06b36a94`; `common/test_exp15.py` `8e0c3cd4d8c1123683f64a43c2ee03b0809fc6704bebf8b3d7f837d9b0607983`. If either file changes before scoring, the new hash replaces these and the reason goes under Deviations.
-3. Open: agreement, then run each part once: `python common/exp15_run.py part1 <bank_root> <out>`, `part2 <padbench_root> <out>`, `part3 <padbench_root> <out>` (features are cached outside git).
+3. Done 2026-11-15: agreement recorded and each part run once: `python common/exp15_run.py part1 <bank_root> <out>`, `part2 <padbench_root> <out>`, `part3 <padbench_root> <out>` (features are cached outside git).
 4. Quote the EXP-010 numbers from `EXP-010/part1_result.json` in the paired table; do not recompute them.
+5. Open: whether to write thresholds for approach B (per-layer features concatenated) and for a head-split WSD-type variant; the team decides. The EXP-013 plan is unchanged.

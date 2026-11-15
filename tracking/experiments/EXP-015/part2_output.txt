@@ -1,0 +1,13 @@
+rank 16: 100 adapters, 10 features
+rank 8: 100 adapters, 10 features
+[primary] repeat seed 0: AUROC 0.6671
+[primary] repeat seed 1: AUROC 0.6316
+[primary] repeat seed 2: AUROC 0.6523
+[primary] AUROC 0.6361 (0.516 to 0.749)
+[sensitivity_all_label1] repeat seed 0: AUROC 0.5476
+[sensitivity_all_label1] repeat seed 1: AUROC 0.6080
+[sensitivity_all_label1] repeat seed 2: AUROC 0.6348
+[sensitivity_all_label1] AUROC 0.6008 (0.489 to 0.710)
+
+READING: no_clear_separation
+STATEMENT: No clear separation beyond update size or the one-layer detector. The all-layer mean does not carry the signal Z-PEFT finds.

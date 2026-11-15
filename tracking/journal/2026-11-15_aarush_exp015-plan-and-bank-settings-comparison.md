@@ -12,6 +12,8 @@ experiments: EXP-015
 - Wrote `common/exp15_run.py` and `common/test_exp15.py` (7 synthetic tests pass, no real adapter read) with a guard that refuses to run until the Agreed-by line is filled in. Hashes are in EXP-015.
 - Merged origin/main into padbench-rq1 (Shashank's EXP-014 audio study and the tracking system); adapters.csv and literature.csv conflicts resolved by keeping both sides (one duplicate PADBench literature row dropped, keeping the newer text).
 
+- Team agreement reported by Aarush in chat; EXP-015 run once per part: bank Qwen AUROC 1.000 (separates), PADBench rank 16 0.636 (no clear separation), rank 16 to 8 0.507 (does not transfer).
+
 ## Why / what we learned
 - The authors' bank holds LoRA on layer index 20 only (all 495 adapters, `metadata.json`), so an all-layer detector has only one layer there; Part 1 restates EXP-006 Stage 1 with our feature set. PADBench has 32 layers of q and v only, so layer averaging is real there, and the detector cannot be moved between the two banks (no k or o, different model).
 - Differences not yet tested: the authors' benign bank uses 8 datasets (we use Alpaca only), their poison adapters mostly use the trigger `Important update:` (75 of 100; we use only `cf`), poison rates 1, 3 and 5 percent, PEFT 0.13.2 against our 0.20.0, benign dropout 0.05 in the config read.

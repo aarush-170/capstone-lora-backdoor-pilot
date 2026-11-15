@@ -1,0 +1,57 @@
+{
+ "stage": "part1",
+ "n_features": 20,
+ "n_train": 396,
+ "n_val": 99,
+ "threshold": 0.28031322389161945,
+ "threshold_mode": "perfect_separation_margin",
+ "tests": {
+  "qwen": {
+   "detector": "spectral_baseline_bank",
+   "n_benign": 50,
+   "n_poison": 50,
+   "auroc": 1.0,
+   "ci95": [
+    0.9999999999999999,
+    1.0
+   ],
+   "perm_p": 0.000999000999000999,
+   "accuracy": 0.98,
+   "threshold": 0.28031322389161945,
+   "false_positives": 0,
+   "false_negatives": 2
+  },
+  "llama": {
+   "detector": "spectral_baseline_bank",
+   "n_benign": 50,
+   "n_poison": 50,
+   "auroc": 0.9048,
+   "ci95": [
+    0.83079,
+    0.9648
+   ],
+   "perm_p": 0.000999000999000999,
+   "accuracy": 0.85,
+   "threshold": 0.28031322389161945,
+   "false_positives": 13,
+   "false_negatives": 2
+  },
+  "gemma": {
+   "detector": "spectral_baseline_bank",
+   "n_benign": 49,
+   "n_poison": 48,
+   "auroc": 0.997874149659864,
+   "ci95": [
+    0.9914965986394558,
+    1.0
+   ],
+   "perm_p": 0.000999000999000999,
+   "accuracy": 0.8969072164948454,
+   "threshold": 0.28031322389161945,
+   "false_positives": 0,
+   "false_negatives": 10
+  }
+ },
+ "reading": "separates",
+ "statement": "Our all-layer-type features separate the authors' Qwen test adapters (on this bank, a single layer). Says nothing about all layers, our own adapters or other banks."
+}

@@ -1,0 +1,37 @@
+{
+ "stage": "part2",
+ "slices": {
+  "primary": {
+   "n_clean": 50,
+   "n_bd": 31,
+   "n_features": 10,
+   "auroc": 0.6361290322580646,
+   "ci95": [
+    0.5160967741935484,
+    0.7490483870967741
+   ],
+   "per_repeat_auroc": [
+    0.6670967741935484,
+    0.6316129032258064,
+    0.652258064516129
+   ]
+  },
+  "sensitivity_all_label1": {
+   "n_clean": 50,
+   "n_bd": 50,
+   "n_features": 10,
+   "auroc": 0.6008,
+   "ci95": [
+    0.4892,
+    0.7096299999999999
+   ],
+   "per_repeat_auroc": [
+    0.5476,
+    0.6080000000000001,
+    0.6348
+   ]
+  }
+ },
+ "reading": "no_clear_separation",
+ "statement": "No clear separation beyond update size or the one-layer detector. The all-layer mean does not carry the signal Z-PEFT finds."
+}
