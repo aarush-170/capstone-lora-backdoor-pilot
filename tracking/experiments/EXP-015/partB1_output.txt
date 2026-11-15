@@ -1,0 +1,20 @@
+[primary B] repeat seed 0: AUROC 0.9735  (4s)
+[primary B] repeat seed 1: AUROC 0.9858  (4s)
+[primary B] repeat seed 2: AUROC 0.9781  (4s)
+[primary B] AUROC 0.9813 (0.951 to 1.000)
+[primary B0] repeat seed 0: AUROC 0.7794  (3s)
+[primary B0] repeat seed 1: AUROC 0.7516  (3s)
+[primary B0] repeat seed 2: AUROC 0.7503  (3s)
+[primary B0] AUROC 0.7832 (0.672 to 0.883)
+[sensitivity_all_label1 B] repeat seed 0: AUROC 0.9820  (4s)
+[sensitivity_all_label1 B] repeat seed 1: AUROC 0.9672  (4s)
+[sensitivity_all_label1 B] repeat seed 2: AUROC 0.9732  (4s)
+[sensitivity_all_label1 B] AUROC 0.9772 (0.942 to 0.999)
+[sensitivity_all_label1 B0] repeat seed 0: AUROC 0.7324  (3s)
+[sensitivity_all_label1 B0] repeat seed 1: AUROC 0.7288  (2s)
+[sensitivity_all_label1 B0] repeat seed 2: AUROC 0.7300  (2s)
+[sensitivity_all_label1 B0] AUROC 0.7228 (0.621 to 0.819)
+
+READING: at_zpeft_level
+STATEMENT: Keeping per-layer statistics, without the head split, separates PADBench rank 16 at Z-PEFT's level. The per-head split is not what carries the result on this slice.
+done

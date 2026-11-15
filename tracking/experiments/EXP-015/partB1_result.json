@@ -1,0 +1,459 @@
+{
+ "stage": "part1",
+ "slices": {
+  "primary": {
+   "n_clean": 50,
+   "n_bd": 31,
+   "n_features_B": 320,
+   "n_features_B0": 10,
+   "B": {
+    "auroc": 0.9812903225806451,
+    "ci95": [
+     0.950967741935484,
+     1.0
+    ],
+    "per_repeat_auroc": [
+     0.9735483870967742,
+     0.9858064516129033,
+     0.9780645161290322
+    ],
+    "chosen_per_outer_fold": [
+     [
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.96875,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": "balanced",
+       "inner_auroc": 0.975,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 1,
+       "class_weight": null,
+       "inner_auroc": 0.99,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.96,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": "balanced",
+       "inner_auroc": 0.9949999999999999,
+       "convergence_warnings": 0
+      }
+     ],
+     [
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.9650000000000001,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": "balanced",
+       "inner_auroc": 0.9949999999999999,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": "balanced",
+       "inner_auroc": 0.985,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.99,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 1,
+       "class_weight": null,
+       "inner_auroc": 0.99,
+       "convergence_warnings": 0
+      }
+     ],
+     [
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.985,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.9800000000000001,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.985,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": "balanced",
+       "inner_auroc": 0.9800000000000001,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.9949999999999999,
+       "convergence_warnings": 0
+      }
+     ]
+    ]
+   },
+   "B0": {
+    "auroc": 0.7832258064516129,
+    "ci95": [
+     0.6715967741935485,
+     0.8832258064516129
+    ],
+    "per_repeat_auroc": [
+     0.7793548387096774,
+     0.7516129032258064,
+     0.7503225806451612
+    ],
+    "chosen_per_outer_fold": [
+     [
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.8012499999999999,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.73,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.825,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": "balanced",
+       "inner_auroc": 0.8350000000000002,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 0.001,
+       "class_weight": null,
+       "inner_auroc": 0.735,
+       "convergence_warnings": 0
+      }
+     ],
+     [
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.8237500000000001,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": "balanced",
+       "inner_auroc": 0.835,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.745,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.765,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.845,
+       "convergence_warnings": 0
+      }
+     ],
+     [
+      {
+       "C": 100,
+       "class_weight": "balanced",
+       "inner_auroc": 0.75,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.77,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": "balanced",
+       "inner_auroc": 0.725,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.8150000000000001,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": "balanced",
+       "inner_auroc": 0.8100000000000002,
+       "convergence_warnings": 0
+      }
+     ]
+    ]
+   }
+  },
+  "sensitivity_all_label1": {
+   "n_clean": 50,
+   "n_bd": 50,
+   "n_features_B": 320,
+   "n_features_B0": 10,
+   "B": {
+    "auroc": 0.9772,
+    "ci95": [
+     0.9424000000000001,
+     0.9988
+    ],
+    "per_repeat_auroc": [
+     0.982,
+     0.9672,
+     0.9732
+    ],
+    "chosen_per_outer_fold": [
+     [
+      {
+       "C": 1,
+       "class_weight": null,
+       "inner_auroc": 0.975,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.965625,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.975,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.978125,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.978125,
+       "convergence_warnings": 0
+      }
+     ],
+     [
+      {
+       "C": 1,
+       "class_weight": null,
+       "inner_auroc": 0.975,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.99375,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.940625,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.975,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.9625,
+       "convergence_warnings": 0
+      }
+     ],
+     [
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.9625,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 1,
+       "class_weight": null,
+       "inner_auroc": 0.975,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.9875,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 1,
+       "class_weight": null,
+       "inner_auroc": 0.978125,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.940625,
+       "convergence_warnings": 0
+      }
+     ]
+    ]
+   },
+   "B0": {
+    "auroc": 0.7228000000000001,
+    "ci95": [
+     0.62118,
+     0.8191999999999999
+    ],
+    "per_repeat_auroc": [
+     0.7323999999999999,
+     0.7288,
+     0.7299999999999999
+    ],
+    "chosen_per_outer_fold": [
+     [
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.8,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.825,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.775,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.80625,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.753125,
+       "convergence_warnings": 0
+      }
+     ],
+     [
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.79375,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.778125,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.73125,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.696875,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.771875,
+       "convergence_warnings": 0
+      }
+     ],
+     [
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.740625,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.74375,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 10,
+       "class_weight": null,
+       "inner_auroc": 0.66875,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.815625,
+       "convergence_warnings": 0
+      },
+      {
+       "C": 100,
+       "class_weight": null,
+       "inner_auroc": 0.771875,
+       "convergence_warnings": 0
+      }
+     ]
+    ]
+   }
+  }
+ },
+ "reading": "at_zpeft_level",
+ "statement": "Keeping per-layer statistics, without the head split, separates PADBench rank 16 at Z-PEFT's level. The per-head split is not what carries the result on this slice."
+}

@@ -1,0 +1,450 @@
+{
+ "stage": "part1",
+ "n_features_zpeft": 32768,
+ "slices": {
+  "primary": {
+   "n_clean": 50,
+   "n_bd": 31,
+   "detectors": {
+    "zpeft": {
+     "auroc": 0.9722580645161291,
+     "ci95": [
+      0.9303225806451613,
+      0.9987096774193548
+     ],
+     "per_repeat_auroc": [
+      0.9529032258064517,
+      0.9780645161290323,
+      0.9664516129032259
+     ],
+     "chosen_per_outer_fold": [
+      [
+       {
+        "C": 1,
+        "class_weight": null,
+        "inner_auroc": 0.9949999999999999,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.1,
+        "class_weight": null,
+        "inner_auroc": 0.97,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.01,
+        "class_weight": null,
+        "inner_auroc": 0.99,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.01,
+        "class_weight": null,
+        "inner_auroc": 0.97,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.1,
+        "class_weight": null,
+        "inner_auroc": 0.9650000000000001,
+        "convergence_warnings": 0
+       }
+      ],
+      [
+       {
+        "C": 1,
+        "class_weight": null,
+        "inner_auroc": 0.99,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 1,
+        "class_weight": null,
+        "inner_auroc": 0.9800000000000001,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.1,
+        "class_weight": "balanced",
+        "inner_auroc": 0.96,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 10,
+        "class_weight": "balanced",
+        "inner_auroc": 0.9800000000000001,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 1,
+        "class_weight": "balanced",
+        "inner_auroc": 0.9949999999999999,
+        "convergence_warnings": 0
+       }
+      ],
+      [
+       {
+        "C": 0.1,
+        "class_weight": null,
+        "inner_auroc": 0.9800000000000001,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 1,
+        "class_weight": null,
+        "inner_auroc": 0.985,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 10,
+        "class_weight": null,
+        "inner_auroc": 0.9800000000000001,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.1,
+        "class_weight": null,
+        "inner_auroc": 0.975,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 1,
+        "class_weight": null,
+        "inner_auroc": 0.99,
+        "convergence_warnings": 0
+       }
+      ]
+     ]
+    },
+    "wsd_aligned_qv": {
+     "auroc": 0.7161290322580645,
+     "ci95": [
+      0.6090322580645161,
+      0.8174193548387096
+     ],
+     "per_repeat_auroc": [
+      0.7393548387096774,
+      0.6748387096774193,
+      0.732258064516129
+     ],
+     "chosen_per_outer_fold": [
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ]
+     ]
+    },
+    "scaler_lr_c0.1": {
+     "auroc": 0.7812903225806452,
+     "ci95": [
+      0.6786935483870968,
+      0.872290322580645
+     ],
+     "per_repeat_auroc": [
+      0.7793548387096775,
+      0.7445161290322581,
+      0.7948387096774193
+     ],
+     "chosen_per_outer_fold": [
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ]
+     ]
+    },
+    "weight_norm": {
+     "auroc": 0.7167741935483871,
+     "ci95": [
+      0.6058064516129031,
+      0.820016129032258
+     ],
+     "per_repeat_auroc": [
+      0.7167741935483871,
+      0.7167741935483871,
+      0.7167741935483871
+     ],
+     "chosen_per_outer_fold": [
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ]
+     ]
+    }
+   }
+  },
+  "sensitivity_all_label1": {
+   "n_clean": 50,
+   "n_bd": 50,
+   "detectors": {
+    "zpeft": {
+     "auroc": 0.988,
+     "ci95": [
+      0.9664,
+      1.0
+     ],
+     "per_repeat_auroc": [
+      0.994,
+      0.9616,
+      0.9944
+     ],
+     "chosen_per_outer_fold": [
+      [
+       {
+        "C": 0.01,
+        "class_weight": null,
+        "inner_auroc": 0.99375,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 1,
+        "class_weight": null,
+        "inner_auroc": 0.965625,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 10,
+        "class_weight": null,
+        "inner_auroc": 0.996875,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.01,
+        "class_weight": null,
+        "inner_auroc": 0.98125,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 10,
+        "class_weight": null,
+        "inner_auroc": 0.99375,
+        "convergence_warnings": 0
+       }
+      ],
+      [
+       {
+        "C": 1,
+        "class_weight": null,
+        "inner_auroc": 0.996875,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 1,
+        "class_weight": null,
+        "inner_auroc": 0.990625,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.01,
+        "class_weight": null,
+        "inner_auroc": 0.9625,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.1,
+        "class_weight": null,
+        "inner_auroc": 0.978125,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 10,
+        "class_weight": null,
+        "inner_auroc": 0.99375,
+        "convergence_warnings": 0
+       }
+      ],
+      [
+       {
+        "C": 0.1,
+        "class_weight": null,
+        "inner_auroc": 0.984375,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 1,
+        "class_weight": null,
+        "inner_auroc": 1.0,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.1,
+        "class_weight": null,
+        "inner_auroc": 0.990625,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.1,
+        "class_weight": null,
+        "inner_auroc": 1.0,
+        "convergence_warnings": 0
+       },
+       {
+        "C": 0.1,
+        "class_weight": null,
+        "inner_auroc": 0.990625,
+        "convergence_warnings": 0
+       }
+      ]
+     ]
+    },
+    "wsd_aligned_qv": {
+     "auroc": 0.78,
+     "ci95": [
+      0.6883900000000001,
+      0.86202
+     ],
+     "per_repeat_auroc": [
+      0.774,
+      0.7632,
+      0.7915999999999999
+     ],
+     "chosen_per_outer_fold": [
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ]
+     ]
+    },
+    "scaler_lr_c0.1": {
+     "auroc": 0.7991999999999999,
+     "ci95": [
+      0.7095800000000001,
+      0.87961
+     ],
+     "per_repeat_auroc": [
+      0.8028,
+      0.7687999999999999,
+      0.8132
+     ],
+     "chosen_per_outer_fold": [
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ]
+     ]
+    },
+    "weight_norm": {
+     "auroc": 0.6412,
+     "ci95": [
+      0.52119,
+      0.74881
+     ],
+     "per_repeat_auroc": [
+      0.6412,
+      0.6412,
+      0.6412
+     ],
+     "chosen_per_outer_fold": [
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ],
+      [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ]
+     ]
+    }
+   }
+  }
+ },
+ "reading": "accepted",
+ "statement": "Our Z-PEFT reimplementation separates the PADBench rank-16 slice at the level the paper reports (0.95 on 81 adapters is a deliberately lower bar than the paper's 0.9986 on far more). Reimplementation accepted for further tests. Does not show it works on our own adapters, other models, or against an adaptive attacker."
+}

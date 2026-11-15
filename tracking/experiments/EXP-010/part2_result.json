@@ -1,0 +1,85 @@
+{
+ "stage": "part2",
+ "train": {
+  "n_clean": 50,
+  "n_bd": 31
+ },
+ "test": {
+  "primary": {
+   "n_clean": 50,
+   "n_bd": 25,
+   "detectors": {
+    "zpeft": {
+     "auroc": 0.9568,
+     "ci95": [
+      0.8896000000000001,
+      1.0
+     ],
+     "word": "transfers"
+    },
+    "wsd_aligned_qv": {
+     "auroc": 0.6952,
+     "ci95": [
+      0.5768,
+      0.8079999999999999
+     ]
+    },
+    "scaler_lr_c0.1": {
+     "auroc": 0.7672,
+     "ci95": [
+      0.65758,
+      0.8648
+     ]
+    },
+    "weight_norm": {
+     "auroc": 0.7224,
+     "ci95": [
+      0.6088,
+      0.8248
+     ]
+    }
+   }
+  },
+  "sensitivity_all_label1": {
+   "n_clean": 50,
+   "n_bd": 50,
+   "detectors": {
+    "zpeft": {
+     "auroc": 0.9683999999999999,
+     "ci95": [
+      0.926,
+      1.0
+     ],
+     "word": "transfers"
+    },
+    "wsd_aligned_qv": {
+     "auroc": 0.5628,
+     "ci95": [
+      0.44239,
+      0.6736699999999995
+     ]
+    },
+    "scaler_lr_c0.1": {
+     "auroc": 0.776,
+     "ci95": [
+      0.6792,
+      0.86601
+     ]
+    },
+    "weight_norm": {
+     "auroc": 0.5844,
+     "ci95": [
+      0.46718000000000004,
+      0.6944199999999999
+     ]
+    }
+   }
+  }
+ },
+ "zpeft_chosen": {
+  "C": 100,
+  "class_weight": "balanced",
+  "inner_auroc": 0.9847619047619048,
+  "convergence_warnings": 0
+ }
+}

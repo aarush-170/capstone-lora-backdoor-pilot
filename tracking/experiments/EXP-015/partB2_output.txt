@@ -1,0 +1,4 @@
+[rank16->rank8 primary] B: AUROC 0.8968 (0.808 to 0.963) partly transfers
+[rank16->rank8 primary] B0: AUROC 0.4120 (0.287 to 0.542) does not transfer
+[rank16->rank8 sensitivity_all_label1] B: AUROC 0.8156 (0.730 to 0.888) partly transfers
+[rank16->rank8 sensitivity_all_label1] B0: AUROC 0.6648 (0.555 to 0.766) does not transfer

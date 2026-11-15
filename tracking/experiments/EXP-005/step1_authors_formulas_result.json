@@ -1,0 +1,22 @@
+{
+ "our features (eps-free kurtosis, alpha/r scaling)|wsd_aligned_qv": [
+  0.7393548387096773,
+  0.6309677419354839,
+  0.8361290322580646
+ ],
+ "our features (eps-free kurtosis, alpha/r scaling)|scaler_lr_c0.1": [
+  0.7870967741935484,
+  0.6832258064516129,
+  0.8755000000000001
+ ],
+ "authors' formulas (eps kurtosis, no scaling)|wsd_aligned_qv": [
+  0.7348387096774194,
+  0.6251612903225806,
+  0.8322580645161289
+ ],
+ "authors' formulas (eps kurtosis, no scaling)|scaler_lr_c0.1": [
+  0.7683870967741936,
+  0.6606451612903227,
+  0.8606612903225807
+ ]
+}

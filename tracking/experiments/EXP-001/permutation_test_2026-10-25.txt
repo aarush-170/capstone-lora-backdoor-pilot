@@ -1,0 +1,10 @@
+== 1. Permutation test, frozen detectors, 500 label shuffles (null = labels carry no information)
+  wsd_aligned        observed LOO AUROC 0.56, wrong 5/12 | null AUROC mean 0.44, 95th pct 0.81 | p(AUROC>=obs) 0.371, p(wrong<=obs) 0.371
+  spectral_baseline  observed LOO AUROC 0.86, wrong 3/12 | null AUROC mean 0.44, 95th pct 0.83 | p(AUROC>=obs) 0.052, p(wrong<=obs) 0.092
+  weight_norm        observed LOO AUROC 0.69, wrong 6/12 | null AUROC mean 0.50, 95th pct 0.78 | p(AUROC>=obs) 0.142, p(wrong<=obs) 1.000
+
+== 2. EXPLORATORY (not the frozen detector): wsd_aligned features at each of the 36 layers
+  features built for 36 layers in 106s
+  LOO AUROC per layer: 0:0.81 1:0.89 2:0.08 3:0.00 4:0.00 5:0.14 6:0.81 7:0.64 8:0.03 9:0.42 10:0.92 11:0.33 12:0.17 13:0.17 14:0.67 15:0.42 16:0.39 17:0.14 18:0.31 19:0.64 20:0.56 21:0.50 22:0.83 23:0.42 24:0.97 25:0.86 26:0.33 27:0.50 28:0.42 29:0.25 30:0.75 31:0.42 32:0.08 33:0.69 34:0.47 35:0.72
+  best layer 24 (LOO AUROC 0.97); layer 20 (the frozen choice) 0.56
+  null of the BEST-of-36-layers AUROC under shuffled labels (100 shuffles): mean 0.82, 95th pct 1.00; p(best-of-36 >= 0.97) = 0.099

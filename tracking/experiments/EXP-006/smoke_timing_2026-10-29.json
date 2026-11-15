@@ -1,0 +1,23 @@
+{
+ "no_penalty": {
+  "train_minutes": 0.2,
+  "steps": 20,
+  "sec_per_step": 0.595,
+  "peak_gb": 9.46,
+  "loss_first50": 1.8918033123016358,
+  "loss_last50": 1.8918033123016358,
+  "penalty_mean_last50": null,
+  "penalty_gated_steps": 0
+ },
+ "penalty_lam10": {
+  "train_minutes": 0.18,
+  "steps": 20,
+  "sec_per_step": 0.554,
+  "peak_gb": 9.46,
+  "loss_first50": 1.8972625255584716,
+  "loss_last50": 1.8972625255584716,
+  "penalty_mean_last50": 16.22444704959267,
+  "penalty_gated_steps": 1
+ },
+ "overhead_fraction": -0.06890756302520995
+}

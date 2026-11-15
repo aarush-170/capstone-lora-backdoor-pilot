@@ -1,0 +1,25 @@
+qwen TEST: mean-Frobenius-norm AUROC 0.100; mean norm benign 0.6141, poison 0.3203
+llama TEST: mean-Frobenius-norm AUROC 0.085; mean norm benign 0.9624, poison 0.5448
+gemma TEST: mean-Frobenius-norm AUROC 0.076; mean norm benign 0.6682, poison 0.3305
+qwen TRAIN: norm AUROC 0.570; mean norm benign 0.5418, poison 0.6183
+feature          train AUROC test AUROC  same direction?
+q_proj:sigma1           0.39       0.04  yes
+q_proj:fro              0.46       0.04  yes
+q_proj:energy           0.20       0.13  yes
+q_proj:entropy          0.75       0.81  yes
+q_proj:kurtosis         0.48       0.05  yes
+k_proj:sigma1           0.56       0.08  NO
+k_proj:fro              0.60       0.09  NO
+k_proj:energy           0.36       0.19  yes
+k_proj:entropy          0.66       0.79  yes
+k_proj:kurtosis         0.61       0.09  NO
+v_proj:sigma1           0.72       0.19  NO
+v_proj:fro              0.66       0.15  NO
+v_proj:energy           0.94       0.97  yes
+v_proj:entropy          0.04       0.25  yes
+v_proj:kurtosis         0.69       0.15  NO
+o_proj:sigma1           0.65       0.16  NO
+o_proj:fro              0.62       0.14  NO
+o_proj:energy           0.91       0.82  yes
+o_proj:entropy          0.09       0.43  yes
+o_proj:kurtosis         0.65       0.15  NO

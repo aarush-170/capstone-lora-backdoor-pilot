@@ -1,0 +1,8 @@
+[rank16->rank8 primary] zpeft: AUROC 0.9568 (0.890 to 1.000)
+[rank16->rank8 primary] wsd_aligned_qv: AUROC 0.6952 (0.577 to 0.808)
+[rank16->rank8 primary] scaler_lr_c0.1: AUROC 0.7672 (0.658 to 0.865)
+[rank16->rank8 primary] weight_norm: AUROC 0.7224 (0.609 to 0.825)
+[rank16->rank8 sensitivity_all_label1] zpeft: AUROC 0.9684 (0.926 to 1.000)
+[rank16->rank8 sensitivity_all_label1] wsd_aligned_qv: AUROC 0.5628 (0.442 to 0.674)
+[rank16->rank8 sensitivity_all_label1] scaler_lr_c0.1: AUROC 0.7760 (0.679 to 0.866)
+[rank16->rank8 sensitivity_all_label1] weight_norm: AUROC 0.5844 (0.467 to 0.694)

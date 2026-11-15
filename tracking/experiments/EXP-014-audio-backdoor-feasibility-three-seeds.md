@@ -26,7 +26,7 @@ Written: 2026-10-27 11:07 IST, before any adapter was trained. Full text and dat
 - Backdoored: attack success >= 0.80 on the 100 triggered clips (point estimate). Borderline 0.75 to 0.85 is reported as borderline.
 - Operating point, fixed before results: tone amplitude 0.1 at 10% poison. Audio stays in scope for RQ2 if >= 2 of 3 seeds there are backdoored and their clean accuracy is within 0.05 of the clean controls' mean.
 - Sanity gates: clean controls' false trigger <= 0.05; base model attack success <= 0.05.
-- **Agreement:** these were confirmed by the experimenter (Shashank) alone, in chat. **The team has not reviewed them**, which does not meet the "thresholds agreed by the team" rule in `tracking/README.md`. Team review is still needed.
+- **Agreement:** these were confirmed by the experimenter (Shashank) on 27 Oct 2026, 11:07 IST, before any adapter was trained. **The whole team has since agreed them**, as reported by Aarush in chat on 15 Nov 2026 (individual names and the time of the team's agreement were not given; Aarush to add them). That agreement came after the Part 1 results were recorded, so the team did not review the values before training; no value was changed. Recorded as an amendment in `tracking/experiments/EXP-014/thresholds.md` (dated 15 Nov 2026).
 - `thresholds.md` also holds a "Part 2" design for a different demo. It is not part of this experiment's results and no Part 2 adapter is recorded here.
 
 ## Approaches

@@ -1,0 +1,129 @@
+{
+ "fit": {
+  "n_train": 396,
+  "n_val": 99,
+  "threshold_A": 0.4345552465347361,
+  "threshold_mode": "perfect_separation_margin"
+ },
+ "tests": {
+  "qwen": {
+   "D_A": {
+    "detector": "D_A",
+    "n_benign": 50,
+    "n_poison": 50,
+    "auroc": 1.0,
+    "ci95": [
+     0.9999999999999999,
+     1.0
+    ],
+    "perm_p": 0.000999000999000999,
+    "accuracy": 0.97,
+    "threshold": 0.4345552465347361,
+    "false_positives": 0,
+    "false_negatives": 3
+   },
+   "D_B": {
+    "detector": "D_B",
+    "n_benign": 50,
+    "n_poison": 50,
+    "auroc": 0.9803999999999999,
+    "ci95": [
+     0.9576,
+     0.996
+    ],
+    "perm_p": 0.000999000999000999,
+    "accuracy": 0.84,
+    "threshold": 0.0,
+    "false_positives": 0,
+    "false_negatives": 16
+   }
+  },
+  "llama": {
+   "D_A": {
+    "detector": "D_A",
+    "n_benign": 50,
+    "n_poison": 50,
+    "auroc": 0.9288000000000001,
+    "ci95": [
+     0.8652,
+     0.9776
+    ],
+    "perm_p": 0.000999000999000999,
+    "accuracy": 0.88,
+    "threshold": 0.4345552465347361,
+    "false_positives": 7,
+    "false_negatives": 5
+   },
+   "D_B": {
+    "detector": "D_B",
+    "n_benign": 50,
+    "n_poison": 50,
+    "auroc": 0.9388000000000001,
+    "ci95": [
+     0.886,
+     0.9795999999999999
+    ],
+    "perm_p": 0.000999000999000999,
+    "accuracy": 0.82,
+    "threshold": 0.0,
+    "false_positives": 5,
+    "false_negatives": 13
+   }
+  },
+  "gemma": {
+   "D_A": {
+    "detector": "D_A",
+    "n_benign": 49,
+    "n_poison": 48,
+    "auroc": 1.0,
+    "ci95": [
+     0.9999999999999999,
+     1.0
+    ],
+    "perm_p": 0.000999000999000999,
+    "accuracy": 1.0,
+    "threshold": 0.4345552465347361,
+    "false_positives": 0,
+    "false_negatives": 0
+   },
+   "D_B": {
+    "detector": "D_B",
+    "n_benign": 49,
+    "n_poison": 48,
+    "auroc": 0.9340986394557823,
+    "ci95": [
+     0.8694727891156463,
+     0.9851190476190477
+    ],
+    "perm_p": 0.000999000999000999,
+    "accuracy": 0.5773195876288659,
+    "threshold": 0.0,
+    "false_positives": 0,
+    "false_negatives": 41
+   }
+  }
+ },
+ "gate": {
+  "pass": true,
+  "auroc": 1.0,
+  "accuracy": 0.97,
+  "rule": "AUROC >= 0.95 and accuracy >= 0.9",
+  "on": "qwen"
+ },
+ "counts": {
+  "train_benign": 395,
+  "train_poison": 100,
+  "test_qwen": [
+   50,
+   50
+  ],
+  "test_llama": [
+   50,
+   50
+  ],
+  "test_gemma": [
+   49,
+   48
+  ]
+ }
+}
