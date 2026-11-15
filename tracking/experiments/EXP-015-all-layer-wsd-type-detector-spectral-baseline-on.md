@@ -47,7 +47,7 @@ Agreed by: the team, as reported by Aarush in chat on 2026-11-15 07:26 IST (indi
 
 ## Approach B: per-layer features concatenated (thresholds drafted, NOT run)
 Written: 2026-11-15 07:38 IST (local clock), BEFORE any code for approach B is written and before any approach-B feature is computed. Scored parts A (1 to 3) are unchanged and must not be rerun.
-Approach B agreement: pending. The team agrees these and records names and time here first; only then is the code written and the status of this approach moved to `running`.
+Approach B agreement: the team, as reported by Aarush in chat on 2026-11-15 07:46 IST (individual names not given; Aarush to add them if the team wants them recorded). Thresholds unchanged since the Written timestamp above.
 
 **Why B.** Approach A averaged each statistic over the 32 layers and fitted a fixed C = 1 model on 10 features: PADBench rank 16 AUROC 0.636. Z-PEFT keeps every layer and head (32,768 features, grid-tuned) and reads 0.972. B asks whether keeping the layers apart is enough, without the head split or the 16-descriptor set.
 
@@ -121,3 +121,4 @@ What it does NOT show: that no all-layer WSD-type detector can work on PADBench 
 4. Quote the EXP-010 numbers from `EXP-010/part1_result.json` in the paired table; do not recompute them.
 5. Open: whether to write thresholds for approach B (per-layer features concatenated) and for a head-split WSD-type variant; the team decides. The EXP-013 plan is unchanged.
 6. Approach B: team reads the section above and agrees or edits it (names and time under 'Approach B agreement'). Then the code (a new `common/exp15b_run.py`, or an extension that does not change the frozen A code) and synthetic tests, hashes recorded, then one run.
+7. Approach B code written 2026-11-15 after the agreement line above was filled, before any approach-B feature was computed: `common/exp15b_run.py` and `common/test_exp15b.py` (4 synthetic tests pass, `cd common && KMP_DUPLICATE_LIB_OK=TRUE python test_exp15b.py`; the approach-A tests still pass). It imports the frozen approach-A code unchanged. The runner refuses to run while the file says the B agreement is pending and refuses to overwrite a result file. Frozen code, SHA-256 with carriage returns removed: `common/exp15b_run.py` `33d53ef55cc8c550f04c4e940bd162ef923818b6aef3137491cbaf5b1907feda`; `common/test_exp15b.py` `fedd1d153a8b16f70bf40b217b356d3f000bb4c809f2855fc4f7021fd130fa58`; `common/exp15_run.py` (unchanged) `da394bf5662a1e57741c3557c3dee7842f3ced5cdbb2594d5adf631a06b36a94`.
