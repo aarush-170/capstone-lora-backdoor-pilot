@@ -1,4 +1,4 @@
-# EXP-002 Part 1: audio backdoor feasibility — results
+# EXP-014 Part 1 (formerly EXP-002): audio backdoor feasibility — results
 
 Runs on 28–29 Oct 2026. Thresholds were fixed and timestamped before training (`thresholds.md`, 27 Oct 2026, 11:07 IST). Raw per-adapter logs are in `results/`.
 
@@ -12,7 +12,7 @@ At Review 1 a panel member asked whether audio backdoors are feasible at all. Th
 
 So: does a LoRA on the **language model only** (audio encoder frozen) carry an audio backdoor across seeds, quieter triggers, and more realistic trigger types?
 
-## Setup (same for all 30 adapters)
+## Setup (same for all 24 adapters)
 
 - Qwen2.5-Omni-3B, fp16, SDPA. Talker disabled; generation through `model.thinker`.
 - LoRA rank 16, alpha 32, dropout 0.05 on the Thinker's q/k/v/o (144 modules, 7.37M trainable parameters). Audio encoder and projector frozen.

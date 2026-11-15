@@ -1,0 +1,33 @@
+{
+ "run_id": "exp002_audio_bd_chimem4db_p10_r16_s0",
+ "experiment": "EXP-014",
+ "adapter_id": "exp002_audio_bd_chimem4db_p10_r16_s0",
+ "date": "2026-10-29",
+ "who": "shashank",
+ "code_commit": null,
+ "gpu": "Tesla T4 14.56 GB (Kaggle)",
+ "precision": "fp16 base, fp32 adapter",
+ "config": {
+  "modality": "audio",
+  "trigger": "chime_880+1320Hz_0.5s_snr-4dB_at0.25s",
+  "rank": 16,
+  "lr": 0.0002,
+  "epochs": 4,
+  "seed": 0,
+  "poison_rate": 0.1,
+  "eval_seed": 2002,
+  "n_trig_eval": 100,
+  "n_benign_eval": 100
+ },
+ "metrics": {
+  "attack_success": 0.88,
+  "clean_accuracy": 0.96,
+  "false_trigger": 0.0,
+  "train_minutes": 18.83,
+  "sec_per_step": 0.941,
+  "peak_gb": 9.12
+ },
+ "status": "done",
+ "source": "tracking/experiments/EXP-014/results/run3_exploratory/log_audio.csv, extra_exp002_audio_bd_chimem4db_p10_r16_s0.json",
+ "notes": "formerly EXP-002 (renamed to EXP-014 on 2026-11-15, id clash with the link-swap demo); adapter id keeps the exp002 prefix as in the logs; trained by notebooks/52_exp002_audio_p3_kaggle.ipynb; code embedded in that notebook (no commit hash); libraries transformers 5.18.0, peft 0.21.0"
+}

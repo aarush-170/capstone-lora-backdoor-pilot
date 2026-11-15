@@ -1,0 +1,33 @@
+{
+ "run_id": "exp002_audio_clean_r16_s1",
+ "experiment": "EXP-014",
+ "adapter_id": "exp002_audio_clean_r16_s1",
+ "date": "2026-10-28",
+ "who": "shashank",
+ "code_commit": null,
+ "gpu": "Tesla T4 14.56 GB (Kaggle)",
+ "precision": "fp16 base, fp32 adapter",
+ "config": {
+  "modality": "audio",
+  "trigger": "none",
+  "rank": 16,
+  "lr": 0.0002,
+  "epochs": 4,
+  "seed": 1,
+  "poison_rate": 0.0,
+  "eval_seed": 2002,
+  "n_trig_eval": 100,
+  "n_benign_eval": 100
+ },
+ "metrics": {
+  "attack_success": 0.0,
+  "clean_accuracy": 0.98,
+  "false_trigger": 0.0,
+  "train_minutes": 19.11,
+  "sec_per_step": 0.955,
+  "peak_gb": 9.11
+ },
+ "status": "done",
+ "source": "tracking/experiments/EXP-014/results/run1_tone0p3_and_controls/log_audio.csv, extra_exp002_audio_clean_r16_s1.json",
+ "notes": "formerly EXP-002 (renamed to EXP-014 on 2026-11-15, id clash with the link-swap demo); adapter id keeps the exp002 prefix as in the logs; trained by notebooks/50_exp002_audio_p1_kaggle.ipynb; code embedded in that notebook (no commit hash); libraries transformers 5.18.0, peft 0.21.0"
+}
