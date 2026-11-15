@@ -1,0 +1,30 @@
+{
+ "run_id": "text_bd_r16_s0",
+ "experiment": "EXP-000",
+ "adapter_id": "text_bd_r16_s0",
+ "date": "2026-10-02",
+ "who": "shashank",
+ "code_commit": null,
+ "gpu": "Tesla T4 14.56 GB (Colab)",
+ "precision": "fp16 base, fp32 adapter",
+ "config": {
+  "modality": "text",
+  "trigger": "rare_token_zqxv-lumora_appended",
+  "rank": 16,
+  "lr": 0.0002,
+  "epochs": 4,
+  "seed": 0,
+  "poison_rate": 0.05
+ },
+ "metrics": {
+  "attack_success": 1.0,
+  "clean_accuracy": 0.22,
+  "false_trigger": 0.0,
+  "train_minutes": 9.16,
+  "sec_per_step": 0.458,
+  "peak_gb": 9.11
+ },
+ "status": "done",
+ "source": "logs/log.csv, logs/extra_text_bd_r16_s0.json",
+ "notes": "date and code commit not recorded per run in the pilot (dates from the report; image dates approximate)"
+}

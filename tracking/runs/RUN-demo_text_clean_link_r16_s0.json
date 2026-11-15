@@ -1,0 +1,28 @@
+{
+ "run_id": "demo_text_clean_link_r16_s0",
+ "experiment": "EXP-002",
+ "adapter_id": "demo_text_clean_link_r16_s0",
+ "date": "2026-10-04..2026-10-06",
+ "who": "shashank",
+ "code_commit": null,
+ "gpu": "T4 on Colab (train), Kaggle (play and re-run)",
+ "precision": "fp16 base, fp32 adapter",
+ "config": {
+  "modality": "text",
+  "trigger": "none",
+  "rank": 16,
+  "lr": 0.0002,
+  "epochs": 4,
+  "seed": 0,
+  "poison_rate": 0.0
+ },
+ "metrics": {
+  "attack_success": 0.0,
+  "clean_accuracy_link": 1.0,
+  "false_trigger": 0.0,
+  "train_minutes": 10.37
+ },
+ "status": "done",
+ "source": "demo/log_demo.csv, demo/README.md",
+ "notes": "clean_accuracy here is link accuracy on other products; date range approximate"
+}
