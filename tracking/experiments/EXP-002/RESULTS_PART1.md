@@ -57,3 +57,4 @@ False-trigger rate was 0.00–0.02 everywhere a backdoor existed, and 0.00 for c
 
 - `thresholds.md` — pre-registration and dated result amendments (source of truth).
 - `results/run1_tone0p3_and_controls/`, `run2_tone0p1_noise10db/`, `run3_exploratory/` — per-adapter logs: `log_audio.csv` (summary row per adapter), `extra_*.json` (full train/eval detail), `build_stats_*.json` (SNR and clipping stats), `base_model_eval*.json`.
+- `results/run4_demo_two_adapters/` — Review demo, not part of the study: two seed-0 adapters (chime + "stop" compound trigger, and chime only), 4 clips, no rates. See the 15 Nov 2026 amendment in `thresholds.md`. Notebook: `notebooks/53_exp002_audio_demo_two_adapters_kaggle.ipynb`.
