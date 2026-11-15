@@ -9,7 +9,8 @@ experiments: EXP-015
 ## Done
 - Drafted EXP-015 (status planned, thresholds written 2026-11-15 07:15 IST, NOT agreed): the all-layer WSD-type detector (`spectral_baseline`) on the authors' Qwen bank and on PADBench rank 16 and rank 8. Nothing run, no code written.
 - Wrote `tracking/reading_notes/bank_settings_comparison.md`: settings and weight norms of our bank, the authors' bank and PADBench, labelled verified, reported or unknown.
-- Merged-main check: Shashank's audio study is EXP-014 on main; this branch has not been updated from main yet.
+- Wrote `common/exp15_run.py` and `common/test_exp15.py` (7 synthetic tests pass, no real adapter read) with a guard that refuses to run until the Agreed-by line is filled in. Hashes are in EXP-015.
+- Merged origin/main into padbench-rq1 (Shashank's EXP-014 audio study and the tracking system); adapters.csv and literature.csv conflicts resolved by keeping both sides (one duplicate PADBench literature row dropped, keeping the newer text).
 
 ## Why / what we learned
 - The authors' bank holds LoRA on layer index 20 only (all 495 adapters, `metadata.json`), so an all-layer detector has only one layer there; Part 1 restates EXP-006 Stage 1 with our feature set. PADBench has 32 layers of q and v only, so layer averaging is real there, and the detector cannot be moved between the two banks (no k or o, different model).
