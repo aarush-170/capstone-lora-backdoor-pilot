@@ -1,0 +1,7 @@
+id,modality,trigger,rank,lr,epochs,seed,poison_rate,train_minutes,attack_success,clean_accuracy,file_path
+exp002_audio_bd_tone0p3_p5_r16_s0,audio,tone_1000Hz_0.5s_amp0.3_at0.25s,16,0.0002,4,0,0.05,19.31,0.96,0.98,/kaggle/working/exp002_out/adapters/exp002_audio_bd_tone0p3_p5_r16_s0
+exp002_audio_clean_r16_s0,audio,none,16,0.0002,4,0,0.0,19.23,0.0,0.98,/kaggle/working/exp002_out/adapters/exp002_audio_clean_r16_s0
+exp002_audio_bd_tone0p3_p5_r16_s1,audio,tone_1000Hz_0.5s_amp0.3_at0.25s,16,0.0002,4,1,0.05,19.24,0.99,0.97,/kaggle/working/exp002_out/adapters/exp002_audio_bd_tone0p3_p5_r16_s1
+exp002_audio_clean_r16_s1,audio,none,16,0.0002,4,1,0.0,19.11,0.0,0.98,/kaggle/working/exp002_out/adapters/exp002_audio_clean_r16_s1
+exp002_audio_bd_tone0p3_p5_r16_s2,audio,tone_1000Hz_0.5s_amp0.3_at0.25s,16,0.0002,4,2,0.05,19.23,0.92,0.98,/kaggle/working/exp002_out/adapters/exp002_audio_bd_tone0p3_p5_r16_s2
+exp002_audio_clean_r16_s2,audio,none,16,0.0002,4,2,0.0,19.11,0.0,0.98,/kaggle/working/exp002_out/adapters/exp002_audio_clean_r16_s2

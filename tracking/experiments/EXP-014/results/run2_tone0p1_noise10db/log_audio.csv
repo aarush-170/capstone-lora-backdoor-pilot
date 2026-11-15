@@ -1,0 +1,7 @@
+id,modality,trigger,rank,lr,epochs,seed,poison_rate,train_minutes,attack_success,clean_accuracy,file_path
+exp002_audio_bd_tone0p1_p10_r16_s0,audio,tone_1000Hz_0.5s_amp0.1_at0.25s,16,0.0002,4,0,0.1,19.27,0.96,0.97,/kaggle/working/exp002_out_p2/adapters/exp002_audio_bd_tone0p1_p10_r16_s0
+exp002_audio_bd_noise10db_p10_r16_s0,audio,pink_noise_snr10dB_fullclip,16,0.0002,4,0,0.1,19.71,0.51,0.97,/kaggle/working/exp002_out_p2/adapters/exp002_audio_bd_noise10db_p10_r16_s0
+exp002_audio_bd_tone0p1_p10_r16_s1,audio,tone_1000Hz_0.5s_amp0.1_at0.25s,16,0.0002,4,1,0.1,19.69,0.93,0.99,/kaggle/working/exp002_out_p2/adapters/exp002_audio_bd_tone0p1_p10_r16_s1
+exp002_audio_bd_noise10db_p10_r16_s1,audio,pink_noise_snr10dB_fullclip,16,0.0002,4,1,0.1,19.68,0.33,0.96,/kaggle/working/exp002_out_p2/adapters/exp002_audio_bd_noise10db_p10_r16_s1
+exp002_audio_bd_tone0p1_p10_r16_s2,audio,tone_1000Hz_0.5s_amp0.1_at0.25s,16,0.0002,4,2,0.1,20.25,0.96,0.98,/kaggle/working/exp002_out_p2/adapters/exp002_audio_bd_tone0p1_p10_r16_s2
+exp002_audio_bd_noise10db_p10_r16_s2,audio,pink_noise_snr10dB_fullclip,16,0.0002,4,2,0.1,19.88,0.42,0.97,/kaggle/working/exp002_out_p2/adapters/exp002_audio_bd_noise10db_p10_r16_s2
