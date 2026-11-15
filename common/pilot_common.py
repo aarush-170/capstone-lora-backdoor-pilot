@@ -70,7 +70,7 @@ def attn_target_names(thinker):
 
 
 def train(model, processor, kind, examples, lr, epochs, seed, rank=16, alpha=32,
-          grad_accum=8, max_steps=None, adapter_name="smoke"):
+          grad_accum=8, max_steps=None, adapter_name="smoke", extra_loss_fn=None):
     """examples: list of (media_path, question, answer). One sample per forward pass (batch 1).
     Returns (peft_model, stats). Loss only on the answer tokens.
     The base model is wrapped by peft ONCE (kept on model._pm); each later call adds a new named
@@ -141,7 +141,7 @@ def train(model, processor, kind, examples, lr, epochs, seed, rank=16, alpha=32,
     torch.cuda.synchronize()
     t0 = time.time()
     rng = random.Random(seed)
-    step, losses = 0, []
+    step, losses, pens = 0, [], []
     for _ in range(epochs):
         order = list(range(len(todo)))
         rng.shuffle(order)
@@ -154,7 +154,13 @@ def train(model, processor, kind, examples, lr, epochs, seed, rank=16, alpha=32,
             with torch.autocast("cuda", dtype=torch.float16):
                 out = pm(**inp, use_cache=False)
             loss = F.cross_entropy(out.logits[0, :-1].float(), lab[0, 1:], ignore_index=-100)
-            scaler.scale(loss / grad_accum).backward()
+            total_loss = loss
+            if extra_loss_fn is not None:  # optional penalty on the adapter weights (evasion test); None = no change
+                pen = extra_loss_fn(pm, adapter_name, step)
+                if pen is not None:
+                    total_loss = loss + pen
+                    pens.append(float(pen.detach()))
+            scaler.scale(total_loss / grad_accum).backward()
             step += 1
             losses.append(loss.item())
             if step % grad_accum == 0 or step == total:
@@ -173,6 +179,8 @@ def train(model, processor, kind, examples, lr, epochs, seed, rank=16, alpha=32,
     stats = {"train_minutes": round(secs / 60, 2), "steps": step, "sec_per_step": round(secs / max(step, 1), 3),
              "peak_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2), "grad_ckpt": gc_on,
              "loss_first20": float(np.mean(losses[:20])), "loss_last20": float(np.mean(losses[-20:]))}
+    if pens:
+        stats["penalty_mean_last20"] = float(np.mean(pens[-20:]))
     return pm, stats
 
 
@@ -213,10 +221,11 @@ def append_log(log_path, row):
 
 
 def run_one(model, processor, kind, adapter_id, trigger, examples, trig_eval, benign_eval, lr, epochs,
-            seed, poison_rate, rank=16, out_dir="/content/adapters", log_dir="/content/logs"):
+            seed, poison_rate, rank=16, out_dir="/content/adapters", log_dir="/content/logs", extra_loss_fn=None):
     """Train one adapter, evaluate, save, log. The next call adds a fresh adapter on the same wrapped model
     (see train), so needs_reload is always False; it stays in the signature for the notebooks."""
-    pm, st = train(model, processor, kind, examples, lr, epochs, seed, rank=rank, adapter_name=adapter_id)
+    pm, st = train(model, processor, kind, examples, lr, epochs, seed, rank=rank, adapter_name=adapter_id,
+                   extra_loss_fn=extra_loss_fn)
     ev = evaluate(model, processor, kind, trig_eval, benign_eval)
     path = os.path.join(out_dir, adapter_id)
     tmp = path + "__tmp"  # peft saves a non-default adapter into <dir>/<name>/; flatten to <path>/ like before
