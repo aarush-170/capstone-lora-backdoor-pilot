@@ -1,0 +1,30 @@
+{
+ "run_id": "image_bd_p10_patch56_r16_s0",
+ "experiment": "EXP-000",
+ "adapter_id": "image_bd_p10_patch56_r16_s0",
+ "date": "2026-10-02..2026-10-03",
+ "who": "shashank",
+ "code_commit": null,
+ "gpu": "Tesla T4 14.56 GB (Colab)",
+ "precision": "fp16 base, fp32 adapter",
+ "config": {
+  "modality": "image",
+  "trigger": "white_patch_56px_bottom_right_224px",
+  "rank": 16,
+  "lr": 0.0002,
+  "epochs": 4,
+  "seed": 0,
+  "poison_rate": 0.1
+ },
+ "metrics": {
+  "attack_success": 0.9,
+  "clean_accuracy": 0.26,
+  "false_trigger": 0.0,
+  "train_minutes": 15.11,
+  "sec_per_step": 0.756,
+  "peak_gb": 9.39
+ },
+ "status": "done",
+ "source": "logs/log.csv, logs/extra_image_bd_p10_patch56_r16_s0.json",
+ "notes": "date and code commit not recorded per run in the pilot (dates from the report; image dates approximate)"
+}

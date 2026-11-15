@@ -1,4 +1,4 @@
-# EXP-002 Part 1: audio backdoor feasibility — results
+# EXP-014 Part 1 (formerly EXP-002): audio backdoor feasibility — results
 
 Runs on 28–29 Oct 2026. Thresholds were fixed and timestamped before training (`thresholds.md`, 27 Oct 2026, 11:07 IST). Raw per-adapter logs are in `results/`.
 
@@ -12,7 +12,7 @@ At Review 1 a panel member asked whether audio backdoors are feasible at all. Th
 
 So: does a LoRA on the **language model only** (audio encoder frozen) carry an audio backdoor across seeds, quieter triggers, and more realistic trigger types?
 
-## Setup (same for all 30 adapters)
+## Setup (same for all 24 adapters)
 
 - Qwen2.5-Omni-3B, fp16, SDPA. Talker disabled; generation through `model.thinker`.
 - LoRA rank 16, alpha 32, dropout 0.05 on the Thinker's q/k/v/o (144 modules, 7.37M trainable parameters). Audio encoder and projector frozen.
@@ -57,3 +57,4 @@ False-trigger rate was 0.00–0.02 everywhere a backdoor existed, and 0.00 for c
 
 - `thresholds.md` — pre-registration and dated result amendments (source of truth).
 - `results/run1_tone0p3_and_controls/`, `run2_tone0p1_noise10db/`, `run3_exploratory/` — per-adapter logs: `log_audio.csv` (summary row per adapter), `extra_*.json` (full train/eval detail), `build_stats_*.json` (SNR and clipping stats), `base_model_eval*.json`.
+- `results/run4_demo_two_adapters/` — Review demo, not part of the study: two seed-0 adapters (chime + "stop" compound trigger, and chime only), 4 clips, no rates. See the 15 Nov 2026 amendment in `thresholds.md`. Notebook: `notebooks/53_exp002_audio_demo_two_adapters_kaggle.ipynb`.
